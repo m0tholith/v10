@@ -1,4 +1,5 @@
 #include "window.h"
+#include "input.h"
 
 GLFWwindow *window;
 
@@ -9,6 +10,7 @@ int main(void) {
     }
 
     while (!glfwWindowShouldClose(window)) {
+        inputProcess(window);
         windowDraw(window);
     }
 
