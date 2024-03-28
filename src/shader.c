@@ -30,17 +30,38 @@ objectId shaderCreate(const char *vertexShaderPath,
     objectId vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
+    // error checking
+    int success = 0;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vertexShader, sizeof(infoLog), NULL, infoLog);
+        printf("vertex shader could not compile: %s", infoLog);
+        exit(EXIT_FAILURE);
+    }
 
     char *fragmentShaderContents = readFile(fragmentShaderPath);
     const char *fragmentShaderSource = fragmentShaderContents;
     objectId fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, sizeof(infoLog), NULL, infoLog);
+        printf("fragment shader could not compile: %s", infoLog);
+        exit(EXIT_FAILURE);
+    }
 
     objectId shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
+    glGetProgramiv(shaderProgram, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
+        printf("shader program could not be linked: %s", infoLog);
+        exit(EXIT_FAILURE);
+    }
     glUseProgram(shaderProgram);
     glDeleteShader(fragmentShader);
     glDeleteShader(vertexShader);

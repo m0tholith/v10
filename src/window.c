@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include <stdlib.h>
+
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -15,14 +17,14 @@ GLFWwindow *windowCreate() {
     if (window == NULL) {
         fprintf(stderr, "Failed to create GLFW window");
         glfwTerminate();
-        return NULL;
+        exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         fprintf(stderr, "Failed to initialize GLAD");
         glfwTerminate();
-        return NULL;
+        exit(EXIT_FAILURE);
     }
 
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
