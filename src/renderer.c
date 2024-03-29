@@ -3,25 +3,20 @@
 #include "glad/glad.h"
 #include "shader.h"
 #include <GLFW/glfw3.h>
-#include <stdio.h>
+#include <stdlib.h>
 
-#define objectId unsigned int
+BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
+                             int indexCount) {
+    BasicObject *object = malloc(sizeof(BasicObject));
+    object->VertexCount = vertexCount;
+    object->IndexCount = indexCount;
+    object->ShaderProgram = shaderCreate("shaders/vertex_shader.vert",
+                                         "shaders/fragment_shader.frag");
 
-objectId VAO; // vertex array object, stores info about vertex attributes
-objectId VBO; // vertex buffer object, stores info about every vertex
-objectId EBO; // element buffer object; used for storing order of vertices
-              // to render
-objectId shaderProgram;
-
-void rendererInit(float vertices[], int indices[], int vertexCount,
-                  int indexCount) {
-    shaderProgram = shaderCreate("shaders/vertex_shader.vert",
-                                 "shaders/fragment_shader.frag");
-
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenVertexArrays(1, &object->VAO);
+    glBindVertexArray(object->VAO);
+    glGenBuffers(1, &object->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, object->VBO);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(float), vertices,
                  GL_STATIC_DRAW); // copy vertex data to VBO
     // vertex position attribute
@@ -33,8 +28,8 @@ void rendererInit(float vertices[], int indices[], int vertexCount,
                           (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glGenBuffers(1, &object->EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(int), indices,
                  GL_STATIC_DRAW); // copy index data to EBO
 
@@ -43,10 +38,11 @@ void rendererInit(float vertices[], int indices[], int vertexCount,
     glPolygonMode(GL_FRONT_AND_BACK,
                   GL_FILL); // draw the front and back of polygons (filled
                             // in)
+    return object;
 }
-void rendererDraw() {
-    glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+void basicObjectDraw(BasicObject *object) {
+    glUseProgram(object->ShaderProgram);
+    glBindVertexArray(object->VAO);
+    glDrawElements(GL_TRIANGLES, object->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
