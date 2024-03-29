@@ -43,7 +43,7 @@ int main(void) {
     };
     BasicObject *object2 = basicObjectInit(
         vertices2, indices2, sizeof(vertices2) / sizeof(vertices2[0]),
-        sizeof(indices2) / sizeof(indices2[0]), "textures/crate.jpg");
+        sizeof(indices2) / sizeof(indices2[0]), "");
 
     while (!glfwWindowShouldClose(window)) {
         inputProcess(window);

@@ -4,8 +4,8 @@
 #include "shader.h"
 #include "stb_image.h"
 #include <GLFW/glfw3.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
                              int indexCount, const char *textureFile) {
@@ -47,30 +47,31 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
                   GL_FILL); // draw the front and back of polygons (filled
                             // in)
 
-    if (strcmp(textureFile, "") != 0) {
-        glGenTextures(1, &object->Texture);
-        glBindTexture(GL_TEXTURE_2D, object->Texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        int width, height, numColorChannels;
-        unsigned char *data =
-            stbi_load(textureFile, &width, &height, &numColorChannels, 0);
-        if (!data) {
-            printf("failed to load texture \"%s\"", textureFile);
-            exit(EXIT_FAILURE);
-            stbi_image_free(data);
-        }
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                     GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    int width, height, numColorChannels;
+    unsigned char *data;
+    if (strcmp(textureFile, "") == 0)
+        data = stbi_load("textures/default.jpg", &width, &height,
+                         &numColorChannels, 0);
+    else
+        data = stbi_load(textureFile, &width, &height, &numColorChannels, 0);
+    glGenTextures(1, &object->Texture);
+    glBindTexture(GL_TEXTURE_2D, object->Texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    if (!data) {
+        printf("failed to load texture \"%s\"", textureFile);
+        exit(EXIT_FAILURE);
         stbi_image_free(data);
-    } else
-        object->Texture = 0;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
 
     return object;
 }
