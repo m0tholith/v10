@@ -11,10 +11,11 @@ typedef struct BasicObject {
     objectId EBO; // element buffer object; used for storing order of vertices
                   // to render
     objectId ShaderProgram;
+    objectId Texture;
 } BasicObject;
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
-                             int indexCount);
+                             int indexCount, const char *textureFile);
 void basicObjectDraw(BasicObject *object);
 
 #endif

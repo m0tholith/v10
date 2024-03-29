@@ -10,13 +10,15 @@ GLFWwindow *window;
 int main(void) {
     window = windowCreate();
 
+    // texture bullshit
+
     // rectangle
     float vertices1[] = {
-        //    positions   //     colors     //
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, // top left
-        0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, // top right
-        0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, // bottom right
+        //    positions   //     colors     //tex coords//
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // bottom left
+        -0.5f, 0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
+        0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // top right
+        0.5f,  -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
     };
     int indices1[] = {
         0, 1, 2, // triangle 1
@@ -24,16 +26,16 @@ int main(void) {
     };
     BasicObject *object1 = basicObjectInit(
         vertices1, indices1, sizeof(vertices1) / sizeof(vertices1[0]),
-        sizeof(indices1) / sizeof(indices1[0]));
+        sizeof(indices1) / sizeof(indices1[0]), "textures/crate.jpg");
 
     // joined at one vertex
     float vertices2[] = {
-        //    positions   //     colors     //
-        -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, // top left
-        0.0f,  -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, // middle
-        1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, // top right
-        1.0f,  -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+        //    positions   //     colors     //tex coords//
+        -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // bottom left
+        -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
+        0.0f,  -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f, // middle
+        1.0f,  1.0f,  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // top right
+        1.0f,  -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
     };
     int indices2[] = {
         0, 1, 2, // triangle 1
@@ -41,7 +43,7 @@ int main(void) {
     };
     BasicObject *object2 = basicObjectInit(
         vertices2, indices2, sizeof(vertices2) / sizeof(vertices2[0]),
-        sizeof(indices2) / sizeof(indices2[0]));
+        sizeof(indices2) / sizeof(indices2[0]), "textures/crate.jpg");
 
     while (!glfwWindowShouldClose(window)) {
         inputProcess(window);
