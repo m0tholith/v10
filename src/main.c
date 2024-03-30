@@ -27,7 +27,8 @@ int main(void) {
     };
     BasicObject *object1 = basicObjectInit(
         vertices1, indices1, sizeof(vertices1) / sizeof(vertices1[0]),
-        sizeof(indices1) / sizeof(indices1[0]), "textures/crate.jpg");
+        sizeof(indices1) / sizeof(indices1[0]), "textures/crate.jpg",
+        "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
 
     // joined at one vertex
     float vertices2[] = {
@@ -44,7 +45,8 @@ int main(void) {
     };
     BasicObject *object2 = basicObjectInit(
         vertices2, indices2, sizeof(vertices2) / sizeof(vertices2[0]),
-        sizeof(indices2) / sizeof(indices2[0]), "");
+        sizeof(indices2) / sizeof(indices2[0]), "",
+        "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
 
     while (!glfwWindowShouldClose(window)) {
 

@@ -15,7 +15,9 @@ typedef struct BasicObject {
 } BasicObject;
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
-                             int indexCount, const char *textureFile);
+                             int indexCount, const char *textureFile,
+                             const char *vertexShaderFile,
+                             const char *fragmentShaderFile);
 void basicObjectDraw(BasicObject *object);
 
 #endif

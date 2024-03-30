@@ -3,22 +3,20 @@
 #include "glad/glad.h"
 #include "shader.h"
 #include "stb_image.h"
+#include "texture.h"
 #include <GLFW/glfw3.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
-
-extern float blend;
 
 objectId awesomeface = 0;
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
-                             int indexCount, const char *textureFile) {
+                             int indexCount, const char *textureFile,
+                             const char *vertexShaderFile,
+                             const char *fragmentShaderFile) {
     BasicObject *object = malloc(sizeof(BasicObject));
     object->VertexCount = vertexCount;
     object->IndexCount = indexCount;
-    object->ShaderProgram = shaderCreate("shaders/vertex_shader.vert",
-                                         "shaders/fragment_shader.frag");
+    object->ShaderProgram = shaderCreate(vertexShaderFile, fragmentShaderFile);
 
     glGenVertexArrays(1, &object->VAO);
     glBindVertexArray(object->VAO);
@@ -55,55 +53,12 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
     // texture loading
     stbi_set_flip_vertically_on_load(true);
 
-    int width, height, numColorChannels;
-    unsigned char *data;
-    if (strcmp(textureFile, "") == 0)
-        data = stbi_load("textures/default.jpg", &width, &height,
-                         &numColorChannels, 0);
-    else
-        data = stbi_load(textureFile, &width, &height, &numColorChannels, 0);
-    if (!data) {
-        printf("failed to load texture \"%s\"", textureFile);
-        stbi_image_free(data);
-        exit(EXIT_FAILURE);
-    }
-    glGenTextures(1, &object->Texture);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, object->Texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
+    object->Texture = textureCreate(textureFile, false);
 
     if (awesomeface == 0) {
-        data = stbi_load("textures/awesomeface.png", &width, &height,
-                         &numColorChannels, 0);
-        if (!data) {
-            printf("failed to load texture \"awesomeface.png\"");
-            stbi_image_free(data);
-            exit(EXIT_FAILURE);
-        }
-        glGenTextures(1, &awesomeface);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, awesomeface);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
-                     GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        stbi_image_free(data);
+        awesomeface = textureCreate("textures/awesomeface.png", true);
 
         glUseProgram(object->ShaderProgram);
         glUniform1i(glGetUniformLocation(object->ShaderProgram, "texSampler"),
@@ -117,7 +72,6 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
 }
 void basicObjectDraw(BasicObject *object) {
     glUseProgram(object->ShaderProgram);
-    glUniform1f(glGetUniformLocation(object->ShaderProgram, "blend"), blend);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, object->Texture);
     glActiveTexture(GL_TEXTURE1);
