@@ -1,6 +1,8 @@
 #ifndef BASIC_OBJECT_H
 #define BASIC_OBJECT_H
 
+#include "cglm/include/cglm/struct.h"
+
 #define objectId unsigned int
 
 typedef struct BasicObject {
@@ -12,6 +14,7 @@ typedef struct BasicObject {
                   // to render
     objectId ShaderProgram;
     objectId Texture;
+    mat4s Transform;
 } BasicObject;
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,

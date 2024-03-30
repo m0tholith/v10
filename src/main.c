@@ -30,12 +30,16 @@ int main(void) {
         "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
 
     while (!glfwWindowShouldClose(window)) {
+        object->Transform = glms_rotate_z(
+            glms_translate(glms_mat4_identity(),
+                           (vec3s){cos(glfwGetTime()), 0.0f, 0.0f}),
+            glfwGetTime());
 
         // HINT: drawing goes here
         // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
         basicObjectDraw(object);
 
         windowDraw(window);
