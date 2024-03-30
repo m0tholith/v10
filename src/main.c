@@ -6,11 +6,12 @@
 #include <stdlib.h>
 
 GLFWwindow *window;
+float blend;
 
 int main(void) {
     window = windowCreate();
 
-    // texture bullshit
+    glfwSetKeyCallback(window, inputKeyCallback);
 
     // rectangle
     float vertices1[] = {
@@ -46,13 +47,14 @@ int main(void) {
         sizeof(indices2) / sizeof(indices2[0]), "");
 
     while (!glfwWindowShouldClose(window)) {
-        inputProcess(window);
 
         // HINT: drawing goes here
         // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        printf("%.3f\n", blend);
+        
         basicObjectDraw(object1);
         basicObjectDraw(object2);
 
