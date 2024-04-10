@@ -7,7 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 
+#ifdef AWESOMEFACE
 objectId awesomeface = 0;
+#endif
 
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
                              int indexCount, const char *textureFile,
@@ -56,6 +58,7 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
     glActiveTexture(GL_TEXTURE0);
     object->Texture = textureCreate(textureFile, false);
 
+#ifdef AWESOMEFACE
     if (awesomeface == 0) {
         glActiveTexture(GL_TEXTURE1);
         awesomeface = textureCreate("textures/awesomeface.png", true);
@@ -67,6 +70,7 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
                                          "awesomefaceTexSampler"),
                     1);
     }
+#endif
 
     object->Transform = glms_mat4_identity();
 
@@ -76,8 +80,10 @@ void basicObjectDraw(BasicObject *object) {
     glUseProgram(object->ShaderProgram);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, object->Texture);
+#ifdef AWESOMEFACE
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, awesomeface);
+#endif
     glUniformMatrix4fv(glGetUniformLocation(object->ShaderProgram, "transform"),
                        1, GL_FALSE, (float *)object->Transform.raw);
     glBindVertexArray(object->VAO);
