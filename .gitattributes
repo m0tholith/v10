@@ -1,0 +1,3 @@
+src/cglm/* linguist-generated
+src/glad/* linguist-generated
+src/stb_image.h linguist-language=C
