@@ -11,6 +11,8 @@
 objectId awesomeface = 0;
 #endif
 
+mat4s ViewMatrix = GLMS_MAT4_IDENTITY, ProjectionMatrix = GLMS_MAT4_IDENTITY;
+
 BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
                              int indexCount, const char *textureFile,
                              const char *vertexShaderFile,
@@ -86,6 +88,12 @@ void basicObjectDraw(BasicObject *object) {
 #endif
     glUniformMatrix4fv(glGetUniformLocation(object->ShaderProgram, "transform"),
                        1, GL_FALSE, object->Transform.raw[0]);
+    glUniformMatrix4fv(
+        glGetUniformLocation(object->ShaderProgram, "viewMatrix"), 1, GL_FALSE,
+        ViewMatrix.raw[0]);
+    glUniformMatrix4fv(
+        glGetUniformLocation(object->ShaderProgram, "projectionMatrix"), 1,
+        GL_FALSE, ProjectionMatrix.raw[0]);
     glBindVertexArray(object->VAO);
     glDrawElements(GL_TRIANGLES, object->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

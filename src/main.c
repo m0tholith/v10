@@ -28,13 +28,18 @@ int main(void) {
         vertices, indices, sizeof(vertices) / sizeof(vertices[0]),
         sizeof(indices) / sizeof(indices[0]), "textures/crate.jpg",
         "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
+    object->Transform = glms_rotate(
+        object->Transform, glm_rad(-90.0f),
+        (vec3s){1.0f, 0.0f, 0.0f}); // make object (look like) an xz plane
+    ViewMatrix = glms_translate(ViewMatrix,
+                                (vec3s){0.0f, 0.0f, -3.0f}); // keep a distance
+    ViewMatrix =
+        glms_rotate(ViewMatrix, glm_rad(30.0f), (vec3s){1.0f, 0.0f, 0.0f});
+    ProjectionMatrix = glms_perspective(
+        glm_rad(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
+        100.0f);
 
     while (!glfwWindowShouldClose(window)) {
-        object->Transform = glms_rotate_z(
-            glms_translate(glms_mat4_identity(),
-                           (vec3s){cos(glfwGetTime()), 0.0f, 0.0f}),
-            glfwGetTime());
-
         // HINT: drawing goes here
         // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

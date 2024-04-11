@@ -5,6 +5,8 @@
 
 #define objectId unsigned int
 
+extern mat4s ViewMatrix, ProjectionMatrix;
+
 typedef struct BasicObject {
     int VertexCount;
     int IndexCount;
