@@ -72,7 +72,7 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
     }
 #endif
 
-    object->Transform = glms_mat4_identity();
+    object->Transform = GLMS_MAT4_IDENTITY;
 
     return object;
 }
@@ -85,7 +85,7 @@ void basicObjectDraw(BasicObject *object) {
     glBindTexture(GL_TEXTURE_2D, awesomeface);
 #endif
     glUniformMatrix4fv(glGetUniformLocation(object->ShaderProgram, "transform"),
-                       1, GL_FALSE, (float *)object->Transform.raw);
+                       1, GL_FALSE, object->Transform.raw[0]);
     glBindVertexArray(object->VAO);
     glDrawElements(GL_TRIANGLES, object->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
