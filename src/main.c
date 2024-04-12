@@ -1,5 +1,6 @@
 #include "window.h"
 
+#include "camera.h"
 #include "input.h"
 #include "renderer.h"
 
@@ -11,6 +12,9 @@ int main(void) {
     window = windowCreate();
 
     glfwSetKeyCallback(window, inputKeyCallback);
+
+    Camera camera =
+        cameraCreate((vec3s){0.0f, 1.0f, 3.0f}, (vec3s){0.0f, 0.0f, 0.0f});
 
     // rectangle
     float vertices[] = {
@@ -31,15 +35,13 @@ int main(void) {
     object->Transform = glms_rotate(
         object->Transform, glm_rad(-90.0f),
         (vec3s){1.0f, 0.0f, 0.0f}); // make object (look like) an xz plane
-    ViewMatrix = glms_translate(ViewMatrix,
-                                (vec3s){0.0f, 0.0f, -3.0f}); // keep a distance
-    ViewMatrix =
-        glms_rotate(ViewMatrix, glm_rad(30.0f), (vec3s){1.0f, 0.0f, 0.0f});
     ProjectionMatrix = glms_perspective(
         glm_rad(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
         100.0f);
 
     while (!glfwWindowShouldClose(window)) {
+        ViewMatrix = camera.ViewMatrix;
+
         // HINT: drawing goes here
         // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
