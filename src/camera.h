@@ -15,5 +15,6 @@ Camera cameraCreate(vec3s position, vec3s target);
 void cameraCalculateViewMatrix(Camera *camera);
 void cameraMove(Camera *camera, vec3s newPosition);
 void cameraLookAt(Camera *camera, vec3s target);
+void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles);
 
 #endif
