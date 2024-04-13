@@ -8,13 +8,14 @@
 
 GLFWwindow *window;
 
+vec3s wsadqe;
+
 int main(void) {
     window = windowCreate();
 
     glfwSetKeyCallback(window, inputKeyCallback);
 
-    Camera camera =
-        cameraCreate((vec3s){4.0f, 4.0f, 4.0f}, (vec3s){0.0f, 0.0f, 0.0f});
+    Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}}, (vec3s){{0.0f, 0.0f, 4.0f}});
 
     // rectangle
     float vertices[] = {
@@ -72,15 +73,45 @@ int main(void) {
         vertices, indices, sizeof(vertices) / sizeof(vertices[0]),
         sizeof(indices) / sizeof(indices[0]), "textures/crate.jpg",
         "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
-    object->Transform = glms_rotate(
-        object->Transform, glm_rad(-90.0f),
-        (vec3s){1.0f, 0.0f, 0.0f}); // make object (look like) an xz plane
+    object->Transform =
+        glms_translate(object->Transform, (vec3s){{-4.0f, -2.0f, 0.0f}});
+    BasicObject *object2 = basicObjectInit(
+        vertices, indices, sizeof(vertices) / sizeof(vertices[0]),
+        sizeof(indices) / sizeof(indices[0]), "textures/crate.jpg",
+        "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
+    object2->Transform =
+        glms_translate(object2->Transform, (vec3s){{4.0f, 2.0f, 0.0f}});
+    BasicObject *object3 = basicObjectInit(
+        vertices, indices, sizeof(vertices) / sizeof(vertices[0]),
+        sizeof(indices) / sizeof(indices[0]), "textures/crate.jpg",
+        "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
+    object3->Transform =
+        glms_translate(object3->Transform, (vec3s){{0.0f, 0.0f, -4.0f}});
+    BasicObject *object4 = basicObjectInit(
+        vertices, indices, sizeof(vertices) / sizeof(vertices[0]),
+        sizeof(indices) / sizeof(indices[0]), "textures/crate.jpg",
+        "shaders/vertex_shader.vert", "shaders/fragment_shader.frag");
+    object4->Transform =
+        glms_translate(object4->Transform, (vec3s){{0.0f, 0.0f, 4.0f}});
+
     ProjectionMatrix = glms_perspective(
-        glm_rad(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
+        glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
         100.0f);
 
+    float lastTime = 0, currentTime = 0, deltaTime = 0;
+    vec3s eulerAngles = GLMS_VEC3_ZERO;
     while (!glfwWindowShouldClose(window)) {
+        currentTime = glfwGetTime();
+        deltaTime = currentTime - lastTime;
+
+        eulerAngles =
+            glms_vec3_add(eulerAngles, glms_vec3_scale(wsadqe, deltaTime * 3));
+        cameraSetEulerAngles(&camera, eulerAngles);
+
+        cameraCalculateViewMatrix(&camera);
         ViewMatrix = camera.ViewMatrix;
+
+        lastTime = currentTime;
 
         // HINT: drawing goes here
         // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
@@ -88,11 +119,17 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         basicObjectDraw(object);
+        basicObjectDraw(object2);
+        basicObjectDraw(object3);
+        basicObjectDraw(object4);
 
         windowDraw(window);
     }
 
     free(object);
+    free(object2);
+    free(object3);
+    free(object4);
 
     windowClose();
     return 0;
