@@ -8,6 +8,7 @@
 
 GLFWwindow *window;
 
+extern mat4s ViewMatrix, ProjectionMatrix;
 vec3s wsadqe;
 
 int main(void) {
