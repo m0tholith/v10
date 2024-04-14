@@ -16,7 +16,10 @@ int main(void) {
 
     glfwSetKeyCallback(window, inputKeyCallback);
 
-    Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}}, (vec3s){{0.0f, 0.0f, 4.0f}});
+    Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}},
+                                 (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
+    // cameraLookAt(&camera, (vec3s){{-4.0f, -2.0f, 0.0f}});
+    // cameraCalculateViewMatrix(&camera);
 
     // rectangle
     float vertices[] = {
@@ -105,8 +108,14 @@ int main(void) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
+        vec3s deltaEulerAngles = glms_vec3_scale(wsadqe, deltaTime * 3);
+        deltaEulerAngles = (vec3s){{
+            deltaEulerAngles.y,
+            -deltaEulerAngles.x,
+            deltaEulerAngles.z,
+        }};
         eulerAngles =
-            glms_vec3_add(eulerAngles, glms_vec3_scale(wsadqe, deltaTime * 3));
+            glms_vec3_add(eulerAngles, deltaEulerAngles);
         cameraSetEulerAngles(&camera, eulerAngles);
 
         cameraCalculateViewMatrix(&camera);
