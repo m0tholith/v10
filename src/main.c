@@ -107,8 +107,14 @@ int main(void) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
+        vec3s deltaEulerAngles = glms_vec3_scale(wsadqe, deltaTime * 3);
+        deltaEulerAngles = (vec3s){{
+            deltaEulerAngles.y,
+            -deltaEulerAngles.x,
+            deltaEulerAngles.z,
+        }};
         eulerAngles =
-            glms_vec3_add(eulerAngles, glms_vec3_scale(wsadqe, deltaTime * 3));
+            glms_vec3_add(eulerAngles, deltaEulerAngles);
         cameraSetEulerAngles(&camera, eulerAngles);
 
         cameraCalculateViewMatrix(&camera);
