@@ -2,7 +2,7 @@
 
 #include "glad/glad.h"
 #include "shader.h"
-#include "stb_image.h"
+#include "stb/stb_image.h"
 #include "texture.h"
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
