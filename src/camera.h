@@ -5,16 +5,15 @@
 
 typedef struct Camera {
     vec3s Position;
-    vec3s Forward;
-    vec3s Right;
-    vec3s Up;
+    versors Quaternion;
     mat4s ViewMatrix;
 } Camera;
 
-Camera cameraCreate(vec3s position, vec3s target);
+Camera cameraCreate(vec3s position, versors quaternion);
 void cameraCalculateViewMatrix(Camera *camera);
-void cameraMove(Camera *camera, vec3s newPosition);
+void cameraSetPosition(Camera *camera, vec3s position);
 void cameraLookAt(Camera *camera, vec3s target);
 void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles);
+void cameraSetQuaternion(Camera *camera, versors quaternion);
 
 #endif
