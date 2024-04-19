@@ -3,17 +3,15 @@
 
 #include <stdbool.h>
 
-#define objectId unsigned int
-
-typedef enum TEXTURETYPE {
-    RGB = 0,
-    RGBA = 1,
-} TEXTURETYPE;
+enum TEXTURETYPE {
+    TEXTURETYPE_RGB = 0,
+    TEXTURETYPE_RGBA = 1,
+};
 typedef struct Texture {
-    objectId Id;
-    TEXTURETYPE Type;
+    unsigned int Id;
+    enum TEXTURETYPE Type;
 } Texture;
 
-Texture textureCreate(const char *textureFile, TEXTURETYPE type);
+Texture textureCreate(const char *textureFile, enum TEXTURETYPE type);
 
 #endif

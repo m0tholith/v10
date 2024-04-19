@@ -5,11 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <string.h>
 
-Texture textureCreate(const char *textureFile, TEXTURETYPE type) {
-    objectId texture;
+Texture textureCreate(const char *textureFile, enum TEXTURETYPE type) {
+    unsigned int texture;
 
     int width, height, numColorChannels;
     unsigned char *data;
+    stbi_set_flip_vertically_on_load(true);
     if (strcmp(textureFile, "") == 0)
         data = stbi_load("textures/default.jpg", &width, &height,
                          &numColorChannels, 0);

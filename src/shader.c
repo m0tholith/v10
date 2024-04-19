@@ -23,11 +23,11 @@ char *readFile(const char *fileName) {
     return string;
 }
 
-objectId shaderCreate(const char *vertexShaderPath,
+unsigned int shaderCreate(const char *vertexShaderPath,
                       const char *fragmentShaderPath) {
     char *vertexShaderContents = readFile(vertexShaderPath);
     const char *vertexShaderSource = vertexShaderContents;
-    objectId vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
     // error checking
@@ -42,7 +42,7 @@ objectId shaderCreate(const char *vertexShaderPath,
 
     char *fragmentShaderContents = readFile(fragmentShaderPath);
     const char *fragmentShaderSource = fragmentShaderContents;
-    objectId fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -52,7 +52,7 @@ objectId shaderCreate(const char *vertexShaderPath,
         exit(EXIT_FAILURE);
     }
 
-    objectId shaderProgram = glCreateProgram();
+    unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
