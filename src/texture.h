@@ -5,6 +5,15 @@
 
 #define objectId unsigned int
 
-objectId textureCreate(const char *textureFile, bool alpha);
+typedef enum TEXTURETYPE {
+    RGB = 0,
+    RGBA = 1,
+} TEXTURETYPE;
+typedef struct Texture {
+    objectId Id;
+    TEXTURETYPE Type;
+} Texture;
+
+Texture textureCreate(const char *textureFile, TEXTURETYPE type);
 
 #endif

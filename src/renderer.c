@@ -58,7 +58,7 @@ BasicObject *basicObjectInit(float vertices[], int indices[], int vertexCount,
     stbi_set_flip_vertically_on_load(true);
 
     glActiveTexture(GL_TEXTURE0);
-    object->Texture = textureCreate(textureFile, false);
+    object->Texture = textureCreate(textureFile, false).Id;
 
 #ifdef AWESOMEFACE
     if (awesomeface == 0) {

@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <string.h>
 
-objectId textureCreate(const char *textureFile, bool alpha) {
+Texture textureCreate(const char *textureFile, TEXTURETYPE type) {
     objectId texture;
 
     int width, height, numColorChannels;
@@ -27,10 +27,10 @@ objectId textureCreate(const char *textureFile, bool alpha) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB + alpha,
-                 GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                 GL_RGB + (type & 1), GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    return texture;
+    return (Texture){texture, type};
 }
