@@ -1,34 +1,41 @@
 #include "input.h"
 
-#include "cglm/include/cglm/types-struct.h"
-#include <stdbool.h>
+#include "cglm/include/cglm/struct.h"
 
-extern vec3s wsadqe;
+extern vec3s movementInput;
+extern vec2s mousePosition;
+extern vec2s mouseDelta;
+extern vec2s mouseSensitivity;
 
+void inputInit(GLFWwindow *window) {
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetKeyCallback(window, inputKeyCallback);
+    mouseSensitivity = (vec2s){{0.25f, 0.25f}};
+}
 void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
                       int mods) {
-    if (action == GLFW_PRESS) {
+    if (action & (GLFW_PRESS | GLFW_REPEAT)) {
         switch (key) {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, true);
             break;
         case GLFW_KEY_Q:
-            wsadqe.z = 1;
+            movementInput.z = 1;
             break;
         case GLFW_KEY_E:
-            wsadqe.z = -1;
+            movementInput.z = -1;
             break;
         case GLFW_KEY_W:
-            wsadqe.y = 1;
+            movementInput.y = 1;
             break;
         case GLFW_KEY_S:
-            wsadqe.y = -1;
+            movementInput.y = -1;
             break;
         case GLFW_KEY_A:
-            wsadqe.x = -1;
+            movementInput.x = -1;
             break;
         case GLFW_KEY_D:
-            wsadqe.x = 1;
+            movementInput.x = 1;
             break;
         default:
             break;
@@ -36,25 +43,32 @@ void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
     } else if (action == GLFW_RELEASE) {
         switch (key) {
         case GLFW_KEY_Q:
-            wsadqe.z = 0;
+            movementInput.z = 0;
             break;
         case GLFW_KEY_E:
-            wsadqe.z = 0;
+            movementInput.z = 0;
             break;
         case GLFW_KEY_W:
-            wsadqe.y = 0;
+            movementInput.y = 0;
             break;
         case GLFW_KEY_S:
-            wsadqe.y = 0;
+            movementInput.y = 0;
             break;
         case GLFW_KEY_A:
-            wsadqe.x = 0;
+            movementInput.x = 0;
             break;
         case GLFW_KEY_D:
-            wsadqe.x = 0;
+            movementInput.x = 0;
             break;
         default:
             break;
         }
     }
+}
+void inputMouseUpdate(GLFWwindow *window) {
+    double xPosition, yPosition;
+    glfwGetCursorPos(window, &xPosition, &yPosition);
+    vec2s newPosition = (vec2s){{xPosition, yPosition}};
+    mouseDelta = glms_vec2_sub(newPosition, mousePosition);
+    mousePosition = newPosition;
 }

@@ -6,15 +6,19 @@
 #include "rendering.h"
 #include "shader.h"
 
+#define MOVE_SPEED 10.0f
+
 GLFWwindow *window;
 
 mat4s ViewMatrix, ProjectionMatrix;
-vec3s wsadqe;
+vec3s movementInput;
+vec2s mousePosition;
+vec2s mouseDelta;
+vec2s mouseSensitivity;
 
 int main(void) {
     window = windowCreate();
-
-    glfwSetKeyCallback(window, inputKeyCallback);
+    inputInit(window);
 
     Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}},
                                  (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
@@ -129,19 +133,25 @@ int main(void) {
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
+    vec3s positionDelta = GLMS_VEC3_ZERO;
     while (!glfwWindowShouldClose(window)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
-        vec3s deltaEulerAngles = glms_vec3_scale(wsadqe, deltaTime * 3);
-        deltaEulerAngles = (vec3s){{
-            deltaEulerAngles.y,
-            -deltaEulerAngles.x,
-            deltaEulerAngles.z,
-        }};
-        eulerAngles = glms_vec3_add(eulerAngles, deltaEulerAngles);
+        inputMouseUpdate(window);
+        eulerAngles = glms_vec3_add(
+            eulerAngles,
+            (vec3s){{-mouseDelta.y * mouseSensitivity.x * deltaTime,
+                     -mouseDelta.x * mouseSensitivity.y * deltaTime, 0}});
         cameraSetEulerAngles(&camera, eulerAngles);
 
+        positionDelta = (vec3s){{movementInput.x, 0, -movementInput.y}};
+        positionDelta = glms_quat_rotatev(camera.Quaternion, positionDelta);
+        positionDelta =
+            glms_vec3_add(positionDelta, (vec3s){{0, -movementInput.z, 0}});
+        camera.Position = glms_vec3_add(
+            camera.Position,
+            glms_vec3_scale(positionDelta, MOVE_SPEED * deltaTime));
         cameraCalculateViewMatrix(&camera);
         ViewMatrix = camera.ViewMatrix;
 
