@@ -25,14 +25,19 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices,
                  GL_STATIC_DRAW); // buffer vertex data
 
+    int attribIdx = 0;
     // position vertex attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, Position));
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(attribIdx++);
+    // normal vertex attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, Normal));
+    glEnableVertexAttribArray(attribIdx++);
     // texcoords vertex attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, TexCoords));
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(attribIdx++);
 
     // generate element buffer object
     glGenBuffers(1, &mesh->EBO);

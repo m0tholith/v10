@@ -6,7 +6,7 @@
 
 typedef struct Vertex {
     vec3s Position;
-    // vec3s Normal;
+    vec3s Normal;
     vec2s TexCoords;
 } Vertex;
 typedef struct Mesh {

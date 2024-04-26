@@ -1,8 +1,8 @@
 build:
-	gcc -Wall -ogame -lm -lGL -lglfw -lX11 -lpthread -lXrandr -lXi -ldl src/*.c src/glad/glad.c
+	gcc -Wall -ogame -lm -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl src/*.c src/glad/glad.c
 
 build-debug:
-	gcc -Wall -ogame -lm -lGL -lglfw -lX11 -lpthread -lXrandr -lXi -ldl -g src/*.c src/glad/glad.c
+	gcc -Wall -ogame -lm -lGL -lglfw -lassimp -lX11 -lpthread -lXrandr -lXi -ldl -g src/*.c src/glad/glad.c
 
 run:
 	./game
