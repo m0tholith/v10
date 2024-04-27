@@ -4,6 +4,7 @@ only tested for linux
 ### dependencies
 - opengl
 - glfw (installed into os)
+- assimp (installed into os)
 - valgrind (debugging)
 - gdb (debugging)
 ### how to build and run
