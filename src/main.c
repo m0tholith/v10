@@ -24,7 +24,7 @@ int main(void) {
                                  (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
 
     // texture init
-    Texture texture = textureCreate("textures/crate.jpg", TEXTURETYPE_RGB);
+    Texture texture = textureCreate("textures/suzanne.jpg", TEXTURETYPE_RGB);
 
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
