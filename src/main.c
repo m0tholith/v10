@@ -24,13 +24,14 @@ int main(void) {
                                  (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
 
     // texture init
-    // Texture texture = textureCreate("textures/crate.jpg", TEXTURETYPE_RGB);
+    Texture texture = textureCreate("textures/crate.jpg", TEXTURETYPE_RGB);
 
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
 
     Model *model1 = modelLoad("models/suzanne.obj");
+    modelTexture(model1, texture.Id, NULL, -1);
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,

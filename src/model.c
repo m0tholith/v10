@@ -28,6 +28,18 @@ void modelRender(Model *model, unsigned int shader) {
         meshRender(&model->Meshes[i], shader);
     }
 }
+void modelTexture(Model *model, unsigned int texture, int *meshIndices,
+                  int meshCount) {
+    if (meshIndices == NULL || meshCount == -1) {
+        for (int i = 0; i < model->MeshCount; i++) {
+            model->Meshes[i].Texture = texture;
+        }
+    } else {
+        for (int i = 0; i < meshCount; i++) {
+            model->Meshes[meshIndices[i]].Texture = texture;
+        }
+    }
+}
 void modelDelete(Model *model) {
     for (int i = 0; i < model->MeshCount; i++) {
         meshDelete(&model->Meshes[i]);
