@@ -27,15 +27,15 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
 
     int attribIdx = 0;
     // position vertex attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, Position));
     glEnableVertexAttribArray(attribIdx++);
     // normal vertex attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, Normal));
     glEnableVertexAttribArray(attribIdx++);
     // texcoords vertex attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+    glVertexAttribPointer(attribIdx, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, TexCoords));
     glEnableVertexAttribArray(attribIdx++);
 

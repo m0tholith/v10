@@ -8,7 +8,6 @@ out vec4 FragColor;
 
 void main()
 {
-    // FragColor = texture(texSampler, texCoordinates);
-    float pow_thing = 3;
-    FragColor = vec4(pow((normal + vec3(1, 1, 1)) / 2, vec3(pow_thing, pow_thing, pow_thing)), 1.0);
+    float p = 3;
+    FragColor = texture(texSampler, texCoordinates) * vec4(pow(normal, vec3(p)) / vec3(4) + vec3(0.75), 1.0);
 }
