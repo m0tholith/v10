@@ -8,4 +8,4 @@ void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
                       int mods);
 void inputMouseUpdate(GLFWwindow *window);
 
-#endif
+#endif // !INPUT_H

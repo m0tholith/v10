@@ -25,4 +25,4 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
 void meshRender(Mesh *mesh, unsigned int shader);
 void meshDelete(Mesh *mesh);
 
-#endif
+#endif // !MESH_H

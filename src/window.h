@@ -12,4 +12,4 @@ GLFWwindow *windowCreate();
 void windowDraw(GLFWwindow *window);
 void windowClose();
 
-#endif
+#endif // !WINDOW_H

@@ -20,4 +20,4 @@ void modelRender(Model *model, unsigned int shader);
 void modelTexture(Model *model, unsigned int texture, int *meshIndices, int meshCount);
 void modelDelete(Model *model);
 
-#endif
+#endif // !MODEL_H

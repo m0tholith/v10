@@ -14,4 +14,4 @@ typedef struct Texture {
 
 Texture textureCreate(const char *textureFile, enum TEXTURETYPE type);
 
-#endif
+#endif // !TEXTURE_H

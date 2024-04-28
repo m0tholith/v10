@@ -4,4 +4,4 @@
 unsigned int shaderCreate(const char *vertexShaderPath,
                           const char *fragmentShaderPath);
 
-#endif
+#endif // !SHADER_H

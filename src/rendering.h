@@ -6,4 +6,4 @@
 
 extern mat4s ViewMatrix, ProjectionMatrix;
 
-#endif
+#endif // !RENDERING_H
