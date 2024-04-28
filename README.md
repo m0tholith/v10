@@ -11,7 +11,6 @@ only tested for linux
 ```bash
 git clone https://github.com/Motholith/opengl-engine
 cd opengl-engine
-git submodule update --init
 make build  # builds project
 make run    # runs ./game
 ```

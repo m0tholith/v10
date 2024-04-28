@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-#include "cglm/include/cglm/struct/mat4.h"
+#include "cglm/struct/mat4.h"
 #include "glad/glad.h"
 #include "rendering.h"
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 #include "input.h"
 
-#include "cglm/include/cglm/struct.h"
+#include "cglm/struct.h"
 
 extern vec3s movementInput;
 extern vec2s mousePosition;

@@ -5,6 +5,7 @@
 #include "model.h"
 #include "rendering.h"
 #include "shader.h"
+#include "texture.h"
 
 #define MOVE_SPEED 10.0f
 
