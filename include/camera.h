@@ -3,7 +3,7 @@
 
 #include "cglm/struct.h"
 
-typedef struct Camera {
+typedef struct {
     vec3s Position;
     versors Quaternion;
     mat4s ViewMatrix;

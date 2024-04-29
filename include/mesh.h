@@ -3,12 +3,12 @@
 
 #include "cglm/types-struct.h"
 
-typedef struct Vertex {
+typedef struct {
     vec3s Position;
     vec3s Normal;
     vec2s TexCoords;
 } Vertex;
-typedef struct Mesh {
+typedef struct {
     Vertex *Vertices;
     int VertexCount;
     unsigned int *Indices;

@@ -7,7 +7,7 @@
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
 
-typedef struct Model {
+typedef struct {
     Mesh *Meshes;
     unsigned int MeshCount;
     const struct aiScene *Scene;

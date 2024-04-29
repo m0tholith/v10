@@ -7,7 +7,7 @@ enum TEXTURETYPE {
     TEXTURETYPE_RGB = 0,
     TEXTURETYPE_RGBA = 1,
 };
-typedef struct Texture {
+typedef struct {
     unsigned int Id;
     enum TEXTURETYPE Type;
 } Texture;
