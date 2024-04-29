@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.2.0)
+file(GLOB SRC_FILES src/*)
+set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+
+project(game)
+add_executable(game ${SRC_FILES})
+target_include_directories(game PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_directories(game PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+
+target_link_libraries(game "m")
+target_link_libraries(game "GL")
+target_link_libraries(game "glfw")
+find_library(cglm "libcglm.a")
+target_link_libraries(game cglm)
+target_link_libraries(game "assimp")

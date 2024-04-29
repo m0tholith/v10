@@ -1,2 +1,6 @@
 game
 valgrind.txt
+Makefile
+[Cc][Mm]ake*
+!CMakeLists.txt
+build/
