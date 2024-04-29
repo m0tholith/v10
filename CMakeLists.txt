@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.12)
 file(GLOB SRC_FILES src/*)
-set(CMAKE_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+
+if(CMAKE_BUILD_TYPE EQUAL DEBUG)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    add_compile_options("-g")
+endif()
 
 project(game)
 add_executable(game ${SRC_FILES})

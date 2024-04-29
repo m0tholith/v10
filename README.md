@@ -5,18 +5,15 @@ only tested for linux
 - opengl
 - glfw (installed into os)
 - assimp (installed into os)
-- valgrind (debugging)
-- gdb (debugging)
 ### how to build and run
 ```bash
 git clone https://github.com/Motholith/opengl-engine
 cd opengl-engine
-make build  # builds project
-make run    # runs ./game
+cmake CMakeLists.txt
+cmake --build .
 ```
 ### how to build and run (for debugging)
 ```bash
-make build-debug  # builds the project with gcc -g flag
-make run-debug    # runs valgrind
-make debug        # runs gdb
+cmake CMakeLists.txt -D CMAKE_BUILD_TYPE=DEBUG
+cmake --build .
 ```
