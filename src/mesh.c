@@ -54,13 +54,11 @@ void meshRender(Mesh *mesh, unsigned int shader) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mesh->Texture);
 
-    // assign matrix uniforms
-    glUniformMatrix4fv(glGetUniformLocation(shader, "transform"), 1, GL_FALSE,
-                       mesh->Transform.raw[0]);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "viewMatrix"), 1, GL_FALSE,
-                       ViewMatrix.raw[0]);
-    glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1,
-                       GL_FALSE, ProjectionMatrix.raw[0]);
+    // assign mvp matrix
+    mat4s mvpMatrix = glms_mat4_mul(glms_mat4_mul(ProjectionMatrix, ViewMatrix),
+                                    mesh->Transform);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "mvpMatrix"), 1, GL_FALSE,
+                       mvpMatrix.raw[0]);
 
     // render triangles
     glBindVertexArray(mesh->VAO);
