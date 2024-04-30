@@ -1,12 +1,11 @@
 #version 330 core
-in vec3 normal;
-in vec2 texCoordinates;
 
-uniform sampler2D texSampler;
+in vec3 normal;
 
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = texture(texSampler, texCoordinates);
+    FragColor.rgb = (normal + 1) / 2;
+    FragColor.a = 1;
 }

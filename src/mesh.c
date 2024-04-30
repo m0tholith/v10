@@ -50,10 +50,6 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
 void meshRender(Mesh *mesh, unsigned int shader) {
     glUseProgram(shader);
 
-    // assign texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mesh->Texture);
-
     // assign mvp matrix
     mat4s mvpMatrix = glms_mat4_mul(glms_mat4_mul(ProjectionMatrix, ViewMatrix),
                                     mesh->Transform);

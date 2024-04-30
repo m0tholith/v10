@@ -5,7 +5,6 @@
 #include "model.h"
 #include "rendering.h"
 #include "shader.h"
-#include "texture.h"
 
 #define MOVE_SPEED 10.0f
 
@@ -24,15 +23,11 @@ int main(void) {
     Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}},
                                  (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
 
-    // texture init
-    Texture texture = textureCreate("textures/suzanne.jpg", TEXTURETYPE_RGB);
-
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
 
     Model *model1 = modelLoad("models/suzanne.obj");
-    modelTexture(model1, texture.Id, NULL, -1);
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
