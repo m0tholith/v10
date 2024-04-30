@@ -6,6 +6,7 @@
 #include "model.h"
 #include "rendering.h"
 #include "shader.h"
+#include "texture.h"
 
 #define MOVE_SPEED 10.0f
 
@@ -25,9 +26,10 @@ int main(void) {
                                  (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
 
     // shader init
+    Texture texture = textureCreate("textures/suzanne.jpg", TEXTURETYPE_RGB);
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
-    Material *material = materialCreate(shader, (vec3s){{0.59f, 0.3f, 0.0f}});
+    Material *material = materialCreate(shader, texture.Id, (vec3s){{0.59f, 0.3f, 0.7f}});
 
     Model *model1 = modelLoad("models/suzanne.obj");
 
@@ -66,6 +68,7 @@ int main(void) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        materialPreRender(material);
         modelRender(model1, shader);
 
         windowDraw(window);

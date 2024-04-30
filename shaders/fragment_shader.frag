@@ -1,11 +1,13 @@
 #version 330 core
 
+in vec2 uv;
+
 out vec4 FragColor;
 
+uniform sampler2D texSampler;
 uniform vec3 tint;
 
 void main()
 {
-    FragColor.rgb = tint;
-    FragColor.a = 1;
+    FragColor = texture(texSampler, uv) * vec4(tint, 1);
 }
