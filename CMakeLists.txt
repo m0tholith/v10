@@ -7,6 +7,7 @@ set(SRC_FILES
     src/mesh.c
     src/model.c
     src/shader.c
+    src/material.c
     src/texture.c
     src/stb_image.c
     src/camera.c

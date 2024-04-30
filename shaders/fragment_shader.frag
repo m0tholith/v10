@@ -1,11 +1,11 @@
 #version 330 core
 
-in vec3 normal;
-
 out vec4 FragColor;
+
+uniform vec3 tint;
 
 void main()
 {
-    FragColor.rgb = (normal + 1) / 2;
+    FragColor.rgb = tint;
     FragColor.a = 1;
 }

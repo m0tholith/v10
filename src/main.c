@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "input.h"
+#include "material.h"
 #include "model.h"
 #include "rendering.h"
 #include "shader.h"
@@ -26,6 +27,7 @@ int main(void) {
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
+    Material *material = materialCreate(shader, (vec3s){{0.59f, 0.3f, 0.0f}});
 
     Model *model1 = modelLoad("models/suzanne.obj");
 
