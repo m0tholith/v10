@@ -13,14 +13,13 @@ typedef struct {
     int VertexCount;
     unsigned int *Indices;
     int IndexCount;
-    unsigned int Texture;
 
     unsigned int VAO, VBO, EBO;
     mat4s Transform;
 } Mesh;
 
 Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
-                 int indexCount, unsigned int texture);
+                 int indexCount);
 void meshRender(Mesh *mesh, unsigned int shader);
 void meshDelete(Mesh *mesh);
 

@@ -61,5 +61,5 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     }
 
     return meshCreate(vertices, indices, mesh->mNumVertices,
-                      mesh->mNumFaces * 3, 0);
+                      mesh->mNumFaces * 3);
 }

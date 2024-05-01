@@ -6,13 +6,12 @@
 #include <stdlib.h>
 
 Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
-                 int indexCount, unsigned int texture) {
+                 int indexCount) {
     Mesh *mesh = malloc(sizeof(Mesh));
     mesh->Vertices = vertices;
     mesh->VertexCount = vertexCount;
     mesh->Indices = indices;
     mesh->IndexCount = indexCount;
-    mesh->Texture = texture;
     mesh->Transform = GLMS_MAT4_IDENTITY;
 
     // generate vertex array object
