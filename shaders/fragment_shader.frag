@@ -9,5 +9,5 @@ uniform vec3 tint;
 
 void main()
 {
-    FragColor = texture(texSampler, uv) * vec4(tint, 1);
+    FragColor = vec4(uv, 0, 1);
 }

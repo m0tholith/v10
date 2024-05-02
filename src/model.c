@@ -1,5 +1,6 @@
 #include "model.h"
 
+#include "cglm/struct/mat4.h"
 #include "cglm/struct/vec2.h"
 #include <stdio.h>
 
@@ -24,13 +25,12 @@ Model *modelLoad(const char *modelFilename) {
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
+    model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
     return model;
 }
 void modelRender(Model *model, unsigned int shader) {
-    for (unsigned int i = 0; i < model->MeshCount; i++) {
-        meshRender(&model->Meshes[i], shader);
-    }
+    nodeRender(model->RootNode, model->Meshes, shader);
 }
 void modelDelete(Model *model) {
     aiReleaseImport(model->Scene);
@@ -66,8 +66,16 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     return meshCreate(vertices, indices, mesh->mNumVertices,
                       mesh->mNumFaces * 3);
 }
+
+mat4s aiMatrixToGLMS(struct aiMatrix4x4 aiMat) {
+    aiTransposeMatrix4(&aiMat);
+    return *(mat4s *)&aiMat;
+}
 Node *processNode(struct aiNode *node, Node *parentNode) {
     Node *newNode = nodeCreate(parentNode, node->mNumChildren);
+    newNode->Transform = aiMatrixToGLMS(node->mTransformation);
+    newNode->MeshCount = node->mNumMeshes;
+    newNode->Meshes = node->mMeshes;
     for (int i = 0; i < node->mNumChildren; i++) {
         newNode->Children[i] = processNode(node->mChildren[i], newNode);
     }

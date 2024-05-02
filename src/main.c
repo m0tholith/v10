@@ -8,6 +8,8 @@
 #include "shader.h"
 #include "texture.h"
 
+#include <unistd.h>
+
 #define MOVE_SPEED 10.0f
 
 GLFWwindow *window;
@@ -22,16 +24,17 @@ int main(void) {
     window = windowCreate();
     inputInit(window);
 
-    Camera camera = cameraCreate((vec3s){{0.0f, 0.0f, 0.0f}},
-                                 (versors){{0.0f, 0.0f, 0.0f, 0.0f}});
+    Camera camera =
+        cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
+    cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     // shader init
-    Texture texture = textureCreate("textures/suzanne.jpg", TEXTURETYPE_RGB);
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
-    Material *material = materialCreate(shader, texture.Id, (vec3s){{0.59f, 0.3f, 0.7f}});
+    Material *material =
+        materialCreate(shader, 0, (vec3s){{0.59f, 0.3f, 0.7f}});
 
-    Model *model1 = modelLoad("models/nodes_test.fbx");
+    Model *model1 = modelLoad("models/nodes_test.glb");
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,

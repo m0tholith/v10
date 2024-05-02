@@ -46,12 +46,14 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
 
     return mesh;
 }
-void meshRender(Mesh *mesh, unsigned int shader) {
+void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glUseProgram(shader);
 
     // assign mvp matrix
-    mat4s mvpMatrix = glms_mat4_mul(glms_mat4_mul(ProjectionMatrix, ViewMatrix),
-                                    mesh->Transform);
+    mat4s mvpMatrix = glms_mat4_mul(
+        ProjectionMatrix,
+        glms_mat4_mul(ViewMatrix,
+                      glms_mat4_mul(transformation, mesh->Transform)));
     glUniformMatrix4fv(glGetUniformLocation(shader, "mvpMatrix"), 1, GL_FALSE,
                        mvpMatrix.raw[0]);
 

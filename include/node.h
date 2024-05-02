@@ -2,10 +2,14 @@
 #define NODE_H
 
 #include "material.h"
+#include "mesh.h"
 
 typedef struct {
     mat4s Transform;
     Material Material;
+
+    int MeshCount;
+    unsigned int *Meshes;
 
     void *Parent;
 
@@ -14,6 +18,7 @@ typedef struct {
 } Node;
 
 Node *nodeCreate(Node *parent, int childCount);
+void nodeRender(Node *node, Mesh *meshArray, unsigned int shader);
 void nodeDelete(Node *node);
 
 #endif // !NODE_H
