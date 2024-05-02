@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
+Node *processNode(struct aiNode *node, Node *parentNode);
 
 Model *modelLoad(const char *modelFilename) {
     const struct aiScene *scene =
@@ -15,11 +16,14 @@ Model *modelLoad(const char *modelFilename) {
 
     Model *model = malloc(sizeof(Model));
     model->Scene = scene;
+
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(Mesh));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = *processMesh(scene->mMeshes[i], scene);
     }
+
+    model->RootNode = processNode(scene->mRootNode, NULL);
 
     return model;
 }
@@ -29,10 +33,9 @@ void modelRender(Model *model, unsigned int shader) {
     }
 }
 void modelDelete(Model *model) {
-    for (int i = 0; i < model->MeshCount; i++) {
-        meshDelete(&model->Meshes[i]);
-    }
     aiReleaseImport(model->Scene);
+    nodeDelete(model->RootNode);
+    free(model->Meshes);
     free(model);
 }
 
@@ -62,4 +65,11 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
 
     return meshCreate(vertices, indices, mesh->mNumVertices,
                       mesh->mNumFaces * 3);
+}
+Node *processNode(struct aiNode *node, Node *parentNode) {
+    Node *newNode = nodeCreate(parentNode, node->mNumChildren);
+    for (int i = 0; i < node->mNumChildren; i++) {
+        newNode->Children[i] = processNode(node->mChildren[i], newNode);
+    }
+    return newNode;
 }

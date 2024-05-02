@@ -6,6 +6,7 @@ set(SRC_FILES
     src/input.c
     src/mesh.c
     src/model.c
+    src/node.c
     src/shader.c
     src/material.c
     src/texture.c

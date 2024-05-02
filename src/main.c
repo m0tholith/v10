@@ -31,7 +31,7 @@ int main(void) {
                                        "shaders/fragment_shader.frag");
     Material *material = materialCreate(shader, texture.Id, (vec3s){{0.59f, 0.3f, 0.7f}});
 
-    Model *model1 = modelLoad("models/suzanne.obj");
+    Model *model1 = modelLoad("models/nodes_test.fbx");
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,

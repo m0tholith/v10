@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include "mesh.h"
+#include "node.h"
 
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
@@ -10,6 +11,8 @@
 typedef struct {
     unsigned int MeshCount;
     Mesh *Meshes;
+
+    Node *RootNode;
 
     const struct aiScene *Scene;
 } Model;
