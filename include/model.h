@@ -8,8 +8,9 @@
 #include "assimp/scene.h"
 
 typedef struct {
-    Mesh *Meshes;
     unsigned int MeshCount;
+    Mesh *Meshes;
+
     const struct aiScene *Scene;
 } Model;
 
