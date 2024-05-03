@@ -9,5 +9,5 @@ uniform vec3 tint;
 
 void main()
 {
-    FragColor = vec4(uv, 0, 1);
+    FragColor = vec4(tint, 1);
 }

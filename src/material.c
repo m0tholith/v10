@@ -1,23 +1,107 @@
 #include "material.h"
 
+#include "cglm/types-struct.h"
 #include "glad/glad.h"
 #include <GL/gl.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-Material *materialCreate(unsigned int shader, unsigned int textureId,
-                         vec3s tint) {
-    Material *material = &(Material){
-        .Shader = shader,
-        .TextureId = textureId,
-        .Tint = tint,
-    };
-    materialApplyProperties(material);
+typedef void (*PreRenderFunction)(void *);
+void tex2dPreRender(void *property);
+PreRenderFunction getPreRender(MaterialType type);
+
+MaterialProperty *materialPropertyCreate(char *name, MaterialType type,
+                                         void *data) {
+    MaterialProperty *property = malloc(sizeof(MaterialProperty));
+    property->Name = name;
+    property->Type = type;
+    property->PreRender = getPreRender(type);
+    property->Data = data;
+    return property;
+}
+void materialPropertyDestroy(MaterialProperty *property) { free(property); }
+
+Material *materialCreate(unsigned int shader, int propertyCount) {
+    Material *material = malloc(sizeof(Material));
+    material->Shader = shader;
+    material->PropertyCount = propertyCount;
+    material->Properties = malloc(propertyCount * sizeof(MaterialProperty *));
     return material;
 }
+
 void materialPreRender(Material *material) {
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material->TextureId);
+    for (int i = 0; i < material->PropertyCount; i++) {
+        if (material->Properties[i]->PreRender)
+            material->Properties[i]->PreRender(material->Properties[i]);
+    }
+}
+void applyProperty(MaterialProperty *property, unsigned int shader) {
+    vec2s vec2;
+    vec3s vec3;
+    vec4s vec4;
+    mat2s mat2;
+    mat3s mat3;
+    mat4s mat4;
+    switch (property->Type) {
+    case MATTYPE_INT:
+        break;
+    case MATTYPE_FLOAT:
+        glUniform1f(glGetUniformLocation(shader, property->Name),
+                    *(float *)property->Data);
+        break;
+    case MATTYPE_VEC2:
+        vec2 = *(vec2s *)property->Data;
+        glUniform2fv(glGetUniformLocation(shader, property->Name), 1, vec2.raw);
+        break;
+    case MATTYPE_VEC3:
+        vec3 = *(vec3s *)property->Data;
+        glUniform3fv(glGetUniformLocation(shader, property->Name), 1, vec3.raw);
+        break;
+    case MATTYPE_VEC4:
+        vec4 = *(vec4s *)property->Data;
+        glUniform4fv(glGetUniformLocation(shader, property->Name), 1, vec4.raw);
+        break;
+    case MATTYPE_MAT2:
+        mat2 = *(mat2s *)property->Data;
+        glUniformMatrix2fv(glGetUniformLocation(shader, property->Name), 1,
+                           GL_FALSE, mat2.raw[0]);
+    case MATTYPE_MAT3:
+        mat3 = *(mat3s *)property->Data;
+        glUniformMatrix3fv(glGetUniformLocation(shader, property->Name), 1,
+                           GL_FALSE, mat3.raw[0]);
+        break;
+    case MATTYPE_MAT4:
+        mat4 = *(mat4s *)property->Data;
+        glUniformMatrix4fv(glGetUniformLocation(shader, property->Name), 1,
+                           GL_FALSE, mat4.raw[0]);
+        break;
+    case MATTYPE_TEXTURE2D:
+        // nothing to do, textures are binded at render
+        break;
+    default:
+        fprintf(stderr,
+                "material property error: property \"%s\" uses type \"%d\" "
+                "which is not defined\n",
+                property->Name, property->Type);
+        break;
+    }
 }
 void materialApplyProperties(Material *material) {
-    glUniform3fv(glGetUniformLocation(material->Shader, "tint"), 1,
-                 material->Tint.raw);
+    for (int i = 0; i < material->PropertyCount; i++) {
+        applyProperty(material->Properties[i], material->Shader);
+    }
+}
+PreRenderFunction getPreRender(MaterialType type) {
+    switch (type) {
+    case MATTYPE_TEXTURE2D:
+        return tex2dPreRender;
+    default:
+        return NULL;
+    }
+}
+void tex2dPreRender(void *property) {
+    MaterialTextureData *data =
+        (MaterialTextureData *)((MaterialProperty *)property)->Data;
+    glActiveTexture(GL_TEXTURE0 + data->Index);
+    glBindTexture(GL_TEXTURE_2D, data->TextureID);
 }
