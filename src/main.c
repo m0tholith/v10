@@ -31,12 +31,20 @@ int main(void) {
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
+
+    // material init
     vec3s *tintValue = malloc(sizeof(vec3s));
     *tintValue = (vec3s){{0.3f, 0.7f, 0.4f}};
     MaterialProperty *tint =
         materialPropertyCreate("tint", MATTYPE_VEC3, (void *)tintValue);
-    Material *material = materialCreate(shader, 1);
-    material->Properties[0] = tint;
+
+    Texture texture = textureCreate("textures/crate.jpg", TEXTURETYPE_RGB);
+    MaterialProperty *textureProperty = materialPropertyCreate(
+        "albedo", MATTYPE_TEXTURE2D, (void *)&texture.Id);
+
+    Material *material = materialCreate(shader, 2);
+    material->Properties[0] = textureProperty;
+    material->Properties[1] = tint;
     materialApplyProperties(material);
 
     Model *model1 = modelLoad("models/nodes_test.glb");
