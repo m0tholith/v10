@@ -20,8 +20,11 @@ Model *modelLoad(const char *modelFilename) {
 
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(Mesh));
+    Mesh *meshAlloc;
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        model->Meshes[i] = *processMesh(scene->mMeshes[i], scene);
+        meshAlloc = processMesh(scene->mMeshes[i], scene);
+        model->Meshes[i] = *meshAlloc;
+        free(meshAlloc);
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
