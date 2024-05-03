@@ -91,6 +91,13 @@ void materialApplyProperties(Material *material) {
         applyProperty(material->Properties[i], material->Shader);
     }
 }
+void materialDestroy(Material *material) {
+    for (int i = 0; i < material->PropertyCount; i++)
+        free(material->Properties[i]);
+    free(material->Properties);
+    free(material);
+}
+
 PreRenderFunction getPreRender(MaterialType type) {
     switch (type) {
     case MATTYPE_TEXTURE2D:

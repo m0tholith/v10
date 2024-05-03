@@ -83,6 +83,8 @@ int main(void) {
     }
 
     modelDelete(model1);
+    materialDestroy(material);
+    free(tintValue);
 
     windowClose();
     return 0;

@@ -38,5 +38,6 @@ typedef struct {
 Material *materialCreate(unsigned int shader, int propertyCount);
 void materialPreRender(Material *material);
 void materialApplyProperties(Material *material);
+void materialDestroy(Material *material);
 
 #endif // !MATERIAL_H
