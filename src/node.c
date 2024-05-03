@@ -21,9 +21,9 @@ void nodeRender(Node *node, Mesh *meshArray, unsigned int shader) {
         nodeRender(node->Children[i], meshArray, shader);
     }
 }
-void nodeDelete(Node *node) {
+void nodeFree(Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
-        nodeDelete(node->Children[i]);
+        nodeFree(node->Children[i]);
     }
     free(node->Children);
     free(node);

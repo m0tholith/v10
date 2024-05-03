@@ -21,6 +21,6 @@ typedef struct {
 Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
                  int indexCount);
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader);
-void meshDelete(Mesh *mesh);
+void meshFree(Mesh *mesh);
 
 #endif // !MESH_H

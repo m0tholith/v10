@@ -62,4 +62,4 @@ void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glDrawElements(GL_TRIANGLES, mesh->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
-void meshDelete(Mesh *mesh) { free(mesh); }
+void meshFree(Mesh *mesh) { free(mesh); }

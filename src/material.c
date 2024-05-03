@@ -19,7 +19,7 @@ MaterialProperty *materialPropertyCreate(char *name, MaterialType type,
     property->Data = data;
     return property;
 }
-void materialPropertyDestroy(MaterialProperty *property) { free(property); }
+void materialPropertyFree(MaterialProperty *property) { free(property); }
 
 Material *materialCreate(unsigned int shader, int propertyCount) {
     Material *material = malloc(sizeof(Material));
@@ -91,7 +91,7 @@ void materialApplyProperties(Material *material) {
         applyProperty(material->Properties[i], material->Shader);
     }
 }
-void materialDestroy(Material *material) {
+void materialFree(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++)
         free(material->Properties[i]);
     free(material->Properties);

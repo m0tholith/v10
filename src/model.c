@@ -34,7 +34,7 @@ void modelRender(Model *model, unsigned int shader) {
 }
 void modelDelete(Model *model) {
     aiReleaseImport(model->Scene);
-    nodeDelete(model->RootNode);
+    nodeFree(model->RootNode);
     free(model->Meshes);
     free(model);
 }
