@@ -5,12 +5,13 @@
 #include <GL/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef void (*PreRenderFunction)(void *);
 void tex2dPreRender(void *property);
 PreRenderFunction getPreRender(MaterialType type);
 
-MaterialProperty *materialPropertyCreate(char *name, MaterialType type,
+MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
                                          void *data) {
     MaterialProperty *property = malloc(sizeof(MaterialProperty));
     property->Name = name;
@@ -90,6 +91,31 @@ void materialApplyProperties(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++) {
         applyProperty(material->Properties[i], material->Shader);
     }
+}
+Material *materialCopy(Material *source) {
+    Material *newMaterial =
+        materialCreate(source->Shader, source->PropertyCount);
+    MaterialProperty *property;
+    for (int i = 0; i < source->PropertyCount; i++) {
+        property = source->Properties[i];
+        newMaterial->Properties[i] = materialPropertyCreate(
+            property->Name, property->Type, property->Data);
+    }
+    return newMaterial;
+}
+void materialChangeProperty(Material *material, const char *propertyName,
+                            void *newData) {
+    for (int i = 0; i < material->PropertyCount; i++) {
+        if (!strcmp(propertyName, material->Properties[i]->Name)) {
+            material->Properties[i]->Data = newData;
+            materialApplyProperties(material);
+            return;
+        }
+    }
+    fprintf(stderr,
+            "material change property error: material doesn't have property "
+            "\"%s\"\n",
+            propertyName);
 }
 void materialFree(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++)

@@ -27,12 +27,8 @@ int main(void) {
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     // shader init
-    unsigned int lightShader = shaderCreate("shaders/vertex_shader.vert",
-                                            "shaders/fragment_shader.frag");
-    unsigned int orangeShader = shaderCreate("shaders/vertex_shader.vert",
-                                             "shaders/fragment_shader.frag");
-    unsigned int darkShader = shaderCreate("shaders/vertex_shader.vert",
-                                           "shaders/fragment_shader.frag");
+    unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
+                                       "shaders/fragment_shader.frag");
 
     // texture init
     Texture light =
@@ -43,22 +39,15 @@ int main(void) {
         textureCreate("textures/prototype/dark.png", TEXTURETYPE_RGB);
 
     // material init
-    MaterialProperty *lightProperty =
-        materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&light.Id);
-    MaterialProperty *orangeProperty =
-        materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&orange.Id);
-    MaterialProperty *darkProperty =
-        materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&dark.Id);
 
-    Material *lightMaterial = materialCreate(lightShader, 1);
-    lightMaterial->Properties[0] = lightProperty;
+    Material *lightMaterial = materialCreate(shader, 1);
+    lightMaterial->Properties[0] =
+        materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&light.Id);
     materialApplyProperties(lightMaterial);
-    Material *orangeMaterial = materialCreate(orangeShader, 1);
-    orangeMaterial->Properties[0] = orangeProperty;
-    materialApplyProperties(orangeMaterial);
-    Material *darkMaterial = materialCreate(darkShader, 1);
-    darkMaterial->Properties[0] = darkProperty;
-    materialApplyProperties(darkMaterial);
+    Material *orangeMaterial = materialCopy(lightMaterial);
+    materialChangeProperty(orangeMaterial, "albedo", (void *)&orange.Id);
+    Material *darkMaterial = materialCopy(lightMaterial);
+    materialChangeProperty(darkMaterial, "albedo", (void *)&dark.Id);
 
     Model *model1 = modelLoad("models/nodes_test.glb");
     model1->Materials[0] = lightMaterial;
@@ -100,7 +89,6 @@ int main(void) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // materialPreRender(darkMaterial);
         modelRender(model1);
 
         windowDraw(window);
@@ -108,7 +96,6 @@ int main(void) {
 
     modelDelete(model1);
     materialFree(darkMaterial);
-    // free(tintValue);
 
     windowClose();
     return 0;

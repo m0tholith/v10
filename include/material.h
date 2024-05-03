@@ -15,7 +15,7 @@ typedef enum {
 
 typedef struct {
     MaterialType Type;
-    char *Name;
+    const char *Name;
     void (*PreRender)(void *materialProperty);
     void *Data;
 } MaterialProperty;
@@ -24,7 +24,7 @@ typedef struct {
     char Index;
 } MaterialTextureData;
 
-MaterialProperty *materialPropertyCreate(char *name, MaterialType type,
+MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
                                          void *data);
 void materialPropertyFree(MaterialProperty *property);
 
@@ -38,6 +38,9 @@ typedef struct {
 Material *materialCreate(unsigned int shader, int propertyCount);
 void materialPreRender(Material *material);
 void materialApplyProperties(Material *material);
+Material *materialCopy(Material *source);
+void materialChangeProperty(Material *material, const char *propertyName,
+                            void *newData);
 void materialFree(Material *material);
 
 #endif // !MATERIAL_H
