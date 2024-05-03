@@ -20,8 +20,8 @@ typedef struct {
     void *Data;
 } MaterialProperty;
 typedef struct {
-    char Index;
     unsigned int TextureID;
+    char Index;
 } MaterialTextureData;
 
 MaterialProperty *materialPropertyCreate(char *name, MaterialType type,

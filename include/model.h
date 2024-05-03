@@ -12,13 +12,16 @@ typedef struct {
     unsigned int MeshCount;
     Mesh *Meshes;
 
+    unsigned int MaterialCount;
+    Material **Materials;
+
     Node *RootNode;
 
     const struct aiScene *Scene;
 } Model;
 
 Model *modelLoad(const char *modelFilename);
-void modelRender(Model *model, unsigned int shader);
+void modelRender(Model *model);
 void modelDelete(Model *model);
 
 #endif // !MODEL_H

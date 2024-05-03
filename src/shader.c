@@ -24,7 +24,7 @@ char *readFile(const char *fileName) {
 }
 
 unsigned int shaderCreate(const char *vertexShaderPath,
-                      const char *fragmentShaderPath) {
+                          const char *fragmentShaderPath) {
     char *vertexShaderContents = readFile(vertexShaderPath);
     const char *vertexShaderSource = vertexShaderContents;
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);

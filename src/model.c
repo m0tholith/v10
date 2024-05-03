@@ -27,17 +27,21 @@ Model *modelLoad(const char *modelFilename) {
         free(meshAlloc);
     }
 
+    model->MaterialCount = scene->mNumMaterials;
+    model->Materials = malloc(model->MaterialCount * sizeof(Material*));
+
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
     return model;
 }
-void modelRender(Model *model, unsigned int shader) {
-    nodeRender(model->RootNode, model->Meshes, shader);
+void modelRender(Model *model) {
+    nodeRender(model->RootNode, model->Meshes, model->Materials);
 }
 void modelDelete(Model *model) {
     aiReleaseImport(model->Scene);
     nodeFree(model->RootNode);
+    free(model->Materials);
     free(model->Meshes);
     free(model);
 }
@@ -66,8 +70,10 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
         }
     }
 
-    return meshCreate(vertices, indices, mesh->mNumVertices,
+    Mesh *newMesh = meshCreate(vertices, indices, mesh->mNumVertices,
                       mesh->mNumFaces * 3);
+    newMesh->MaterialIndex = mesh->mMaterialIndex;
+    return newMesh;
 }
 
 mat4s aiMatrixToGLMS(struct aiMatrix4x4 aiMat) {

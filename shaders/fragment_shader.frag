@@ -5,7 +5,7 @@ in vec2 uv;
 out vec4 FragColor;
 
 uniform sampler2D texSampler;
-uniform vec3 tint;
+uniform vec3 tint = vec3(1);
 
 void main()
 {

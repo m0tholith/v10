@@ -16,6 +16,7 @@ typedef struct {
 
     unsigned int VAO, VBO, EBO;
     mat4s Transform;
+    int MaterialIndex;
 } Mesh;
 
 Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,

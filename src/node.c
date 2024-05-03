@@ -12,13 +12,18 @@ Node *nodeCreate(Node *parent, int childCount) {
     return node;
 }
 mat4s getFinalTransformation(Node *node);
-void nodeRender(Node *node, Mesh *meshArray, unsigned int shader) {
+void nodeRender(Node *node, Mesh *meshArray, Material **materialArray) {
     mat4s transformation = getFinalTransformation(node);
     for (int i = 0; i < node->MeshCount; i++) {
-        meshRender(&meshArray[node->Meshes[i]], transformation, shader);
+        int index = (&meshArray[node->Meshes[i]])->MaterialIndex;
+        Material *material =
+            materialArray[index];
+        materialPreRender(material);
+        meshRender(&meshArray[node->Meshes[i]], transformation,
+                   material->Shader);
     }
     for (int i = 0; i < node->ChildCount; i++) {
-        nodeRender(node->Children[i], meshArray, shader);
+        nodeRender(node->Children[i], meshArray, materialArray);
     }
 }
 void nodeFree(Node *node) {
