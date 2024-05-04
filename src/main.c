@@ -111,6 +111,7 @@ int main(void) {
     }
 
     modelDelete(model1);
+    materialFree(lightMaterial);
     materialFree(darkMaterial);
     free(lightData);
     free(darkData);
