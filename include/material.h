@@ -16,7 +16,6 @@ typedef enum {
 typedef struct {
     MaterialType Type;
     const char *Name;
-    void (*PreRender)(void *materialProperty);
     void *Data;
 } MaterialProperty;
 typedef struct {
@@ -36,7 +35,6 @@ typedef struct {
 } Material;
 
 Material *materialCreate(unsigned int shader, int propertyCount);
-void materialPreRender(Material *material);
 void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
 void materialChangeProperty(Material *material, const char *propertyName,

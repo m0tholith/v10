@@ -29,49 +29,41 @@ int main(void) {
     // shader init
     unsigned int lightShader = shaderCreate("shaders/vertex_shader.vert",
                                             "shaders/fragment_shader.frag");
-    unsigned int orangeShader = shaderCreate("shaders/vertex_shader.vert",
-                                             "shaders/fragment_shader.frag");
     unsigned int darkShader = shaderCreate("shaders/vertex_shader.vert",
                                            "shaders/fragment_shader.frag");
 
     // texture init
     Texture light =
         textureCreate("textures/prototype/light.png", TEXTURETYPE_RGB);
-    Texture orange =
-        textureCreate("textures/prototype/orange.png", TEXTURETYPE_RGB);
     Texture dark =
         textureCreate("textures/prototype/dark.png", TEXTURETYPE_RGB);
 
     // material init
+    MaterialTextureData *lightData = malloc(sizeof(MaterialTextureData));
+    lightData->TextureID = light.Id;
+    lightData->Index = 0;
     float tint1 = 0.9f;
     Material *lightMaterial = materialCreate(lightShader, 2);
     lightMaterial->Properties[0] =
         materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&light.Id);
     lightMaterial->Properties[1] =
         materialPropertyCreate("tint", MATTYPE_FLOAT, (void *)&tint1);
+    materialApplyProperties(lightMaterial);
 
+    MaterialTextureData *darkData = malloc(sizeof(MaterialTextureData));
+    darkData->TextureID = dark.Id;
+    darkData->Index = 0;
     float tint2 = 0.4f;
-    Material *orangeMaterial = materialCreate(orangeShader, 2);
-    orangeMaterial->Properties[0] =
-        materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&orange.Id);
-    orangeMaterial->Properties[1] =
-        materialPropertyCreate("tint", MATTYPE_FLOAT, (void *)&tint2);
-
-    float tint3 = 0.1f;
     Material *darkMaterial = materialCreate(darkShader, 2);
     darkMaterial->Properties[0] =
         materialPropertyCreate("albedo", MATTYPE_TEXTURE2D, (void *)&dark.Id);
     darkMaterial->Properties[1] =
-        materialPropertyCreate("tint", MATTYPE_FLOAT, (void *)&tint3);
-
-    Model *model1 = modelLoad("models/nodes_test.glb");
-    model1->Materials[0] = lightMaterial;
-    model1->Materials[1] = orangeMaterial;
-    model1->Materials[2] = darkMaterial;
-
-    materialApplyProperties(lightMaterial);
-    materialApplyProperties(orangeMaterial);
+        materialPropertyCreate("tint", MATTYPE_FLOAT, (void *)&tint2);
     materialApplyProperties(darkMaterial);
+
+    Model *model1 = modelLoad("models/suzanne.glb");
+    model1->Materials[0] = lightMaterial;
+    model1->Materials[1] = darkMaterial;
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
@@ -114,12 +106,14 @@ int main(void) {
         windowDraw(window);
 
         while ((err = glGetError()) != GL_NO_ERROR) {
-            fprintf(stderr, "gl error %X\n", err);
+            fprintf(stderr, "gl error 0x%04X\n", err);
         }
     }
 
     modelDelete(model1);
     materialFree(darkMaterial);
+    free(lightData);
+    free(darkData);
 
     windowClose();
     return 0;

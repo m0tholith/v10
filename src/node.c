@@ -17,7 +17,6 @@ void nodeRender(Node *node, Mesh *meshArray, Material **materialArray) {
     for (int i = 0; i < node->MeshCount; i++) {
         int index = (&meshArray[node->Meshes[i]])->MaterialIndex;
         Material *material = materialArray[index];
-        materialPreRender(material);
         meshRender(&meshArray[node->Meshes[i]], transformation,
                    material->Shader);
     }
