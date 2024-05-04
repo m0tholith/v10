@@ -16,14 +16,14 @@ GLFWwindow *windowCreate() {
     GLFWwindow *window =
         glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "template", NULL, NULL);
     if (window == NULL) {
-        fprintf(stderr, "Failed to create GLFW window");
+        fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        fprintf(stderr, "Failed to initialize GLAD");
+        fprintf(stderr, "Failed to initialize GLAD\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }

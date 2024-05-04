@@ -31,6 +31,7 @@ Material *materialCreate(unsigned int shader, int propertyCount) {
 }
 
 void materialPreRender(Material *material) {
+    materialApplyProperties(material);
     for (int i = 0; i < material->PropertyCount; i++) {
         if (material->Properties[i]->PreRender)
             material->Properties[i]->PreRender(material->Properties[i]);

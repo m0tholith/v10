@@ -56,7 +56,7 @@ unsigned int shaderCreate(const char *vertexShaderPath,
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_COMPILE_STATUS, &success);
+    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
         printf("shader program could not be linked: %s", infoLog);
