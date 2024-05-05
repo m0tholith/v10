@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
+
+set(BUILD_DEBUG ON)
+
 set(SRC_FILES
     src/main.c
     src/glad.c
@@ -14,7 +17,7 @@ set(SRC_FILES
     src/camera.c
 )
 
-if(CMAKE_BUILD_TYPE EQUAL DEBUG)
+if(BUILD_DEBUG)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     add_compile_options("-g")
 endif()
