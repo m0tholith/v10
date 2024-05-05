@@ -7,6 +7,7 @@ typedef struct {
     vec3s Position;
     vec3s Normal;
     vec2s TexCoords;
+    vec3s Color;
 } Vertex;
 typedef struct {
     Vertex *Vertices;

@@ -28,7 +28,7 @@ Model *modelLoad(const char *modelFilename) {
     }
 
     model->MaterialCount = scene->mNumMaterials;
-    model->Materials = malloc(model->MaterialCount * sizeof(Material*));
+    model->Materials = malloc(model->MaterialCount * sizeof(Material *));
 
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
@@ -61,6 +61,16 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
                 {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}};
         else
             v.TexCoords = GLMS_VEC2_ONE;
+        // apparently, this is just assimp's way of saying "i have colors set in
+        // this place right here" instead of setting the first color set to 0???
+        if (mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS])
+            v.Color = (vec3s){{
+                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].r,
+                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].g,
+                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].b,
+            }};
+        else
+            v.Color = GLMS_VEC3_ONE;
         vertices[i] = v;
     }
     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
@@ -70,8 +80,8 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
         }
     }
 
-    Mesh *newMesh = meshCreate(vertices, indices, mesh->mNumVertices,
-                      mesh->mNumFaces * 3);
+    Mesh *newMesh =
+        meshCreate(vertices, indices, mesh->mNumVertices, mesh->mNumFaces * 3);
     newMesh->MaterialIndex = mesh->mMaterialIndex;
     return newMesh;
 }

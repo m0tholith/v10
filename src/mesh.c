@@ -37,6 +37,10 @@ Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
     glVertexAttribPointer(attribIdx, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, TexCoords));
     glEnableVertexAttribArray(attribIdx++);
+    // texcoords vertex attribute
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                          (void *)offsetof(Vertex, Color));
+    glEnableVertexAttribArray(attribIdx++);
 
     // generate element buffer object
     glGenBuffers(1, &mesh->EBO);
