@@ -4,7 +4,6 @@ only tested for linux
 ### dependencies
 - opengl
 - glfw (installed into os)
-- assimp (installed into os)
 ### how to build and run
 ```bash
 git clone https://github.com/Motholith/opengl-engine
