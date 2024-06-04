@@ -61,13 +61,11 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
                 {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}};
         else
             v.TexCoords = GLMS_VEC2_ONE;
-        // apparently, this is just assimp's way of saying "i have colors set in
-        // this place right here" instead of setting the first color set to 0???
-        if (mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS])
+        if (mesh->mColors[0])
             v.Color = (vec3s){{
-                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].r,
-                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].g,
-                mesh->mColors[AI_MAX_NUMBER_OF_COLOR_SETS][i].b,
+                mesh->mColors[0][i].r,
+                mesh->mColors[0][i].g,
+                mesh->mColors[0][i].b,
             }};
         else
             v.Color = GLMS_VEC3_ONE;
