@@ -10,6 +10,6 @@ pkgs.mkShell {
     assimp
 
     # for debugging
-    gdb
+    (pkgs.callPackage ./ugdb.nix {})
   ];
 }
