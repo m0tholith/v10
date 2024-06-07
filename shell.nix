@@ -1,7 +1,6 @@
 {
   pkgs ? import <nixpkgs> { },
 }:
-
 pkgs.mkShell {
   packages = with pkgs; [
     cmake
@@ -10,6 +9,6 @@ pkgs.mkShell {
     assimp
 
     # for debugging
-    (pkgs.callPackage ./ugdb.nix {})
+    (pkgs.callPackage ./ugdb.nix { })
   ];
 }
