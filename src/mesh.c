@@ -1,8 +1,8 @@
 #include "mesh.h"
 
-#include "cglm/struct/mat4.h"
 #include "glad/glad.h"
 #include "rendering.h"
+#include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
 Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,

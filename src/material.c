@@ -1,8 +1,8 @@
 #include "material.h"
 
-#include "cglm/types-struct.h"
 #include "glad/glad.h"
 #include <GL/gl.h>
+#include <cglm/types-struct.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,20 +39,22 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
         break;
     case MATTYPE_FLOAT:
         floatValue = (float *)property->Data;
-        glUniform1f(glGetUniformLocation(shader, property->Name),
-                    *floatValue);
+        glUniform1f(glGetUniformLocation(shader, property->Name), *floatValue);
         break;
     case MATTYPE_VEC2:
         vec2 = (vec2s *)property->Data;
-        glUniform2fv(glGetUniformLocation(shader, property->Name), 1, vec2->raw);
+        glUniform2fv(glGetUniformLocation(shader, property->Name), 1,
+                     vec2->raw);
         break;
     case MATTYPE_VEC3:
         vec3 = (vec3s *)property->Data;
-        glUniform3fv(glGetUniformLocation(shader, property->Name), 1, vec3->raw);
+        glUniform3fv(glGetUniformLocation(shader, property->Name), 1,
+                     vec3->raw);
         break;
     case MATTYPE_VEC4:
         vec4 = (vec4s *)property->Data;
-        glUniform4fv(glGetUniformLocation(shader, property->Name), 1, vec4->raw);
+        glUniform4fv(glGetUniformLocation(shader, property->Name), 1,
+                     vec4->raw);
         break;
     case MATTYPE_MAT2:
         mat2 = (mat2s *)property->Data;

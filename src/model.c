@@ -1,7 +1,7 @@
 #include "model.h"
 
-#include "cglm/struct/mat4.h"
-#include "cglm/struct/vec2.h"
+#include <cglm/struct/mat4.h>
+#include <cglm/struct/vec2.h>
 #include <stdio.h>
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);

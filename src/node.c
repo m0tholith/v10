@@ -1,6 +1,6 @@
 #include "node.h"
 
-#include "cglm/struct/mat4.h"
+#include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
 Node *nodeCreate(Node *parent, int childCount) {
