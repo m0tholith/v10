@@ -1,4 +1,4 @@
-{ gdb, lib }:
+{ pkgs }:
 pkgs.rustPlatform.buildRustPackage rec {
   pname = "ugdb";
   version = "0.1.11";
@@ -7,13 +7,13 @@ pkgs.rustPlatform.buildRustPackage rec {
     name = "ugdb";
   };
   cargoSha256 = "sha256-j/bttlfvrbV5VgOuYgA3nZv22385129rHUDs9xyMUEs=";
-  nativeBuildInputs = [ gdb ];
+  nativeBuildInputs = [ pkgs.gdb ];
   patchPhase = ''
     runHook prePatch
     sed -i "575,584d" src/completion/mod.rs
     runHook postPatch
   '';
   postInstall = ''
-    cp ${lib.getExe' gdb "gdb"} $out/bin
+    cp ${pkgs.lib.getExe' pkgs.gdb "gdb"} $out/bin
   '';
 }
