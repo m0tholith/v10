@@ -1,8 +1,9 @@
 #version 330 core
 
-in vec3 color;
-
+in vec3 vColor;
 out vec4 FragColor;
+
+uniform vec3 color;
 
 void main()
 {

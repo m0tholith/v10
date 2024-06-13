@@ -5,7 +5,7 @@ layout (location = 1) in vec3 vertNormal;
 layout (location = 2) in vec2 vertTexCoord;
 layout (location = 3) in vec3 vertColor;
 
-out vec3 color;
+out vec3 vColor;
 
 uniform mat4 mvpMatrix;
 
@@ -14,5 +14,5 @@ void main()
     // (right to left)
     gl_Position = mvpMatrix * vec4(vertPos, 1.0f);
 
-    color = vertColor;
+    vColor = vertColor;
 }

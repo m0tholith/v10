@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include <GL/gl.h>
 #include <cglm/types-struct.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,11 +18,17 @@ MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
 }
 void materialPropertyFree(MaterialProperty *property) { free(property); }
 
-Material *materialCreate(unsigned int shader, int propertyCount) {
+Material *materialCreate(unsigned int shader, int propertyCount, ...) {
     Material *material = malloc(sizeof(Material));
     material->Shader = shader;
     material->PropertyCount = propertyCount;
     material->Properties = malloc(propertyCount * sizeof(MaterialProperty *));
+    va_list properties;
+    va_start(properties, propertyCount);
+    for (int i = 0; i < propertyCount; i++) {
+        material->Properties[i] = va_arg(properties, MaterialProperty *);
+    }
+    va_end(properties);
     return material;
 }
 

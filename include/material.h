@@ -34,7 +34,7 @@ typedef struct {
     MaterialProperty **Properties;
 } Material;
 
-Material *materialCreate(unsigned int shader, int propertyCount);
+Material *materialCreate(unsigned int shader, int propertyCount, ...);
 void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
 void materialChangeProperty(Material *material, const char *propertyName,

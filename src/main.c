@@ -17,6 +17,7 @@ vec3s movementInput;
 vec2s mousePosition;
 vec2s mouseDelta;
 vec2s mouseSensitivity;
+vec3s col = (vec3s){{0.976f, 0.886f, 0.686f}};
 
 int main(void) {
     window = windowCreate();
@@ -29,7 +30,9 @@ int main(void) {
     // shader init
     unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
                                        "shaders/fragment_shader.frag");
-    Material *material = materialCreate(shader, 0);
+    MaterialProperty *materialColor = materialPropertyCreate("color", MATTYPE_VEC3, &col);
+    Material *material = materialCreate(shader, 1, materialColor);
+    materialApplyProperties(material);
     Model *model1 = modelLoad("models/SM_Deccer_Cubes.glb");
     modelSetDefaultMaterial(model1, material);
 
