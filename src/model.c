@@ -2,6 +2,7 @@
 
 #include <cglm/struct/mat4.h>
 #include <cglm/struct/vec2.h>
+#include <stdarg.h>
 #include <stdio.h>
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
@@ -34,6 +35,19 @@ Model *modelLoad(const char *modelFilename) {
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
     return model;
+}
+void modelSetMaterials(Model *model, ...) {
+    va_list materials;
+    va_start(materials, model->MaterialCount);
+    for (int i = 0; i < model->MaterialCount; i++) {
+        model->Materials[i] = va_arg(materials, Material *);
+    }
+    va_end(materials);
+}
+void modelSetDefaultMaterial(Model *model, Material *material) {
+    for (int i = 0; i < model->MaterialCount; i++) {
+        model->Materials[i] = material;
+    }
 }
 void modelRender(Model *model) {
     nodeRender(model->RootNode, model->Meshes, model->Materials);

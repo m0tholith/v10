@@ -21,6 +21,10 @@ typedef struct {
 } Model;
 
 Model *modelLoad(const char *modelFilename);
+// Arguments are the materials to be assigned to every slot in `model`, must be
+// of count `model->MaterialCount`
+void modelSetMaterials(Model *model, ...);
+void modelSetDefaultMaterial(Model *model, Material *material);
 void modelRender(Model *model);
 void modelDelete(Model *model);
 

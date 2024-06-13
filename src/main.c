@@ -31,13 +31,7 @@ int main(void) {
                                        "shaders/fragment_shader.frag");
     Material *material = materialCreate(shader, 0);
     Model *model1 = modelLoad("models/SM_Deccer_Cubes.glb");
-    // ohmyfuckinggod
-    model1->Materials[0] = material;
-    model1->Materials[1] = material;
-    model1->Materials[2] = material;
-    model1->Materials[3] = material;
-    model1->Materials[4] = material;
-    model1->Materials[5] = material;
+    modelSetDefaultMaterial(model1, material);
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
