@@ -3,7 +3,7 @@
 #include "camera.h"
 #include "input.h"
 #include "material.h"
-#include "model.h"
+#include "model_presets.h"
 #include "rendering.h"
 #include "shader.h"
 #include "texture.h"
@@ -17,7 +17,6 @@ vec3s movementInput;
 vec2s mousePosition;
 vec2s mouseDelta;
 vec2s mouseSensitivity;
-vec3s col = (vec3s){{0.976f, 0.886f, 0.686f}};
 
 int main(void) {
     window = windowCreate();
@@ -27,14 +26,11 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    // shader init
-    unsigned int shader = shaderCreate("shaders/vertex_shader.vert",
-                                       "shaders/fragment_shader.frag");
-    MaterialProperty *materialColor = materialPropertyCreate("color", MATTYPE_VEC3, &col);
-    Material *material = materialCreate(shader, 1, materialColor);
-    materialApplyProperties(material);
-    Model *model1 = modelLoad("models/SM_Deccer_Cubes.glb");
-    modelSetDefaultMaterial(model1, material);
+    Model *model1 = modelPresetTintedLoad(
+        "models/SM_Deccer_Cubes.glb", "shaders/vertex_shader.vert",
+        "shaders/fragment_shader.frag", (vec3s){{0.0, 0.8, 0.0}},
+        (vec3s){{0.0, 0.0, 0.8}}, (vec3s){{0.8, 0.0, 0.8}},
+        (vec3s){{0.8, 0.2, 0.0}}, (vec3s){{0.8, 0.0, 0.0}}, NULL);
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
@@ -81,8 +77,7 @@ int main(void) {
         }
     }
 
-    modelDelete(model1);
-    materialFree(material);
+    modelPresetTintedDelete(model1);
 
     windowClose();
     return 0;
