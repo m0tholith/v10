@@ -22,9 +22,3 @@ Model *modelPresetTintedLoad(const char *modelFilename,
     va_end(colors);
     return model;
 }
-void modelPresetTintedDelete(Model *model) {
-    for (int i = 0; i < model->MaterialCount; i++) {
-        materialFree(model->Materials[i]);
-    }
-    modelDelete(model);
-}

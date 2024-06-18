@@ -59,6 +59,12 @@ void modelDelete(Model *model) {
     free(model->Meshes);
     free(model);
 }
+void modelDeleteFreeMaterials(Model *model) {
+    for (int i = 0; i < model->MaterialCount - 1; i++) {
+        materialFree(model->Materials[i]);
+    }
+    modelDelete(model);
+}
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     Vertex vertices[mesh->mNumVertices];

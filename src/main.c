@@ -1,3 +1,4 @@
+#include "model.h"
 #include "window.h"
 
 #include "camera.h"
@@ -77,7 +78,7 @@ int main(void) {
         }
     }
 
-    modelPresetTintedDelete(model1);
+    modelDeleteFreeMaterials(model1);
 
     windowClose();
     return 0;

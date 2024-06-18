@@ -27,5 +27,6 @@ void modelSetMaterials(Model *model, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelRender(Model *model);
 void modelDelete(Model *model);
+void modelDeleteFreeMaterials(Model *model);
 
 #endif // !MODEL_H
