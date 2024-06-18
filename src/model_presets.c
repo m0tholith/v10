@@ -3,8 +3,11 @@
 #include "material.h"
 #include "model.h"
 #include "shader.h"
+#include "texture.h"
 #include <stdarg.h>
 #include <stdio.h>
+
+void modelPresetTexturedDelete(void *_model);
 
 Model *modelPresetTintedLoad(const char *modelFilename,
                              const char *vertexShaderPath,
@@ -23,4 +26,27 @@ Model *modelPresetTintedLoad(const char *modelFilename,
     va_end(colors);
     model->OnDelete = &modelDeleteFreeMaterials;
     return model;
+}
+Model *modelPresetTexturedLoad(const char *modelFilename,
+                               const char *vertexShaderPath,
+                               const char *fragmentShaderPath,
+                               const char *texturePath) {
+    Model *model = modelLoad(modelFilename);
+    Material *material = materialCreate(
+        shaderCreate(vertexShaderPath, fragmentShaderPath), 1,
+        materialPropertyCreate(
+            "_texture", MATTYPE_TEXTURE2D,
+            (void *)textureCreate(texturePath, TEXTURETYPE_RGB).Id));
+    for (int i = 0; i < model->MaterialCount; i++) {
+        model->Materials[i] = material;
+    }
+    model->OnDelete = &modelPresetTexturedDelete;
+
+    return model;
+}
+void modelPresetTexturedDelete(void *_model) {
+    Model *model = (Model *)_model;
+    if (model->MaterialCount > 0)
+        materialFree(model->Materials[0]);
+    modelDelete(model);
 }
