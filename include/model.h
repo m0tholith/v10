@@ -17,6 +17,8 @@ typedef struct {
 
     Node *RootNode;
 
+    void (*OnDelete)(void *model);
+
     const struct aiScene *Scene;
 } Model;
 
@@ -26,7 +28,9 @@ Model *modelLoad(const char *modelFilename);
 void modelSetMaterials(Model *model, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelRender(Model *model);
-void modelDelete(Model *model);
-void modelDeleteFreeMaterials(Model *model);
+// calls model->OnDelete
+void modelFree(Model *model);
+void modelDelete(void *_model);
+void modelDeleteFreeMaterials(void *_model);
 
 #endif // !MODEL_H

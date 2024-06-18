@@ -34,6 +34,8 @@ Model *modelLoad(const char *modelFilename) {
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
+    model->OnDelete = &modelDelete;
+
     return model;
 }
 void modelSetMaterials(Model *model, ...) {
@@ -52,14 +54,17 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
 void modelRender(Model *model) {
     nodeRender(model->RootNode, model->Meshes, model->Materials);
 }
-void modelDelete(Model *model) {
+void modelFree(Model *model) { (model->OnDelete)(model); }
+void modelDelete(void *_model) {
+    Model *model = (Model *)_model;
     aiReleaseImport(model->Scene);
     nodeFree(model->RootNode);
     free(model->Materials);
     free(model->Meshes);
     free(model);
 }
-void modelDeleteFreeMaterials(Model *model) {
+void modelDeleteFreeMaterials(void *_model) {
+    Model *model = (Model *)_model;
     for (int i = 0; i < model->MaterialCount - 1; i++) {
         materialFree(model->Materials[i]);
     }

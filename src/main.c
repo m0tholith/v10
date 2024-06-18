@@ -78,7 +78,7 @@ int main(void) {
         }
     }
 
-    modelDeleteFreeMaterials(model1);
+    modelFree(model1);
 
     windowClose();
     return 0;

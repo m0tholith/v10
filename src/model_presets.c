@@ -1,6 +1,7 @@
 #include "model_presets.h"
 
 #include "material.h"
+#include "model.h"
 #include "shader.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,5 +21,6 @@ Model *modelPresetTintedLoad(const char *modelFilename,
         printf("%d, (%.2f,%.2f,%.2f)\n", i, color.r, color.g, color.b);
     }
     va_end(colors);
+    model->OnDelete = &modelDeleteFreeMaterials;
     return model;
 }
