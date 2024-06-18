@@ -11,7 +11,7 @@ Model *modelPresetTintedLoad(const char *modelFilename,
     Model *model = modelLoad(modelFilename);
     va_list colors;
     va_start(colors, model->MaterialCount);
-    for (int i = 0; i < model->MaterialCount; i++) {
+    for (int i = 0; i < model->MaterialCount - 1; i++) {
         vec3s color = va_arg(colors, vec3s);
         model->Materials[i] = materialCreate(
             shaderCreate(vertexShaderPath, fragmentShaderPath), 1,

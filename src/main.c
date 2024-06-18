@@ -30,7 +30,7 @@ int main(void) {
         "models/SM_Deccer_Cubes.glb", "shaders/vertex_shader.vert",
         "shaders/fragment_shader.frag", (vec3s){{0.0, 0.8, 0.0}},
         (vec3s){{0.0, 0.0, 0.8}}, (vec3s){{0.8, 0.0, 0.8}},
-        (vec3s){{0.8, 0.2, 0.0}}, (vec3s){{0.8, 0.0, 0.0}}, NULL);
+        (vec3s){{0.8, 0.2, 0.0}}, (vec3s){{0.8, 0.0, 0.0}});
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
