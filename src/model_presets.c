@@ -10,8 +10,8 @@
 void modelPresetTexturedDelete(void *_model);
 
 Model *modelPresetTinted(const char *modelFilename,
-                             const char *vertexShaderPath,
-                             const char *fragmentShaderPath, ...) {
+                         const char *vertexShaderPath,
+                         const char *fragmentShaderPath, ...) {
     Model *model = modelLoad(modelFilename);
     va_list colors;
     va_start(colors, model->MaterialCount);
@@ -28,18 +28,16 @@ Model *modelPresetTinted(const char *modelFilename,
     return model;
 }
 Model *modelPresetTextured(const char *modelFilename,
-                               const char *vertexShaderPath,
-                               const char *fragmentShaderPath,
-                               const char *texturePath) {
+                           const char *vertexShaderPath,
+                           const char *fragmentShaderPath,
+                           const char *texturePath) {
     Model *model = modelLoad(modelFilename);
     Material *material = materialCreate(
         shaderCreate(vertexShaderPath, fragmentShaderPath), 1,
         materialPropertyCreate(
             "_texture", MATTYPE_TEXTURE2D,
             (void *)textureCreate(texturePath, TEXTURETYPE_RGB).Id));
-    for (int i = 0; i < model->MaterialCount; i++) {
-        model->Materials[i] = material;
-    }
+    modelSetDefaultMaterial(model, material);
     model->OnDelete = &modelPresetTexturedDelete;
 
     return model;

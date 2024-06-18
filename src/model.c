@@ -104,7 +104,7 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     }
 
     Mesh *newMesh =
-        meshCreate(vertices, indices, mesh->mNumVertices, mesh->mNumFaces * 3);
+        meshLoad(vertices, indices, mesh->mNumVertices, mesh->mNumFaces * 3);
     newMesh->MaterialIndex = mesh->mMaterialIndex;
     return newMesh;
 }

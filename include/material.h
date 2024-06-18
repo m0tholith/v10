@@ -1,6 +1,9 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+// all types that can be defined as uniforms in shaders. if you want to add
+// more, you need to define a case for your new type in
+// `materialApplyProperties`
 typedef enum {
     MATTYPE_INT,
     MATTYPE_FLOAT,

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 
+// defines the encoding of the image (used for transparency in shaders)
 enum TEXTURETYPE {
     TEXTURETYPE_RGB = 0,
     TEXTURETYPE_RGBA = 1,

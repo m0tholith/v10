@@ -28,8 +28,10 @@ Model *modelLoad(const char *modelFilename);
 void modelSetMaterials(Model *model, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelRender(Model *model);
-// calls model->OnDelete
+// complementary to `modelLoad`, calls `model->OnDelete`
 void modelFree(Model *model);
+
+// not to be used directly, but by presets and such
 void modelDelete(void *_model);
 void modelDeleteFreeMaterials(void *_model);
 

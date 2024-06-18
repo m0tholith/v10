@@ -12,6 +12,10 @@ void inputInit(GLFWwindow *window) {
     glfwSetKeyCallback(window, inputKeyCallback);
     mouseSensitivity = (vec2s){{0.25f, 0.25f}};
 }
+// TODO: make this better
+//
+// currently it is hardcoded for moving and looking around, it doesn't do
+// anything helpful to ease taking input from the user
 void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
                       int mods) {
     if (action & (GLFW_PRESS | GLFW_REPEAT)) {

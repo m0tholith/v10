@@ -15,10 +15,10 @@ mat4s getFinalTransformation(Node *node);
 void nodeRender(Node *node, Mesh *meshArray, Material **materialArray) {
     mat4s transformation = getFinalTransformation(node);
     for (int i = 0; i < node->MeshCount; i++) {
-        int index = (&meshArray[node->Meshes[i]])->MaterialIndex;
+        Mesh *mesh = &meshArray[node->Meshes[i]];
+        int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
-        meshRender(&meshArray[node->Meshes[i]], transformation,
-                   material->Shader);
+        meshRender(mesh, transformation, material->Shader);
     }
     for (int i = 0; i < node->ChildCount; i++) {
         nodeRender(node->Children[i], meshArray, materialArray);

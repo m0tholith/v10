@@ -20,7 +20,7 @@ typedef struct {
     int MaterialIndex;
 } Mesh;
 
-Mesh *meshCreate(Vertex *vertices, unsigned int *indices, int vertexCount,
+Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
                  int indexCount);
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader);
 void meshFree(Mesh *mesh);

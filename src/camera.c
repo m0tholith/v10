@@ -21,6 +21,8 @@ void cameraSetPosition(Camera *camera, vec3s position) {
 void cameraLookAt(Camera *camera, vec3s target) {
     camera->Quaternion = glms_quat_forp(camera->Position, target, Y_AXIS);
 }
+// creates a new quaternion by multiplying per-axis quaternions together in a
+// specific order (YXZ)
 void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles) {
     versors quatX = glms_quatv(eulerAngles.x, X_AXIS);
     versors quatY = glms_quatv(eulerAngles.y, Y_AXIS);

@@ -10,6 +10,7 @@ Texture textureCreate(const char *textureFile, enum TEXTURETYPE type) {
 
     int width, height, numColorChannels;
     unsigned char *data;
+    // load default texture (white)
     if (strcmp(textureFile, "") == 0)
         data = stbi_load("textures/default.jpg", &width, &height,
                          &numColorChannels, 0);
