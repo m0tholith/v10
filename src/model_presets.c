@@ -9,7 +9,7 @@
 
 void modelPresetTexturedDelete(void *_model);
 
-Model *modelPresetTintedLoad(const char *modelFilename,
+Model *modelPresetTinted(const char *modelFilename,
                              const char *vertexShaderPath,
                              const char *fragmentShaderPath, ...) {
     Model *model = modelLoad(modelFilename);
@@ -27,7 +27,7 @@ Model *modelPresetTintedLoad(const char *modelFilename,
     model->OnDelete = &modelDeleteFreeMaterials;
     return model;
 }
-Model *modelPresetTexturedLoad(const char *modelFilename,
+Model *modelPresetTextured(const char *modelFilename,
                                const char *vertexShaderPath,
                                const char *fragmentShaderPath,
                                const char *texturePath) {

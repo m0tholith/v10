@@ -24,7 +24,7 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model1 = modelPresetTexturedLoad(
+    Model *model1 = modelPresetTextured(
         "models/SM_Deccer_Cubes.glb", "shaders/vertex_shader.vert",
         "shaders/fragment_shader.frag", "textures/crate.jpg");
 
