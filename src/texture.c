@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <string.h>
 
-Texture textureCreate(const char *textureFile, enum TEXTURETYPE type) {
+unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type) {
     unsigned int texture;
 
     int width, height, numColorChannels;
@@ -29,9 +29,10 @@ Texture textureCreate(const char *textureFile, enum TEXTURETYPE type) {
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                 GL_RGB + (type & 1), GL_UNSIGNED_BYTE, data);
+                 GL_RGB + (type & 1), GL_UNSIGNED_BYTE,
+                 data); // HINT: type is either 0 or 1; GL_RGBA is 1+GL_RGB
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    return (Texture){texture, type};
+    return texture;
 }
