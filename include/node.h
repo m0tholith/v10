@@ -18,7 +18,8 @@ typedef struct {
 } Node;
 
 Node *nodeCreate(Node *parent, int childCount);
-void nodeRender(Node *node, Mesh *meshArray, Material **materialArray);
+void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
+                Material **materialArray);
 void nodeFree(Node *node);
 
 #endif // !NODE_H

@@ -12,8 +12,10 @@ Node *nodeCreate(Node *parent, int childCount) {
     return node;
 }
 mat4s getFinalTransformation(Node *node);
-void nodeRender(Node *node, Mesh *meshArray, Material **materialArray) {
-    mat4s transformation = getFinalTransformation(node);
+void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
+                Material **materialArray) {
+    mat4s transformation =
+        glms_mat4_mul(transform, getFinalTransformation(node));
     for (int i = 0; i < node->MeshCount; i++) {
         Mesh *mesh = &meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
@@ -21,7 +23,7 @@ void nodeRender(Node *node, Mesh *meshArray, Material **materialArray) {
         meshRender(mesh, transformation, material->Shader);
     }
     for (int i = 0; i < node->ChildCount; i++) {
-        nodeRender(node->Children[i], meshArray, materialArray);
+        nodeRender(transform, node->Children[i], meshArray, materialArray);
     }
 }
 void nodeFree(Node *node) {

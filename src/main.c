@@ -2,6 +2,7 @@
 #include "window.h"
 
 #include "camera.h"
+#include "cglm/struct.h"
 #include "input.h"
 #include "model_presets.h"
 #include "rendering.h"
@@ -27,6 +28,12 @@ int main(void) {
     Model *model1 = modelPresetTextured(
         "models/SM_Deccer_Cubes.glb", "shaders/vertex_shader.vert",
         "shaders/fragment_shader.frag", "textures/crate.jpg");
+    Model *model2 = modelPresetTextured(
+        "models/SM_Deccer_Cubes.glb", "shaders/vertex_shader.vert",
+        "shaders/fragment_shader.frag", "textures/crate.jpg");
+    model2->Transform = glms_translate(
+        glms_rotate(model2->Transform, glm_rad(33), (vec3s){{0.6f, 0.8f, 0}}),
+        (vec3s){{4, 8, 10}});
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
@@ -65,6 +72,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         modelRender(model1);
+        modelRender(model2);
 
         windowDraw(window);
 
@@ -74,6 +82,7 @@ int main(void) {
     }
 
     modelFree(model1);
+    modelFree(model2);
 
     windowClose();
     return 0;

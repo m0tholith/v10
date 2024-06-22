@@ -4,11 +4,14 @@
 #include "mesh.h"
 #include "node.h"
 
-#include "assimp/cimport.h"
-#include "assimp/postprocess.h"
-#include "assimp/scene.h"
+#include <assimp/cimport.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <cglm/struct/mat4.h>
 
 typedef struct {
+    mat4s Transform;
+
     unsigned int MeshCount;
     Mesh *Meshes;
 

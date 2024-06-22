@@ -19,6 +19,8 @@ Model *modelLoad(const char *modelFilename) {
     Model *model = malloc(sizeof(Model));
     model->Scene = scene;
 
+    model->Transform = GLMS_MAT4_IDENTITY;
+
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(Mesh));
     Mesh *meshAlloc;
@@ -52,7 +54,8 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    nodeRender(model->RootNode, model->Meshes, model->Materials);
+    nodeRender(model->Transform, model->RootNode, model->Meshes,
+               model->Materials);
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
 void modelDelete(void *_model) {
