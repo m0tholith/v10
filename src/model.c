@@ -9,8 +9,9 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
 
 Model *modelLoad(const char *modelFilename) {
-    const struct aiScene *scene =
-        aiImportFile(modelFilename, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const struct aiScene *scene = aiImportFile(
+        modelFilename, aiProcess_Triangulate | aiProcess_FlipUVs |
+                           aiProcess_GenNormals | aiProcess_SplitLargeMeshes);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         printf("assimp error: %s", aiGetErrorString());
