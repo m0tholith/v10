@@ -27,10 +27,13 @@ int main(void) {
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     Material *material =
-        materialCreate(shaderCreate("shaders/vertex_shader.vert",
-                                    "shaders/fragment_shader.frag"),
+        materialCreate(shaderCreate("shaders/vertex_shader.glsl",
+                                    "shaders/fragment_shader.glsl"),
                        0);
     Model *model = modelLoad("models/SM_Deccer_Cubes.glb");
+    for (int i = 0; i < model->MaterialCount; i++) {
+        model->Materials[i] = material;
+    }
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
