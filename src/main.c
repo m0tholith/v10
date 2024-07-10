@@ -30,7 +30,7 @@ int main(void) {
         materialCreate(shaderCreate("shaders/vertex_shader.glsl",
                                     "shaders/fragment_shader.glsl"),
                        0);
-    Model *model = modelLoad("models/SM_Deccer_Cubes.glb");
+    Model *model = modelLoad("models/BoxVertexColors.glb");
     for (int i = 0; i < model->MaterialCount; i++) {
         model->Materials[i] = material;
     }
