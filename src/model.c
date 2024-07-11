@@ -76,6 +76,7 @@ void modelDelete(void *_model) {
     nodeFree(model->RootNode);
     free(model->Materials);
     free(model->Meshes);
+    free(model->Textures);
     free(model);
 }
 void modelDeleteFreeMaterials(void *_model) {
