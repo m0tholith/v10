@@ -1,4 +1,5 @@
 #include "node.h"
+#include "material.h"
 
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
@@ -20,6 +21,7 @@ void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
         Mesh *mesh = &meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
+        materialApplyProperties(material);
         meshRender(mesh, transformation, material->Shader);
     }
     for (int i = 0; i < node->ChildCount; i++) {

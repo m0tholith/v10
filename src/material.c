@@ -41,7 +41,7 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
     mat2s mat2;
     mat3s mat3;
     mat4s mat4;
-    MaterialTextureData *textureData;
+    int textureData;
     switch (property->Type) {
     case MATTYPE_INT:
         break;
@@ -76,9 +76,9 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
                            GL_FALSE, mat4.raw[0]);
         break;
     case MATTYPE_TEXTURE2D:
-        textureData = (MaterialTextureData *)property->Data;
-        glActiveTexture(GL_TEXTURE0 + textureData->Index);
-        glBindTexture(GL_TEXTURE_2D, textureData->TextureID);
+        textureData = (int)(property->Data);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureData);
         break;
     default:
         fprintf(stderr,

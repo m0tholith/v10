@@ -1,9 +1,13 @@
 #include "model.h"
+#include "assimp/material.h"
+#include "material.h"
+#include "texture.h"
 
 #include <cglm/struct/mat4.h>
 #include <cglm/struct/vec2.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
@@ -33,6 +37,13 @@ Model *modelLoad(const char *modelFilename) {
 
     model->MaterialCount = scene->mNumMaterials;
     model->Materials = malloc(model->MaterialCount * sizeof(Material *));
+    model->TextureCount = scene->mNumTextures;
+    model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
+    for (int i = 0; i < model->TextureCount; i++) {
+        model->Textures[i] = textureCreate(
+            scene->mTextures[i]->mFilename.data,
+            TEXTURETYPE_RGB);
+    }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;

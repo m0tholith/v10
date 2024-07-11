@@ -26,13 +26,14 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Material *material =
-        materialCreate(shaderCreate("shaders/vertex_shader.glsl",
-                                    "shaders/fragment_shader.glsl"),
-                       0);
-    Model *model = modelLoad("models/BoxVertexColors.glb");
+    Model *model = modelLoad("models/SM_Deccer_Cubes_Textured_Complex.gltf");
     for (int i = 0; i < model->MaterialCount; i++) {
-        model->Materials[i] = material;
+        model->Materials[i] =
+            materialCreate(shaderCreate("shaders/vertex_shader.glsl",
+                                        "shaders/fragment_shader.glsl"),
+                           1,
+                           materialPropertyCreate("_texture", MATTYPE_TEXTURE2D,
+                                                  (void *)model->Textures[i]));
     }
 
     ProjectionMatrix = glms_perspective(
