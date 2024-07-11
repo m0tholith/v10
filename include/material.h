@@ -29,6 +29,8 @@ typedef struct {
 MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
                                          void *data);
 void materialPropertyFree(MaterialProperty *property);
+MaterialTextureData *materialTextureDataCreate(unsigned int texture, int index);
+void materialTextureDataFree(MaterialTextureData *data);
 
 typedef struct {
     unsigned int Shader;

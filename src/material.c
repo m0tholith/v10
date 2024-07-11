@@ -18,6 +18,14 @@ MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
     return property;
 }
 void materialPropertyFree(MaterialProperty *property) { free(property); }
+MaterialTextureData *materialTextureDataCreate(unsigned int texture,
+                                               int index) {
+    MaterialTextureData *data = malloc(sizeof(MaterialTextureData));
+    data->TextureID = texture;
+    data->Index = index;
+    return data;
+}
+void materialTextureDataFree(MaterialTextureData *data) { free(data); }
 
 Material *materialCreate(unsigned int shader, int propertyCount, ...) {
     Material *material = malloc(sizeof(Material));
@@ -41,7 +49,7 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
     mat2s mat2;
     mat3s mat3;
     mat4s mat4;
-    int textureData;
+    MaterialTextureData textureData;
     switch (property->Type) {
     case MATTYPE_INT:
         break;
@@ -76,9 +84,9 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
                            GL_FALSE, mat4.raw[0]);
         break;
     case MATTYPE_TEXTURE2D:
-        textureData = (int)(property->Data);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureData);
+        textureData = *(MaterialTextureData *)(property->Data);
+        glActiveTexture(GL_TEXTURE0 + textureData.Index);
+        glBindTexture(GL_TEXTURE_2D, textureData.TextureID);
         break;
     default:
         fprintf(stderr,

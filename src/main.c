@@ -28,12 +28,13 @@ int main(void) {
 
     Model *model = modelLoad("models/SM_Deccer_Cubes_Textured_Complex.gltf");
     for (int i = 0; i < model->MaterialCount; i++) {
-        model->Materials[i] =
-            materialCreate(shaderCreate("shaders/vertex_shader.glsl",
-                                        "shaders/fragment_shader.glsl"),
-                           1,
-                           materialPropertyCreate("_texture", MATTYPE_TEXTURE2D,
-                                                  (void *)model->Textures[i]));
+        model->Materials[i] = materialCreate(
+            shaderCreate("shaders/vertex_shader.glsl",
+                         "shaders/fragment_shader.glsl"),
+            1,
+            materialPropertyCreate(
+                "_texture", MATTYPE_TEXTURE2D,
+                (void *)materialTextureDataCreate(model->Textures[i], 0)));
     }
 
     ProjectionMatrix = glms_perspective(
@@ -81,6 +82,9 @@ int main(void) {
         }
     }
 
+    for (int i = 0; i < model->MaterialCount; i++) {
+        free((MaterialTextureData *)model->Materials[i]->Properties[0]->Data);
+    }
     modelFree(model);
 
     windowClose();
