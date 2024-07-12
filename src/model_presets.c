@@ -7,8 +7,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void modelPresetTexturedDelete(void *_model);
-
+void modelPresetTintedFree(void *_model);
 Model *modelPresetTinted(const char *modelFilename,
                          const char *vertexShaderPath,
                          const char *fragmentShaderPath, ...) {
@@ -24,9 +23,11 @@ Model *modelPresetTinted(const char *modelFilename,
         printf("%d, (%.2f,%.2f,%.2f)\n", i, color.r, color.g, color.b);
     }
     va_end(colors);
-    model->OnDelete = &modelDeleteFreeMaterials;
+    model->OnDelete = &modelFreeWithMaterials;
     return model;
 }
+
+void modelPresetTexturedFree(void *_model);
 Model *modelPresetTextured(const char *modelFilename,
                            const char *vertexShaderPath,
                            const char *fragmentShaderPath,
@@ -38,13 +39,20 @@ Model *modelPresetTextured(const char *modelFilename,
             "_texture", MATTYPE_TEXTURE2D,
             (void *)textureCreate(texturePath, TEXTURETYPE_RGB)));
     modelSetDefaultMaterial(model, material);
-    model->OnDelete = &modelPresetTexturedDelete;
+    model->OnDelete = &modelPresetTexturedFree;
 
     return model;
 }
-void modelPresetTexturedDelete(void *_model) {
+void modelPresetTexturedFree(void *_model) {
     Model *model = (Model *)_model;
+    // delete only one material out of the bunch, assuming that the same
+    // material takes all slots
     if (model->MaterialCount > 0)
         materialFree(model->Materials[0]);
-    modelDelete(model);
+    _modelDelete(model);
+}
+
+void modelFreeWithMaterials(void *_model) {
+    _modelFreeMaterials(_model);
+    _modelDelete(_model);
 }

@@ -37,7 +37,7 @@ void modelRender(Model *model);
 void modelFree(Model *model);
 
 // not to be used directly, but by presets and such
-void modelDelete(void *_model);
-void modelDeleteFreeMaterials(void *_model);
+void _modelDelete(void *_model);
+void _modelFreeMaterials(void *_model);
 
 #endif // !MODEL_H

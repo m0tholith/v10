@@ -36,6 +36,7 @@ int main(void) {
                 "_texture", MATTYPE_TEXTURE2D,
                 (void *)materialTextureDataCreate(model->Textures[i], 0)));
     }
+    model->OnDelete = &modelFreeWithMaterials;
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
@@ -85,7 +86,7 @@ int main(void) {
     for (int i = 0; i < model->MaterialCount; i++) {
         free((MaterialTextureData *)model->Materials[i]->Properties[0]->Data);
     }
-    modelDeleteFreeMaterials(model);
+    modelFree(model);
 
     windowClose();
     return 0;
