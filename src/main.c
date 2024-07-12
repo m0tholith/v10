@@ -85,7 +85,7 @@ int main(void) {
     for (int i = 0; i < model->MaterialCount; i++) {
         free((MaterialTextureData *)model->Materials[i]->Properties[0]->Data);
     }
-    modelFree(model);
+    modelDeleteFreeMaterials(model);
 
     windowClose();
     return 0;
