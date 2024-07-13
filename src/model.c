@@ -132,6 +132,7 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
     newNode->Transform = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
     newNode->Meshes = node->mMeshes;
+    newNode->Name = node->mName.data;
     for (int i = 0; i < node->mNumChildren; i++) {
         newNode->Children[i] = processNode(node->mChildren[i], newNode);
     }

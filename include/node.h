@@ -16,6 +16,8 @@ typedef struct {
 
     int ChildCount;
     void **Children;
+
+    char *Name;
 } Node;
 
 /// free with `nodeFree`
