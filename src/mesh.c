@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
-                 int indexCount) {
+               int indexCount) {
     Mesh *mesh = malloc(sizeof(Mesh));
     mesh->Vertices = vertices;
     mesh->VertexCount = vertexCount;

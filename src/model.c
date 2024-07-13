@@ -40,9 +40,8 @@ Model *modelLoad(const char *modelFilename) {
     model->TextureCount = scene->mNumTextures;
     model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
     for (int i = 0; i < model->TextureCount; i++) {
-        model->Textures[i] = textureCreate(
-            scene->mTextures[i]->mFilename.data,
-            TEXTURETYPE_RGB);
+        model->Textures[i] =
+            textureCreate(scene->mTextures[i]->mFilename.data, TEXTURETYPE_RGB);
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
