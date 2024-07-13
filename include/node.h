@@ -4,6 +4,7 @@
 #include "material.h"
 #include "mesh.h"
 
+/// to be used with the model class
 typedef struct {
     mat4s Transform;
     Material Material;
@@ -17,6 +18,7 @@ typedef struct {
     void **Children;
 } Node;
 
+/// free with `nodeFree`
 Node *nodeCreate(Node *parent, int childCount);
 void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
                 Material **materialArray);

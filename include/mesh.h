@@ -20,8 +20,10 @@ typedef struct {
     int MaterialIndex;
 } Mesh;
 
+/// creates OpenGL buffers with supplied vertices and indices. free with
+/// `meshFree`
 Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
-                 int indexCount);
+               int indexCount);
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader);
 void meshFree(Mesh *mesh);
 

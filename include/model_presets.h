@@ -3,17 +3,17 @@
 
 #include "model.h"
 
-// arguments are vec3s for each material's color for the model
+/// arguments are vec3s for each material's color for the model
 Model *modelPresetTinted(const char *modelFilename,
                          const char *vertexShaderPath,
                          const char *fragmentShaderPath, ...);
-// sets all materials of model to speified texture path using a single material
+/// sets all materials of model to speified texture path using a single material
 Model *modelPresetTextured(const char *modelFilename,
                            const char *vertexShaderPath,
                            const char *fragmentShaderPath,
                            const char *texturePath);
 
-// callback for `modelFree`, calls `_modelDelete` and `_modelFreeMaterials`
+/// callback for `modelFree`, calls `_modelDelete` and `_modelFreeMaterials`
 void modelFreeWithMaterials(void *model);
 
 #endif // !MODEL_PRESETS_H
