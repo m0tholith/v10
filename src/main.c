@@ -1,6 +1,7 @@
 #include "material.h"
 #include "model.h"
 #include "shader.h"
+#include "texture.h"
 #include "window.h"
 
 #include "camera.h"
@@ -26,16 +27,17 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model = modelLoad("models/SM_Deccer_Cubes_Textured_Complex.gltf");
-    for (int i = 0; i < model->MaterialCount; i++) {
-        model->Materials[i] = materialCreate(
-            shaderCreate("shaders/vertex_shader.glsl",
-                         "shaders/fragment_shader.glsl"),
-            1,
-            materialPropertyCreate(
-                "_texture", MATTYPE_TEXTURE2D,
-                (void *)materialTextureDataCreate(model->Textures[i], 0)));
-    }
+    Model *model = modelLoad("models/AnimatedCube.gltf");
+    model->Materials[0] = materialCreate(
+        shaderCreate("shaders/vertex_shader.glsl",
+                     "shaders/fragment_shader.glsl"),
+        1,
+        materialPropertyCreate(
+            "_texture", MATTYPE_TEXTURE2D,
+            (void *)materialTextureDataCreate(
+                textureCreate("textures/AnimatedCube_BaseColor.png",
+                              TEXTURETYPE_RGB),
+                0)));
     model->OnDelete = &modelFreeWithMaterials;
 
     ProjectionMatrix = glms_perspective(
@@ -83,9 +85,7 @@ int main(void) {
         }
     }
 
-    for (int i = 0; i < model->MaterialCount; i++) {
-        free((MaterialTextureData *)model->Materials[i]->Properties[0]->Data);
-    }
+    free((MaterialTextureData *)model->Materials[0]->Properties[0]->Data);
     modelFree(model);
 
     windowClose();
