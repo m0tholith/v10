@@ -17,6 +17,7 @@ typedef struct {
 
     unsigned int MaterialCount;
     Material **Materials;
+
     unsigned int TextureCount;
     unsigned int *Textures;
 

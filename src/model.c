@@ -37,6 +37,7 @@ Model *modelLoad(const char *modelFilename) {
 
     model->MaterialCount = scene->mNumMaterials;
     model->Materials = malloc(model->MaterialCount * sizeof(Material *));
+
     model->TextureCount = scene->mNumTextures;
     model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
     for (int i = 0; i < model->TextureCount; i++) {
