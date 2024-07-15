@@ -42,7 +42,7 @@ Model *modelLoad(const char *modelFilename) {
     model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
     for (int i = 0; i < model->TextureCount; i++) {
         model->Textures[i] =
-            textureCreate(scene->mTextures[i]->mFilename.data, TEXTURETYPE_RGB);
+            textureCreate(scene->mTextures[i]->mFilename.data, TEXTURETYPE_RGB, true);
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
@@ -51,8 +51,8 @@ Model *modelLoad(const char *modelFilename) {
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
     for (int i = 0; i < model->AnimationCount; i++) {
-        model->Animations[i] =
-            animationCreate(model->Scene, scene->mAnimations[i]->mName.data, );
+        model->Animations[i] = animationCreate(
+            model->Scene, scene->mAnimations[i]->mName.data, model->RootNode);
     }
 
     model->OnDelete = &_modelDelete;

@@ -9,6 +9,7 @@ enum TEXTURETYPE {
     TEXTURETYPE_RGBA = 1,
 };
 
-unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type);
+unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type,
+                           bool optional);
 
 #endif // !TEXTURE_H

@@ -37,7 +37,7 @@ Model *modelPresetTextured(const char *modelFilename,
         shaderCreate(vertexShaderPath, fragmentShaderPath), 1,
         materialPropertyCreate(
             "_texture", MATTYPE_TEXTURE2D,
-            (void *)textureCreate(texturePath, TEXTURETYPE_RGB)));
+            (void *)textureCreate(texturePath, TEXTURETYPE_RGB, false)));
     modelSetDefaultMaterial(model, material);
     model->OnDelete = &modelPresetTexturedFree;
 

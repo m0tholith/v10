@@ -13,7 +13,8 @@ unsigned int crc32b(unsigned char *message);
 void texHashmapInsert(unsigned char *textureFile, unsigned int texture);
 unsigned int texHashmapGet(unsigned char *textureFile, bool *success);
 
-unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type) {
+unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type,
+                           bool optional) {
     unsigned int texture;
 
     bool success;
@@ -33,7 +34,10 @@ unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type) {
     if (!data) {
         printf("failed to load texture \"%s\"", textureFile);
         stbi_image_free(data);
-        exit(EXIT_FAILURE);
+        if (optional)
+            return 0;
+        else
+            exit(EXIT_FAILURE);
     }
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
