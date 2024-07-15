@@ -24,7 +24,7 @@ typedef struct {
 } AnimationNode;
 typedef struct {
     int Duration; // in ticks
-    int Time;
+    float Time;
     int TicksPerSec;
     int NodeCount;
     AnimationNode *Nodes;

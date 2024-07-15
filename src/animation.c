@@ -6,7 +6,6 @@
 #include "cglm/struct/affine.h"
 #include "cglm/struct/mat4.h"
 #include "cglm/struct/quat.h"
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -104,7 +103,7 @@ void animationStep(Animation *animation, float deltaTime) {
             int posKeyIndex =
                 (animNode->LastPositionKey + 1) % animNode->PositionKeyCount;
             if (animNode->PositionKeys[posKeyIndex].Time <= animation->Time) {
-                printf("moving to new poskey %d (time %d) at time %d\n",
+                printf("moving to new poskey %d (time %d) at time %.2f\n",
                        posKeyIndex, animNode->PositionKeys[posKeyIndex].Time,
                        animation->Time);
                 newTransform = glms_translate(
@@ -123,7 +122,7 @@ void animationStep(Animation *animation, float deltaTime) {
             int scaleKeyIndex =
                 (animNode->LastScalingKey + 1) % animNode->ScalingKeyCount;
             if (animNode->ScalingKeys[scaleKeyIndex].Time <= animation->Time) {
-                printf("moving to new scalekey %d (time %d) at time %d\n",
+                printf("moving to new scalekey %d (time %d) at time %.2f\n",
                        scaleKeyIndex, animNode->ScalingKeys[scaleKeyIndex].Time,
                        animation->Time);
                 newTransform = glms_scale(
@@ -142,7 +141,7 @@ void animationStep(Animation *animation, float deltaTime) {
             int rotKeyIndex =
                 (animNode->LastRotationKey + 1) % animNode->RotationKeyCount;
             if (animNode->RotationKeys[rotKeyIndex].Time <= animation->Time) {
-                printf("moving to new rotkey %d (time %d) at time %d\n",
+                printf("moving to new rotkey %d (time %d) at time %.2f\n",
                        rotKeyIndex, animNode->RotationKeys[rotKeyIndex].Time,
                        animation->Time);
                 newTransform = glms_quat_rotate(
@@ -159,7 +158,8 @@ void animationStep(Animation *animation, float deltaTime) {
 
         animNode->Node->Transform = newTransform;
     }
-    animation->Time %= animation->Duration;
+    while (animation->Time >= animation->Duration)
+        animation->Time -= animation->Duration;
 }
 void animationFree(Animation *animation) {
     for (int i = 0; i < animation->NodeCount; i++) {
