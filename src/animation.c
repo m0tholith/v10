@@ -106,17 +106,14 @@ void animationStep(Animation *animation, float deltaTime) {
                 printf("moving to new poskey %d (time %d) at time %.2f\n",
                        posKeyIndex, animNode->PositionKeys[posKeyIndex].Time,
                        animation->Time);
-                newTransform = glms_translate(
-                    newTransform, animNode->PositionKeys[posKeyIndex].Value);
                 animNode->LastPositionKey = posKeyIndex;
-            } else
-                newTransform = glms_translate(
-                    newTransform,
-                    animNode->PositionKeys[animNode->LastPositionKey].Value);
-        } else
+            }
             newTransform = glms_translate(
                 newTransform,
                 animNode->PositionKeys[animNode->LastPositionKey].Value);
+        } else
+            newTransform =
+                glms_translate(newTransform, animNode->PositionKeys[0].Value);
 
         if (animNode->ScalingKeyCount > 1) {
             int scaleKeyIndex =
@@ -125,17 +122,14 @@ void animationStep(Animation *animation, float deltaTime) {
                 printf("moving to new scalekey %d (time %d) at time %.2f\n",
                        scaleKeyIndex, animNode->ScalingKeys[scaleKeyIndex].Time,
                        animation->Time);
-                newTransform = glms_scale(
-                    newTransform, animNode->ScalingKeys[scaleKeyIndex].Value);
                 animNode->LastScalingKey = scaleKeyIndex;
-            } else
-                newTransform = glms_scale(
-                    newTransform,
-                    animNode->ScalingKeys[animNode->LastScalingKey].Value);
-        } else
+            }
             newTransform = glms_scale(
                 newTransform,
                 animNode->ScalingKeys[animNode->LastScalingKey].Value);
+        } else
+            newTransform =
+                glms_scale(newTransform, animNode->ScalingKeys[0].Value);
 
         if (animNode->RotationKeyCount > 1) {
             int rotKeyIndex =
@@ -144,17 +138,14 @@ void animationStep(Animation *animation, float deltaTime) {
                 printf("moving to new rotkey %d (time %d) at time %.2f\n",
                        rotKeyIndex, animNode->RotationKeys[rotKeyIndex].Time,
                        animation->Time);
-                newTransform = glms_quat_rotate(
-                    newTransform, animNode->RotationKeys[rotKeyIndex].Value);
                 animNode->LastRotationKey = rotKeyIndex;
-            } else
-                newTransform = glms_quat_rotate(
-                    newTransform,
-                    animNode->RotationKeys[animNode->LastRotationKey].Value);
-        } else
+            }
             newTransform = glms_quat_rotate(
                 newTransform,
                 animNode->RotationKeys[animNode->LastRotationKey].Value);
+        } else
+            newTransform =
+                glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);
 
         animNode->Node->Transform = newTransform;
     }
