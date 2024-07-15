@@ -9,8 +9,8 @@
 #include <string.h>
 
 // `data` should be a pointer to a value defined in `MaterialType`
-MaterialProperty *materialPropertyCreate(const char *name, MaterialType type,
-                                         void *data) {
+MaterialProperty *materialPropertyCreate(const char *name,
+                                         enum MaterialType type, void *data) {
     MaterialProperty *property = malloc(sizeof(MaterialProperty));
     property->Name = name;
     property->Type = type;
