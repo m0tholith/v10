@@ -6,29 +6,33 @@
 #include "node.h"
 
 typedef struct {
-    float Time;
+    int Time;
     vec3s Value;
 } AnimationVectorKey;
 typedef struct {
-    float Time;
+    int Time;
     versors Value;
 } AnimationQuaternionKey;
 
 typedef struct {
     int PositionKeyCount, RotationKeyCount, ScalingKeyCount;
+    int LastPositionKey, LastRotationKey, LastScalingKey;
     AnimationVectorKey *PositionKeys;
     AnimationQuaternionKey *RotationKeys;
     AnimationVectorKey *ScalingKeys;
-    char *Name;
+    Node *Node;
 } AnimationNode;
 typedef struct {
+    int Duration; // in ticks
+    int Time;
+    int TicksPerSec;
     int NodeCount;
     AnimationNode *Nodes;
     char *Name;
 } Animation;
 
-Animation *animationCreate(struct aiScene *scene, char *name);
-void animationPlay(Animation *animation, Node *rootNode);
+Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode);
+void animationStep(Animation *animation, float deltaTime);
 void animationFree(Animation *animation);
 
 #endif // !ANIMATION_H
