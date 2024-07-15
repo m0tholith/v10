@@ -11,6 +11,7 @@ set(SRC_FILES
     src/model.c
     src/model_presets.c
     src/node.c
+    src/animation.c
     src/shader.c
     src/material.c
     src/texture.c

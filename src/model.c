@@ -1,5 +1,5 @@
 #include "model.h"
-#include "assimp/material.h"
+
 #include "material.h"
 #include "texture.h"
 
@@ -48,6 +48,13 @@ Model *modelLoad(const char *modelFilename) {
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
+    model->AnimationCount = scene->mNumAnimations;
+    model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
+    for (int i = 0; i < model->AnimationCount; i++) {
+        model->Animations[i] =
+            animationCreate(model->Scene, scene->mAnimations[i]->mName.data, );
+    }
+
     model->OnDelete = &_modelDelete;
 
     return model;
@@ -77,6 +84,10 @@ void _modelDelete(void *_model) {
     free(model->Materials);
     free(model->Meshes);
     free(model->Textures);
+    for (int i = 0; i < model->AnimationCount; i++) {
+        animationFree(model->Animations[i]);
+    }
+    free(model->Animations);
     free(model);
 }
 void _modelFreeMaterials(void *_model) {

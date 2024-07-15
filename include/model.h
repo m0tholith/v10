@@ -4,6 +4,7 @@
 #include "mesh.h"
 #include "node.h"
 
+#include "animation.h"
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -22,6 +23,9 @@ typedef struct {
     unsigned int *Textures;
 
     Node *RootNode;
+
+    unsigned int AnimationCount;
+    Animation **Animations;
 
     void (*OnDelete)(void *model);
 

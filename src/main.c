@@ -1,3 +1,4 @@
+#include "animation.h"
 #include "material.h"
 #include "model.h"
 #include "shader.h"
@@ -39,6 +40,20 @@ int main(void) {
                               TEXTURETYPE_RGB),
                 0)));
     model->OnDelete = &modelFreeWithMaterials;
+    animationPlay(model->Animations[0], model->RootNode);
+
+    Model *environment =
+        modelLoad("models/SM_Deccer_Cubes_Textured_Complex.gltf");
+    for (int i = 0; i < environment->MaterialCount; i++) {
+        environment->Materials[i] = materialCreate(
+            shaderCreate("shaders/vertex_shader.glsl",
+                         "shaders/fragment_shader.glsl"),
+            1,
+            materialPropertyCreate("_texture", MATTYPE_TEXTURE2D,
+                                   (void *)materialTextureDataCreate(
+                                       environment->Textures[i], 0)));
+    }
+    environment->OnDelete = &modelFreeWithMaterials;
 
     ProjectionMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
@@ -77,6 +92,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         modelRender(model);
+        modelRender(environment);
 
         windowDraw(window);
 
@@ -87,6 +103,11 @@ int main(void) {
 
     free((MaterialTextureData *)model->Materials[0]->Properties[0]->Data);
     modelFree(model);
+    for (int i = 0; i < environment->MaterialCount; i++) {
+        free((MaterialTextureData *)environment->Materials[i]
+                 ->Properties[0]
+                 ->Data);
+    }
 
     windowClose();
     return 0;
