@@ -9,6 +9,7 @@
 #include "input.h"
 #include "model_presets.h"
 #include "rendering.h"
+#include <string.h>
 
 #define MOVE_SPEED 10.0f
 
@@ -37,8 +38,7 @@ int main(void) {
             materialPropertyCreate(
                 "_texture", MATTYPE_TEXTURE2D,
                 (void *)materialTextureDataCreate(
-                    textureCreate("textures/l.jpg",
-                                  TEXTURETYPE_RGB, false),
+                    textureCreate("textures/l.jpg", TEXTURETYPE_RGB, false),
                     0)));
     }
     model->OnDelete = &modelFreeWithMaterials;
@@ -56,7 +56,10 @@ int main(void) {
         deltaTime = currentTime - lastTime;
 
         for (int i = 0; i < model->AnimationCount; i++) {
-            animationStep(model->Animations[i], deltaTime);
+            if (!strncmp(model->Animations[i]->Name, "Linear", 6))
+                animationStepLinear(model->Animations[i], deltaTime);
+            else if (!strncmp(model->Animations[i]->Name, "Step", 4))
+                animationStep(model->Animations[i], deltaTime);
         }
 
         inputMouseUpdate(window);

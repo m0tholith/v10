@@ -61,10 +61,6 @@ Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
         animNode->RotationKeyCount = channel->mNumRotationKeys;
         animNode->ScalingKeyCount = channel->mNumScalingKeys;
 
-        animNode->LastPositionKey = 0;
-        animNode->LastRotationKey = 0;
-        animNode->LastScalingKey = 0;
-
         animNode->PositionKeys =
             malloc(animNode->PositionKeyCount * sizeof(AnimationVectorKey));
         animNode->RotationKeys =
@@ -91,23 +87,14 @@ Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
 
     return resultAnimation;
 }
-int getNextIndexVec(int lastIndex, float targetTime,
-                    AnimationVectorKey *keyArray, int keyCount);
-int getNextIndexQuat(int lastIndex, float targetTime,
-                     AnimationQuaternionKey *keyArray, int keyCount);
+int getNextIndexVec(float targetTime, AnimationVectorKey *keyArray,
+                    int keyCount);
+int getNextIndexQuat(float targetTime, AnimationQuaternionKey *keyArray,
+                     int keyCount);
 void animationStep(Animation *animation, float deltaTime) {
     animation->Time += deltaTime * animation->TicksPerSec;
-    if (animation->Time >= animation->Duration) {
-        // reset keys to not get in an infinite loop; which would keep checking
-        // for keys with times that are greater than the duration
-        for (int i = 0; i < animation->NodeCount; i++) {
-            animation->Nodes[i].LastPositionKey = 0;
-            animation->Nodes[i].LastRotationKey = 0;
-            animation->Nodes[i].LastScalingKey = 0;
-        }
-        while (animation->Time >= animation->Duration)
-            animation->Time -= animation->Duration;
-    }
+    while (animation->Time >= animation->Duration)
+        animation->Time -= animation->Duration;
 
     // now here's the licker
     for (int i = 0; i < animation->NodeCount; i++) {
@@ -115,55 +102,116 @@ void animationStep(Animation *animation, float deltaTime) {
         mat4s newTransform = GLMS_MAT4_IDENTITY;
 
         if (animNode->PositionKeyCount > 1) {
-            int posKeyIndex = getNextIndexVec(
-                animNode->LastPositionKey, animation->Time,
-                animNode->PositionKeys, animNode->PositionKeyCount);
-            if (posKeyIndex !=
-                animNode->LastPositionKey) { // since it could loop back to 0
-                printf("moving to new poskey %d (time %d) at time %.2f\n",
-                       posKeyIndex, animNode->PositionKeys[posKeyIndex].Time,
-                       animation->Time);
-                animNode->LastPositionKey = posKeyIndex;
-            }
-            newTransform = glms_translate(
-                newTransform,
-                animNode->PositionKeys[animNode->LastPositionKey].Value);
+            int nextPosKeyIdx =
+                getNextIndexVec(animation->Time, animNode->PositionKeys,
+                                animNode->PositionKeyCount);
+            int prevPosKeyIdx =
+                (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
+                animNode->PositionKeyCount;
+            AnimationVectorKey prevPosKey =
+                animNode->PositionKeys[prevPosKeyIdx];
+            newTransform = glms_translate(newTransform, prevPosKey.Value);
         } else
             newTransform =
                 glms_translate(newTransform, animNode->PositionKeys[0].Value);
 
         if (animNode->ScalingKeyCount > 1) {
-            int scaleKeyIndex = getNextIndexVec(
-                animNode->LastScalingKey, animation->Time,
-                animNode->ScalingKeys, animNode->ScalingKeyCount);
-            if (scaleKeyIndex !=
-                animNode->LastScalingKey) { // since it could loop back to 0
-                printf("moving to new scalekey %d (time %d) at time %.2f\n",
-                       scaleKeyIndex, animNode->ScalingKeys[scaleKeyIndex].Time,
-                       animation->Time);
-                animNode->LastScalingKey = scaleKeyIndex;
-            }
-            newTransform = glms_scale(
-                newTransform,
-                animNode->ScalingKeys[animNode->LastScalingKey].Value);
+            int nextScaleKeyIdx =
+                getNextIndexVec(animation->Time, animNode->ScalingKeys,
+                                animNode->ScalingKeyCount);
+            int prevScaleKeyIdx =
+                (nextScaleKeyIdx + animNode->ScalingKeyCount - 1) %
+                animNode->ScalingKeyCount;
+            AnimationVectorKey prevScaleKey =
+                animNode->ScalingKeys[prevScaleKeyIdx];
+            newTransform = glms_scale(newTransform, prevScaleKey.Value);
         } else
             newTransform =
                 glms_scale(newTransform, animNode->ScalingKeys[0].Value);
 
         if (animNode->RotationKeyCount > 1) {
-            int rotKeyIndex = getNextIndexQuat(
-                animNode->LastRotationKey, animation->Time,
-                animNode->RotationKeys, animNode->RotationKeyCount);
-            if (rotKeyIndex !=
-                animNode->LastRotationKey) { // since it could loop back to 0
-                printf("moving to new rotkey %d (time %d) at time %.2f\n",
-                       rotKeyIndex, animNode->RotationKeys[rotKeyIndex].Time,
-                       animation->Time);
-                animNode->LastRotationKey = rotKeyIndex;
-            }
+            int nextRotKeyIdx =
+                getNextIndexQuat(animation->Time, animNode->RotationKeys,
+                                 animNode->RotationKeyCount);
+            int prevRotKeyIdx =
+                (nextRotKeyIdx + animNode->RotationKeyCount - 1) %
+                animNode->RotationKeyCount;
+            AnimationQuaternionKey prevRotKey =
+                animNode->RotationKeys[prevRotKeyIdx];
+            newTransform = glms_quat_rotate(newTransform, prevRotKey.Value);
+        } else
+            newTransform =
+                glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);
+
+        animNode->Node->Transform = newTransform;
+    }
+}
+void animationStepLinear(Animation *animation, float deltaTime) {
+    animation->Time += deltaTime * animation->TicksPerSec;
+    while (animation->Time >= animation->Duration)
+        animation->Time -= animation->Duration;
+
+    // now here's the licker
+    for (int i = 0; i < animation->NodeCount; i++) {
+        AnimationNode *animNode = &animation->Nodes[i];
+        mat4s newTransform = GLMS_MAT4_IDENTITY;
+
+        if (animNode->PositionKeyCount > 1) {
+            int nextPosKeyIdx =
+                getNextIndexVec(animation->Time, animNode->PositionKeys,
+                                animNode->PositionKeyCount);
+            int prevPosKeyIdx =
+                (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
+                animNode->PositionKeyCount;
+            AnimationVectorKey nextPosKey =
+                animNode->PositionKeys[nextPosKeyIdx];
+            AnimationVectorKey prevPosKey =
+                animNode->PositionKeys[prevPosKeyIdx];
+            float t = (animation->Time - prevPosKey.Time) /
+                      (nextPosKey.Time - prevPosKey.Time);
+            newTransform = glms_translate(
+                newTransform,
+                glms_vec3_lerp(prevPosKey.Value, nextPosKey.Value, t));
+        } else
+            newTransform =
+                glms_translate(newTransform, animNode->PositionKeys[0].Value);
+
+        if (animNode->ScalingKeyCount > 1) {
+            int nextScaleKeyIdx =
+                getNextIndexVec(animation->Time, animNode->ScalingKeys,
+                                animNode->ScalingKeyCount);
+            int prevScaleKeyIdx =
+                (nextScaleKeyIdx + animNode->ScalingKeyCount - 1) %
+                animNode->ScalingKeyCount;
+            AnimationVectorKey nextScaleKey =
+                animNode->ScalingKeys[nextScaleKeyIdx];
+            AnimationVectorKey prevScaleKey =
+                animNode->ScalingKeys[prevScaleKeyIdx];
+            float t = (animation->Time - prevScaleKey.Time) /
+                      (nextScaleKey.Time - prevScaleKey.Time);
+            newTransform =
+                glms_scale(newTransform, glms_vec3_lerp(prevScaleKey.Value,
+                                                        nextScaleKey.Value, t));
+        } else
+            newTransform =
+                glms_scale(newTransform, animNode->ScalingKeys[0].Value);
+
+        if (animNode->RotationKeyCount > 1) {
+            int nextRotKeyIdx =
+                getNextIndexQuat(animation->Time, animNode->RotationKeys,
+                                 animNode->RotationKeyCount);
+            int prevRotKeyIdx =
+                (nextRotKeyIdx + animNode->RotationKeyCount - 1) %
+                animNode->RotationKeyCount;
+            AnimationQuaternionKey nextRotKey =
+                animNode->RotationKeys[nextRotKeyIdx];
+            AnimationQuaternionKey prevRotKey =
+                animNode->RotationKeys[prevRotKeyIdx];
+            float t = (animation->Time - prevRotKey.Time) /
+                      (nextRotKey.Time - prevRotKey.Time);
             newTransform = glms_quat_rotate(
                 newTransform,
-                animNode->RotationKeys[animNode->LastRotationKey].Value);
+                glms_quat_slerp(prevRotKey.Value, nextRotKey.Value, t));
         } else
             newTransform =
                 glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);
@@ -195,27 +243,21 @@ Node *getAnimationNode(char *nodeName, Node *rootNode) {
 }
 // these two are exactly the same function but because the vector key array is
 // more tightly packed it would be problematic to cast the quat array
-int getNextIndexVec(int lastIndex, float targetTime,
-                    AnimationVectorKey *keyArray, int keyCount) {
-    int result = lastIndex;
-    while (true) {
+int getNextIndexVec(float targetTime, AnimationVectorKey *keyArray,
+                    int keyCount) {
+    int result = 0;
+    while (keyArray[result].Time < targetTime) {
         result += 1;
         result %= keyCount;
-        if (keyArray[result].Time >= targetTime)
-            return lastIndex;
-        lastIndex = result;
     }
-    fprintf(stderr, "what the fuck");
+    return result;
 }
-int getNextIndexQuat(int lastIndex, float targetTime,
-                     AnimationQuaternionKey *keyArray, int keyCount) {
-    int result = lastIndex;
-    while (true) {
+int getNextIndexQuat(float targetTime, AnimationQuaternionKey *keyArray,
+                     int keyCount) {
+    int result = 0;
+    while (keyArray[result].Time < targetTime) {
         result += 1;
         result %= keyCount;
-        if (keyArray[result].Time >= targetTime)
-            return lastIndex;
-        lastIndex = result;
     }
-    fprintf(stderr, "what the fuck");
+    return result;
 }

@@ -16,7 +16,6 @@ typedef struct {
 
 typedef struct {
     int PositionKeyCount, RotationKeyCount, ScalingKeyCount;
-    int LastPositionKey, LastRotationKey, LastScalingKey;
     AnimationVectorKey *PositionKeys;
     AnimationQuaternionKey *RotationKeys;
     AnimationVectorKey *ScalingKeys;
@@ -33,6 +32,7 @@ typedef struct {
 
 Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode);
 void animationStep(Animation *animation, float deltaTime);
+void animationStepLinear(Animation *animation, float deltaTime);
 void animationFree(Animation *animation);
 
 #endif // !ANIMATION_H
