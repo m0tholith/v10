@@ -13,8 +13,13 @@ unsigned int crc32b(unsigned char *message);
 void texHashmapInsert(unsigned char *textureFile, unsigned int texture);
 unsigned int texHashmapGet(unsigned char *textureFile, bool *success);
 
-unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type,
+unsigned int textureCreate(const char *_texturePath, enum TEXTURETYPE type,
                            bool optional) {
+    char *textureFile =
+        malloc(strlen(_texturePath) + sizeof(TEXTURES_PATH));
+    strcpy(textureFile, TEXTURES_PATH);
+    strcat(textureFile, _texturePath);
+
     unsigned int texture;
 
     bool success;
@@ -53,6 +58,7 @@ unsigned int textureCreate(const char *textureFile, enum TEXTURETYPE type,
     stbi_image_free(data);
 
     texHashmapInsert(textureFile, texture);
+    free(textureFile);
     return texture;
 }
 

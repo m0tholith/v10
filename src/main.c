@@ -38,7 +38,7 @@ int main(void) {
             materialPropertyCreate(
                 "_texture", MATTYPE_TEXTURE2D,
                 (void *)materialTextureDataCreate(
-                    textureCreate("textures/l.jpg", TEXTURETYPE_RGB, false),
+                    textureCreate("l.jpg", TEXTURETYPE_RGB, false),
                     0)));
     }
     model->OnDelete = &modelFreeWithMaterials;
