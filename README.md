@@ -26,8 +26,9 @@ nix-shell
 ```
 if you use `nix-direnv` then you probably don't need me to tell you that the devshell will automatically be enabled
 ## future goals maybe (in no particular order)
-- [ ] ~~use any other library than assimp for importing models~~ there is currently no need to do this, vertex colors were assumed to be broken in assimp but it turns out it's not
 - [X] model animations
-    - currently step animations are implemented
+    - [X] step "interpolation"
+    - [X] linear interpolation
+    - [X] smoothstep interpolation
 - [ ] lighting
 - [ ] lua bindings
