@@ -30,5 +30,6 @@ if you use `nix-direnv` then you probably don't need me to tell you that the dev
     - [X] step "interpolation"
     - [X] linear interpolation
     - [X] smoothstep interpolation
+    - [ ] skeletal animation
 - [ ] lighting
 - [ ] lua bindings
