@@ -32,14 +32,11 @@ int main(void) {
     Model *model = modelLoad("models/InterpolationTest.gltf");
     for (int i = 0; i < model->MaterialCount; i++) {
         model->Materials[i] = materialCreate(
-            shaderCreate("shaders/vertex_shader.glsl",
-                         "shaders/fragment_shader.glsl"),
-            1,
+            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 1,
             materialPropertyCreate(
                 "_texture", MATTYPE_TEXTURE2D,
                 (void *)materialTextureDataCreate(
-                    textureCreate("l.jpg", TEXTURETYPE_RGB, false),
-                    0)));
+                    textureCreate("l.jpg", TEXTURETYPE_RGB, false), 0)));
     }
     model->OnDelete = &modelFreeWithMaterials;
 

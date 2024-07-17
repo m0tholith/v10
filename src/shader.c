@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 char *readFile(const char *fileName) {
     FILE *file = fopen(fileName, "rb");
@@ -23,8 +24,17 @@ char *readFile(const char *fileName) {
     return string;
 }
 
-unsigned int shaderCreate(const char *vertexShaderPath,
-                          const char *fragmentShaderPath) {
+unsigned int shaderCreate(const char *_vertexShaderPath,
+                          const char *_fragmentShaderPath) {
+    char *vertexShaderPath =
+        malloc(strlen(_vertexShaderPath) + sizeof(SHADERS_PATH));
+    strcpy(vertexShaderPath, SHADERS_PATH);
+    strcat(vertexShaderPath, _vertexShaderPath);
+    char *fragmentShaderPath =
+        malloc(strlen(_fragmentShaderPath) + sizeof(SHADERS_PATH));
+    strcpy(fragmentShaderPath, SHADERS_PATH);
+    strcat(fragmentShaderPath, _fragmentShaderPath);
+
     char *vertexShaderContents = readFile(vertexShaderPath);
     const char *vertexShaderSource = vertexShaderContents;
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -69,5 +79,7 @@ unsigned int shaderCreate(const char *vertexShaderPath,
 
     free(vertexShaderContents);
     free(fragmentShaderContents);
+    free(vertexShaderPath);
+    free(fragmentShaderPath);
     return shaderProgram;
 }
