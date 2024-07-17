@@ -26,7 +26,7 @@ int main(void) {
     inputInit(window);
 
     Camera camera =
-        cameraCreate((vec3s){{0.0f, 1.0f, -1.0f}}, GLMS_QUAT_IDENTITY);
+        cameraCreate((vec3s){{0.0f, 5.0f, 15.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     Model *model = modelLoad("models/InterpolationTest.gltf");
