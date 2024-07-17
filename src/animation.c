@@ -6,9 +6,17 @@
 #include "cglm/struct/affine.h"
 #include "cglm/struct/mat4.h"
 #include "cglm/struct/quat.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// interpolation functions
+float StepInterp(float x) { return 0; }
+float LinearInterp(float x) { return x; }
+float SmoothStepInterp(float x) {
+    return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
+}
 
 vec3s aiVecToVec3s(struct aiVector3D vec) {
     return (vec3s){
@@ -48,6 +56,14 @@ Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
     resultAnimation->TicksPerSec = animation->mTicksPerSecond;
     resultAnimation->Time = 0;
 
+    float (*interpFunction)(float);
+    if (!strncmp(resultAnimation->Name, "Step", 4))
+        interpFunction = StepInterp;
+    else if (!strncmp(resultAnimation->Name, "Linear", 6))
+        interpFunction = LinearInterp;
+    else if (!strncmp(resultAnimation->Name, "CubicSpline", 11))
+        interpFunction = SmoothStepInterp;
+
     resultAnimation->NodeCount = animation->mNumChannels;
     resultAnimation->Nodes =
         malloc(animation->mNumChannels * sizeof(AnimationNode));
@@ -56,6 +72,8 @@ Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
         AnimationNode *animNode = &resultAnimation->Nodes[i];
         struct aiNodeAnim *channel = animation->mChannels[i];
         animNode->Node = getAnimationNode(channel->mNodeName.data, rootNode);
+
+        animNode->InterpFunction = interpFunction;
 
         animNode->PositionKeyCount = channel->mNumPositionKeys;
         animNode->RotationKeyCount = channel->mNumRotationKeys;
@@ -108,61 +126,6 @@ void animationStep(Animation *animation, float deltaTime) {
             int prevPosKeyIdx =
                 (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
                 animNode->PositionKeyCount;
-            AnimationVectorKey prevPosKey =
-                animNode->PositionKeys[prevPosKeyIdx];
-            newTransform = glms_translate(newTransform, prevPosKey.Value);
-        } else
-            newTransform =
-                glms_translate(newTransform, animNode->PositionKeys[0].Value);
-
-        if (animNode->ScalingKeyCount > 1) {
-            int nextScaleKeyIdx =
-                getNextIndexVec(animation->Time, animNode->ScalingKeys,
-                                animNode->ScalingKeyCount);
-            int prevScaleKeyIdx =
-                (nextScaleKeyIdx + animNode->ScalingKeyCount - 1) %
-                animNode->ScalingKeyCount;
-            AnimationVectorKey prevScaleKey =
-                animNode->ScalingKeys[prevScaleKeyIdx];
-            newTransform = glms_scale(newTransform, prevScaleKey.Value);
-        } else
-            newTransform =
-                glms_scale(newTransform, animNode->ScalingKeys[0].Value);
-
-        if (animNode->RotationKeyCount > 1) {
-            int nextRotKeyIdx =
-                getNextIndexQuat(animation->Time, animNode->RotationKeys,
-                                 animNode->RotationKeyCount);
-            int prevRotKeyIdx =
-                (nextRotKeyIdx + animNode->RotationKeyCount - 1) %
-                animNode->RotationKeyCount;
-            AnimationQuaternionKey prevRotKey =
-                animNode->RotationKeys[prevRotKeyIdx];
-            newTransform = glms_quat_rotate(newTransform, prevRotKey.Value);
-        } else
-            newTransform =
-                glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);
-
-        animNode->Node->Transform = newTransform;
-    }
-}
-void animationStepLinear(Animation *animation, float deltaTime) {
-    animation->Time += deltaTime * animation->TicksPerSec;
-    while (animation->Time >= animation->Duration)
-        animation->Time -= animation->Duration;
-
-    // now here's the licker
-    for (int i = 0; i < animation->NodeCount; i++) {
-        AnimationNode *animNode = &animation->Nodes[i];
-        mat4s newTransform = GLMS_MAT4_IDENTITY;
-
-        if (animNode->PositionKeyCount > 1) {
-            int nextPosKeyIdx =
-                getNextIndexVec(animation->Time, animNode->PositionKeys,
-                                animNode->PositionKeyCount);
-            int prevPosKeyIdx =
-                (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
-                animNode->PositionKeyCount;
             AnimationVectorKey nextPosKey =
                 animNode->PositionKeys[nextPosKeyIdx];
             AnimationVectorKey prevPosKey =
@@ -170,8 +133,8 @@ void animationStepLinear(Animation *animation, float deltaTime) {
             float t = (animation->Time - prevPosKey.Time) /
                       (nextPosKey.Time - prevPosKey.Time);
             newTransform = glms_translate(
-                newTransform,
-                glms_vec3_lerp(prevPosKey.Value, nextPosKey.Value, t));
+                newTransform, glms_vec3_lerp(prevPosKey.Value, nextPosKey.Value,
+                                             animNode->InterpFunction(t)));
         } else
             newTransform =
                 glms_translate(newTransform, animNode->PositionKeys[0].Value);
@@ -189,9 +152,10 @@ void animationStepLinear(Animation *animation, float deltaTime) {
                 animNode->ScalingKeys[prevScaleKeyIdx];
             float t = (animation->Time - prevScaleKey.Time) /
                       (nextScaleKey.Time - prevScaleKey.Time);
-            newTransform =
-                glms_scale(newTransform, glms_vec3_lerp(prevScaleKey.Value,
-                                                        nextScaleKey.Value, t));
+            newTransform = glms_scale(
+                newTransform,
+                glms_vec3_lerp(prevScaleKey.Value, nextScaleKey.Value,
+                               animNode->InterpFunction(t)));
         } else
             newTransform =
                 glms_scale(newTransform, animNode->ScalingKeys[0].Value);
@@ -211,7 +175,8 @@ void animationStepLinear(Animation *animation, float deltaTime) {
                       (nextRotKey.Time - prevRotKey.Time);
             newTransform = glms_quat_rotate(
                 newTransform,
-                glms_quat_slerp(prevRotKey.Value, nextRotKey.Value, t));
+                glms_quat_slerp(prevRotKey.Value, nextRotKey.Value,
+                                animNode->InterpFunction(t)));
         } else
             newTransform =
                 glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);

@@ -56,10 +56,7 @@ int main(void) {
         deltaTime = currentTime - lastTime;
 
         for (int i = 0; i < model->AnimationCount; i++) {
-            if (!strncmp(model->Animations[i]->Name, "Linear", 6))
-                animationStepLinear(model->Animations[i], deltaTime);
-            else if (!strncmp(model->Animations[i]->Name, "Step", 4))
-                animationStep(model->Animations[i], deltaTime);
+            animationStep(model->Animations[i], deltaTime);
         }
 
         inputMouseUpdate(window);

@@ -20,6 +20,9 @@ typedef struct {
     AnimationQuaternionKey *RotationKeys;
     AnimationVectorKey *ScalingKeys;
     Node *Node;
+    /// interpolation function to use for this animation node; set with
+    /// `animationCreate`
+    float (*InterpFunction)(float);
 } AnimationNode;
 typedef struct {
     int Duration; // in ticks
@@ -30,12 +33,15 @@ typedef struct {
     char *Name;
 } Animation;
 
+// interpolation functions
+float StepInterp(float x);
+float LinearInterp(float x);
+float SmoothStepInterp(float x);
+
 /// free with `animationFree`
 Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode);
-/// step animation; no interpolation
+/// step animation using `InterpFunction` defined by each node
 void animationStep(Animation *animation, float deltaTime);
-/// step animation; linear interpolation
-void animationStepLinear(Animation *animation, float deltaTime);
 void animationFree(Animation *animation);
 
 #endif // !ANIMATION_H
