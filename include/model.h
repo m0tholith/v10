@@ -1,6 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#define MODELS_PATH "models/"
+
 #include "mesh.h"
 #include "node.h"
 

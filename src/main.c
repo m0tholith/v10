@@ -29,7 +29,7 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 5.0f, 15.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model = modelLoad("models/InterpolationTest.gltf");
+    Model *model = modelLoad("InterpolationTest.gltf");
     for (int i = 0; i < model->MaterialCount; i++) {
         model->Materials[i] = materialCreate(
             shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 1,

@@ -12,10 +12,14 @@
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
 
-Model *modelLoad(const char *modelFilename) {
+Model *modelLoad(const char *_modelPath) {
+    char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
+    strcpy(modelFile, MODELS_PATH);
+    strcat(modelFile, _modelPath);
+
     const struct aiScene *scene = aiImportFile(
-        modelFilename, aiProcess_Triangulate | aiProcess_FlipUVs |
-                           aiProcess_GenNormals | aiProcess_SplitLargeMeshes);
+        modelFile, aiProcess_Triangulate | aiProcess_FlipUVs |
+                       aiProcess_GenNormals | aiProcess_SplitLargeMeshes);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         printf("assimp error: %s", aiGetErrorString());
@@ -41,8 +45,8 @@ Model *modelLoad(const char *modelFilename) {
     model->TextureCount = scene->mNumTextures;
     model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
     for (int i = 0; i < model->TextureCount; i++) {
-        model->Textures[i] =
-            textureCreate(scene->mTextures[i]->mFilename.data, TEXTURETYPE_RGB, true);
+        model->Textures[i] = textureCreate(scene->mTextures[i]->mFilename.data,
+                                           TEXTURETYPE_RGB, true);
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
@@ -56,6 +60,8 @@ Model *modelLoad(const char *modelFilename) {
     }
 
     model->OnDelete = &_modelDelete;
+
+    free(modelFile);
 
     return model;
 }
