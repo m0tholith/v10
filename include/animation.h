@@ -30,8 +30,11 @@ typedef struct {
     char *Name;
 } Animation;
 
+/// free with `animationFree`
 Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode);
+/// step animation; no interpolation
 void animationStep(Animation *animation, float deltaTime);
+/// step animation; linear interpolation
 void animationStepLinear(Animation *animation, float deltaTime);
 void animationFree(Animation *animation);
 
