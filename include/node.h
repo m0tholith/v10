@@ -22,7 +22,7 @@ typedef struct {
 
 /// free with `nodeFree`
 Node *nodeCreate(Node *parent, int childCount);
-void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
+void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
                 Material **materialArray);
 void nodeFree(Node *node);
 

@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include "material.h"
+#include "mesh.h"
 #include "texture.h"
 
 #include <cglm/struct/mat4.h>
@@ -31,12 +32,10 @@ Model *modelLoad(const char *_modelPath) {
     model->Transform = GLMS_MAT4_IDENTITY;
 
     model->MeshCount = scene->mNumMeshes;
-    model->Meshes = malloc(model->MeshCount * sizeof(Mesh));
-    Mesh *meshAlloc;
+    model->Meshes = malloc(model->MeshCount * sizeof(Mesh *));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        meshAlloc = processMesh(scene->mMeshes[i], scene);
-        model->Meshes[i] = *meshAlloc;
-        free(meshAlloc);
+        model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
+        meshSendData(&*model->Meshes[i]);
     }
 
     model->MaterialCount = scene->mNumMaterials;
@@ -88,6 +87,9 @@ void _modelDelete(void *_model) {
     aiReleaseImport(model->Scene);
     nodeFree(model->RootNode);
     free(model->Materials);
+    for (int i = 0; i < model->MeshCount; i++) {
+        meshFree(model->Meshes[i]);
+    }
     free(model->Meshes);
     free(model->Textures);
     for (int i = 0; i < model->AnimationCount; i++) {
@@ -104,8 +106,8 @@ void _modelFreeMaterials(void *_model) {
 }
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
-    Vertex vertices[mesh->mNumVertices];
-    unsigned int indices[mesh->mNumFaces * 3];
+    Vertex *vertices = malloc(mesh->mNumVertices * sizeof(Vertex));
+    unsigned int *indices = malloc(mesh->mNumFaces * 3 * sizeof(unsigned int));
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex v = {0};
 

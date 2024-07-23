@@ -14,6 +14,9 @@ Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
     mesh->IndexCount = indexCount;
     mesh->Transform = GLMS_MAT4_IDENTITY;
 
+    return mesh;
+}
+void meshSendData(Mesh *mesh) {
     // generate vertex array object which contains information about all the
     // vertices
     glGenVertexArrays(1, &mesh->VAO);
@@ -22,8 +25,8 @@ Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
     // generate vertex buffer object which is the actual vertex data
     glGenBuffers(1, &mesh->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mesh->VertexCount * sizeof(Vertex),
+                 mesh->Vertices, GL_STATIC_DRAW);
 
     int attribIdx = 0;
     // position vertex attribute
@@ -47,10 +50,9 @@ Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
     // of vertices to draw
     glGenBuffers(1, &mesh->EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int),
-                 indices, GL_STATIC_DRAW);
-
-    return mesh;
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 mesh->IndexCount * sizeof(unsigned int), mesh->Indices,
+                 GL_STATIC_DRAW);
 }
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glUseProgram(shader);
@@ -70,4 +72,8 @@ void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glDrawElements(GL_TRIANGLES, mesh->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
-void meshFree(Mesh *mesh) { free(mesh); }
+void meshFree(Mesh *mesh) {
+    free(mesh->Vertices);
+    free(mesh->Indices);
+    free(mesh);
+}

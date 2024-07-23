@@ -13,12 +13,12 @@ Node *nodeCreate(Node *parent, int childCount) {
     return node;
 }
 mat4s getFinalTransformation(Node *node);
-void nodeRender(mat4s transform, Node *node, Mesh *meshArray,
+void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
                 Material **materialArray) {
     mat4s transformation =
         glms_mat4_mul(transform, getFinalTransformation(node));
     for (int i = 0; i < node->MeshCount; i++) {
-        Mesh *mesh = &meshArray[node->Meshes[i]];
+        Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
         materialApplyProperties(material);

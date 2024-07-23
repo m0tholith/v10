@@ -24,6 +24,7 @@ typedef struct {
 /// `meshFree`
 Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
                int indexCount);
+void meshSendData(Mesh *mesh);
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader);
 void meshFree(Mesh *mesh);
 
