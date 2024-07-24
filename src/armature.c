@@ -6,7 +6,7 @@
 Armature *armatureCreate() {
     Armature *armature = malloc(sizeof(Armature));
     for (int i = 0; i < MAX_BONES; i++) {
-        armature->Bones[i].BoneNode = NULL;
+        armature->Bones[i] = NULL;
         armature->BoneMatrices[i] = GLMS_MAT4_IDENTITY;
     }
     return armature;

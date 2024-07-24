@@ -203,9 +203,9 @@ Armature *processSkeleton(struct aiScene *scene, Mesh **meshes,
         Mesh *mesh = meshes[i];
         for (int j = 0; j < assimpMesh->mNumBones; j++) {
             struct aiBone *assimpBone = assimpMesh->mBones[j];
-            skeleton->Bones[boneCount].BoneNode =
+            skeleton->Bones[boneCount] =
                 searchForNode(assimpBone->mNode->mName.data, rootNode);
-            if (skeleton->Bones[boneCount].BoneNode == NULL) {
+            if (skeleton->Bones[boneCount] == NULL) {
                 boneCount++;
                 continue;
             }
