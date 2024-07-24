@@ -39,5 +39,7 @@ void nodeFree(Node *node) {
         nodeFree(node->Children[i]);
     }
     free(node->Children);
+    free(node->Name);
+    free(node->Meshes);
     free(node);
 }

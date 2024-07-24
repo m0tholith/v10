@@ -12,7 +12,8 @@
 MaterialProperty *materialPropertyCreate(const char *name,
                                          enum MaterialType type, void *data) {
     MaterialProperty *property = malloc(sizeof(MaterialProperty));
-    property->Name = name;
+    property->Name = malloc(strlen(name) * sizeof(char) + 1);
+    strcpy(property->Name, name);
     property->Type = type;
     property->Data = data;
     return property;

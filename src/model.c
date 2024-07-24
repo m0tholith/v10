@@ -35,7 +35,6 @@ Model *modelLoad(const char *_modelPath) {
     }
 
     Model *model = malloc(sizeof(Model));
-    model->Scene = scene;
 
     model->Transform = GLMS_MAT4_IDENTITY;
 
@@ -67,12 +66,13 @@ Model *modelLoad(const char *_modelPath) {
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
     for (int i = 0; i < model->AnimationCount; i++) {
         model->Animations[i] = animationCreate(
-            model->Scene, scene->mAnimations[i]->mName.data, model->RootNode);
+            scene, scene->mAnimations[i]->mName.data, model->RootNode);
     }
 
     model->OnDelete = &_modelDelete;
 
     free(modelFile);
+    aiReleaseImport(scene);
 
     return model;
 }
@@ -102,7 +102,6 @@ void modelRender(Model *model) {
 void modelFree(Model *model) { (model->OnDelete)(model); }
 void _modelDelete(void *_model) {
     Model *model = (Model *)_model;
-    aiReleaseImport(model->Scene);
     nodeFree(model->RootNode);
     free(model->Materials);
     for (int i = 0; i < model->MeshCount; i++) {
@@ -174,8 +173,11 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
     Node *newNode = nodeCreate(parentNode, node->mNumChildren);
     newNode->Transform = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
-    newNode->Meshes = node->mMeshes;
-    newNode->Name = node->mName.data;
+    newNode->Meshes = malloc(node->mNumMeshes * sizeof(unsigned int));
+    memcpy(newNode->Meshes, node->mMeshes,
+           node->mNumMeshes * sizeof(unsigned int));
+    newNode->Name = malloc(node->mName.length * sizeof(char) + 1);
+    strcpy(newNode->Name, node->mName.data);
     for (int i = 0; i < node->mNumChildren; i++) {
         newNode->Children[i] = processNode(node->mChildren[i], newNode);
     }

@@ -20,7 +20,7 @@ enum MaterialType {
 
 typedef struct {
     enum MaterialType Type;
-    const char *Name;
+    char *Name;
     void *Data;
 } MaterialProperty;
 typedef struct {

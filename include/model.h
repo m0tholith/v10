@@ -33,8 +33,6 @@ typedef struct {
     Animation **Animations;
 
     void (*OnDelete)(void *model);
-
-    const struct aiScene *Scene;
 } Model;
 
 /// manages rendering a 3d file. free with `modelFree`
