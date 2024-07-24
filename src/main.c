@@ -26,17 +26,13 @@ int main(void) {
     inputInit(window);
 
     Camera camera =
-        cameraCreate((vec3s){{0.0f, 5.0f, 15.0f}}, GLMS_QUAT_IDENTITY);
+        cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model = modelLoad("InterpolationTest.gltf");
+    Model *model = modelLoad("RiggedSimple.glb");
     for (int i = 0; i < model->MaterialCount; i++) {
         model->Materials[i] = materialCreate(
-            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 1,
-            materialPropertyCreate(
-                "_texture", MATTYPE_TEXTURE2D,
-                (void *)materialTextureDataCreate(
-                    textureCreate("l.jpg", TEXTURETYPE_RGB, false), 0)));
+            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 0);
     }
     model->OnDelete = &modelFreeWithMaterials;
 
@@ -89,8 +85,6 @@ int main(void) {
         }
     }
 
-    for (int i = 0; i < model->MaterialCount; i++)
-        free((MaterialTextureData *)model->Materials[i]->Properties[0]->Data);
     modelFree(model);
 
     windowClose();

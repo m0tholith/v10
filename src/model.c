@@ -1,17 +1,24 @@
 #include "model.h"
 
+#include "armature.h"
+#include "assimp/postprocess.h"
 #include "material.h"
 #include "mesh.h"
+#include "node.h"
 #include "texture.h"
+#include <glad/glad.h>
 
+#include <GL/gl.h>
 #include <cglm/struct/mat4.h>
 #include <cglm/struct/vec2.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
+Armature *processSkeleton(struct aiScene *scene, Mesh **meshes, Node *rootNode);
 
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -20,7 +27,8 @@ Model *modelLoad(const char *_modelPath) {
 
     const struct aiScene *scene = aiImportFile(
         modelFile, aiProcess_Triangulate | aiProcess_FlipUVs |
-                       aiProcess_GenNormals | aiProcess_SplitLargeMeshes);
+                       aiProcess_GenNormals | aiProcess_SplitLargeMeshes |
+                       aiProcess_PopulateArmatureData);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         printf("assimp error: %s", aiGetErrorString());
@@ -35,7 +43,6 @@ Model *modelLoad(const char *_modelPath) {
     model->Meshes = malloc(model->MeshCount * sizeof(Mesh *));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
-        meshSendData(&*model->Meshes[i]);
     }
 
     model->MaterialCount = scene->mNumMaterials;
@@ -50,6 +57,11 @@ Model *modelLoad(const char *_modelPath) {
 
     model->RootNode = processNode(scene->mRootNode, NULL);
     model->RootNode->Transform = GLMS_MAT4_IDENTITY;
+
+    model->Skeleton = processSkeleton(scene, model->Meshes, model->RootNode);
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
+        meshSendData(model->Meshes[i]);
+    }
 
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
@@ -78,6 +90,12 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
+    armatureSetBoneMatrices(model->Skeleton);
+    for (int i = 0; i < model->MaterialCount; i++) {
+        glUniformMatrix4fv(
+            glGetUniformLocation(model->Materials[i]->Shader, "boneMatrices"),
+            MAX_BONES, GL_FALSE, (GLfloat *)model->Skeleton->BoneMatrices);
+    }
     nodeRender(model->Transform, model->RootNode, model->Meshes,
                model->Materials);
 }
@@ -96,6 +114,7 @@ void _modelDelete(void *_model) {
         animationFree(model->Animations[i]);
     }
     free(model->Animations);
+    armatureFree(model->Skeleton);
     free(model);
 }
 void _modelFreeMaterials(void *_model) {
@@ -128,6 +147,10 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
             }};
         else
             v.Color = GLMS_VEC3_ONE;
+        for (int j = 0; j < MAX_BONE_INFLUENCE; j++) {
+            v.BoneIDs[j] = -1;
+            v.Weights[j] = 0;
+        }
         vertices[i] = v;
     }
     for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
@@ -157,4 +180,48 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
         newNode->Children[i] = processNode(node->mChildren[i], newNode);
     }
     return newNode;
+}
+
+Node *searchForNode(char *name, Node *rootNode) {
+    if (!strcmp(name, rootNode->Name))
+        return rootNode;
+    for (int i = 0; i < rootNode->ChildCount; i++) {
+        Node *result = searchForNode(name, rootNode->Children[i]);
+        if (result != NULL)
+            return result;
+    }
+    return NULL;
+}
+Armature *processSkeleton(struct aiScene *scene, Mesh **meshes,
+                          Node *rootNode) {
+    Armature *skeleton = armatureCreate();
+    int boneCount = 0;
+    for (int i = 0; i < scene->mNumMeshes; i++) {
+        struct aiMesh *assimpMesh = scene->mMeshes[i];
+        Mesh *mesh = meshes[i];
+        for (int j = 0; j < assimpMesh->mNumBones; j++) {
+            struct aiBone *assimpBone = assimpMesh->mBones[j];
+            skeleton->Bones[boneCount].BoneNode =
+                searchForNode(assimpBone->mNode->mName.data, rootNode);
+            if (skeleton->Bones[boneCount].BoneNode == NULL) {
+                boneCount++;
+                continue;
+            }
+            for (int k = 0; k < assimpBone->mNumWeights; k++) {
+                Vertex *vertex =
+                    &mesh->Vertices[assimpBone->mWeights[k].mVertexId];
+                int boneIndex = 0;
+                while (boneIndex < MAX_BONE_INFLUENCE &&
+                       vertex->BoneIDs[boneIndex] != -1)
+                    boneIndex++;
+                if (boneIndex == MAX_BONE_INFLUENCE)
+                    continue;
+                vertex->BoneIDs[boneIndex] = boneCount;
+                vertex->Weights[boneIndex] = assimpBone->mWeights[k].mWeight;
+            }
+            boneCount++;
+        }
+    }
+    armatureSetBoneMatrices(skeleton);
+    return skeleton;
 }

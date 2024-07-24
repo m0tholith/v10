@@ -5,6 +5,7 @@
 
 #include "mesh.h"
 #include "node.h"
+#include "armature.h"
 
 #include "animation.h"
 #include <assimp/cimport.h>
@@ -17,6 +18,8 @@ typedef struct {
 
     unsigned int MeshCount;
     Mesh **Meshes;
+
+    Armature *Skeleton;
 
     unsigned int MaterialCount;
     Material **Materials;

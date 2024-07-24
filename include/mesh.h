@@ -3,11 +3,15 @@
 
 #include "cglm/types-struct.h"
 
+#define MAX_BONE_INFLUENCE 4
+
 typedef struct {
     vec3s Position;
     vec3s Normal;
     vec2s TexCoords;
     vec3s Color;
+    float BoneIDs[MAX_BONE_INFLUENCE];
+    float Weights[MAX_BONE_INFLUENCE];
 } Vertex;
 typedef struct {
     Vertex *Vertices;
