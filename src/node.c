@@ -12,11 +12,10 @@ Node *nodeCreate(Node *parent, int childCount) {
     node->Children = malloc(childCount * sizeof(Node *));
     return node;
 }
-mat4s getFinalTransformation(Node *node);
 void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
                 Material **materialArray) {
     mat4s transformation =
-        glms_mat4_mul(transform, getFinalTransformation(node));
+        glms_mat4_mul(transform, nodeGetFinalTransform(node));
     for (int i = 0; i < node->MeshCount; i++) {
         Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
@@ -28,16 +27,17 @@ void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
         nodeRender(transform, node->Children[i], meshArray, materialArray);
     }
 }
+mat4s nodeGetFinalTransform(Node *node) {
+    if (node == NULL)
+        return GLMS_MAT4_IDENTITY;
+    if (node->Parent == NULL)
+        return node->Transform;
+    return glms_mat4_mul(nodeGetFinalTransform(node->Parent), node->Transform);
+}
 void nodeFree(Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
         nodeFree(node->Children[i]);
     }
     free(node->Children);
     free(node);
-}
-
-mat4s getFinalTransformation(Node *node) {
-    if (!node->Parent)
-        return node->Transform;
-    return glms_mat4_mul(getFinalTransformation(node->Parent), node->Transform);
 }
