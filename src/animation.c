@@ -63,6 +63,8 @@ Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
         interpFunction = LinearInterp;
     else if (!strncmp(resultAnimation->Name, "CubicSpline", 11))
         interpFunction = SmoothStepInterp;
+    else
+        interpFunction = LinearInterp;
 
     resultAnimation->NodeCount = animation->mNumChannels;
     resultAnimation->Nodes =
