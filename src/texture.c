@@ -37,7 +37,7 @@ unsigned int textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     else
         data = stbi_load(textureFile, &width, &height, &numColorChannels, 0);
     if (!data) {
-        printf("failed to load texture \"%s\"", textureFile);
+        printf("failed to load texture \"%s\"\n", textureFile);
         stbi_image_free(data);
         if (optional)
             return 0;
