@@ -93,7 +93,7 @@ void modelRender(Model *model) {
     armatureSetBoneMatrices(model->Skeleton);
     for (int i = 0; i < model->MaterialCount; i++) {
         glUniformMatrix4fv(
-            glGetUniformLocation(model->Materials[i]->Shader, "boneMatrices"),
+            glGetUniformLocation(model->Materials[i]->Shader, "boneFromRoot"),
             MAX_BONES, GL_FALSE, (GLfloat *)model->Skeleton->BoneMatrices);
     }
     nodeRender(model->Transform, model->RootNode, model->Meshes,

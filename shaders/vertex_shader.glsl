@@ -13,8 +13,8 @@ layout(location = 5) in float weights[MAX_BONE_INFLUENCE];
 out vec3 vColor;
 out vec2 vTexCoord;
 
-uniform mat4 boneMatrices[MAX_BONES];
-uniform mat4 mvpMatrix;
+uniform mat4 boneFromRoot[MAX_BONES];
+uniform mat4 projectionFromModel;
 
 void main()
 {
@@ -35,10 +35,10 @@ void main()
             totalPosition = vec4(vertPos, 1.0f);
             break;
         }
-        vec4 localPosition = boneMatrices[int(boneIDs[i])] * vec4(vertPos, 1.0f);
+        vec4 localPosition = boneFromRoot[int(boneIDs[i])] * vec4(vertPos, 1.0f);
         totalPosition += localPosition * weights[i];
         vColor = vec3(0, 1, 0);
     }
 
-    gl_Position = mvpMatrix * totalPosition;
+    gl_Position = projectionFromModel * totalPosition;
 }
