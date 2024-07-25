@@ -224,6 +224,7 @@ Armature *processSkeleton(struct aiScene *scene, Mesh **meshes,
             boneCount++;
         }
     }
+    printf("boneCount = %d\n", boneCount);
     armatureSetBoneMatrices(skeleton);
     return skeleton;
 }
