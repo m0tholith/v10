@@ -10,7 +10,7 @@ typedef struct {
     vec3s Normal;
     vec2s TexCoords;
     vec3s Color;
-    float BoneIDs[MAX_BONE_INFLUENCE];
+    int BoneIDs[MAX_BONE_INFLUENCE];
     float Weights[MAX_BONE_INFLUENCE];
 } Vertex;
 typedef struct {

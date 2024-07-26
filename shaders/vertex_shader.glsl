@@ -7,8 +7,8 @@ layout(location = 0) in vec3 vertPos;
 layout(location = 1) in vec3 vertNormal;
 layout(location = 2) in vec2 vertTexCoord;
 layout(location = 3) in vec3 vertColor;
-layout(location = 4) in float boneIDs[MAX_BONE_INFLUENCE];
-layout(location = 5) in float weights[MAX_BONE_INFLUENCE];
+layout(location = 4) in ivec4 boneIDs;
+layout(location = 5) in vec4 weights;
 
 out vec3 vColor;
 out vec2 vTexCoord;
@@ -35,7 +35,7 @@ void main()
             totalPosition = vec4(vertPos, 1.0f);
             break;
         }
-        vec4 localPosition = boneFromRoot[int(boneIDs[i])] * vec4(vertPos, 1.0f);
+        vec4 localPosition = boneFromRoot[boneIDs[i]] * vec4(vertPos, 1.0f);
         totalPosition += localPosition * weights[i];
         vColor = vec3(0, 1, 0);
     }
