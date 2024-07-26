@@ -13,7 +13,7 @@ layout(location = 5) in vec4 weights;
 out vec3 vColor;
 out vec2 vTexCoord;
 
-uniform mat4 boneFromRoot[MAX_BONES];
+uniform mat4 boneTransformations[MAX_BONES];
 uniform mat4 projectionFromModel;
 
 void main()
@@ -35,7 +35,7 @@ void main()
             totalPosition = vec4(vertPos, 1.0f);
             break;
         }
-        vec4 localPosition = boneFromRoot[boneIDs[i]] * vec4(vertPos, 1.0f);
+        vec4 localPosition = boneTransformations[boneIDs[i]] * vec4(vertPos, 1.0f);
         totalPosition += localPosition * weights[i];
         vColor = vec3(0, 1, 0);
     }

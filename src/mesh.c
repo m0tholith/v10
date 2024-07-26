@@ -65,15 +65,15 @@ void meshSendData(Mesh *mesh) {
 void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glUseProgram(shader);
 
-    // assign modelFromProjection matrix
-    mat4s modelFromProjection = glms_mat4_mul(
+    // assign projectionFromModel matrix
+    mat4s projectionFromModel = glms_mat4_mul(
         ProjectionMatrix,
         glms_mat4_mul(ViewMatrix,
                       glms_mat4_mul(transformation, mesh->Transform)));
-    // `modelFromProjection` should probably always be defined and used in the
+    // `projectionFromModel` should probably always be defined and used in the
     // vertex shader
-    glUniformMatrix4fv(glGetUniformLocation(shader, "modelFromProjection"), 1,
-                       GL_FALSE, modelFromProjection.raw[0]);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "projectionFromModel"), 1,
+                       GL_FALSE, projectionFromModel.raw[0]);
 
     // render triangles
     glBindVertexArray(mesh->VAO);

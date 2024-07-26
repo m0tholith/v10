@@ -18,7 +18,8 @@
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
-Armature *processSkeleton(struct aiScene *scene, Mesh **meshes, Node *rootNode);
+Armature *processSkeleton(const struct aiScene *scene, Mesh **meshes,
+                          Node *rootNode);
 
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -55,7 +56,6 @@ Model *modelLoad(const char *_modelPath) {
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
-    model->RootNode->Transform = GLMS_MAT4_IDENTITY;
 
     model->Skeleton = processSkeleton(scene, model->Meshes, model->RootNode);
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
@@ -92,9 +92,10 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
 void modelRender(Model *model) {
     armatureSetBoneMatrices(model->Skeleton);
     for (int i = 0; i < model->MaterialCount; i++) {
-        glUniformMatrix4fv(
-            glGetUniformLocation(model->Materials[i]->Shader, "boneFromRoot"),
-            MAX_BONES, GL_FALSE, (GLfloat *)model->Skeleton->BoneMatrices);
+        glUniformMatrix4fv(glGetUniformLocation(model->Materials[i]->Shader,
+                                                "boneTransformations"),
+                           MAX_BONES, GL_FALSE,
+                           (GLfloat *)model->Skeleton->BoneMatrices);
     }
     nodeRender(model->Transform, model->RootNode, model->Meshes,
                model->Materials);
@@ -170,6 +171,9 @@ mat4s aiMatrixToGLMS(struct aiMatrix4x4 aiMat) {
     return *(mat4s *)&aiMat;
 }
 Node *processNode(struct aiNode *node, Node *parentNode) {
+    if (parentNode == NULL) {
+        printf("Root node is \'%s\'\n", node->mName.data);
+    }
     Node *newNode = nodeCreate(parentNode, node->mNumChildren);
     newNode->Transform = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
@@ -194,7 +198,7 @@ Node *searchForNode(char *name, Node *rootNode) {
     }
     return NULL;
 }
-Armature *processSkeleton(struct aiScene *scene, Mesh **meshes,
+Armature *processSkeleton(const struct aiScene *scene, Mesh **meshes,
                           Node *rootNode) {
     Armature *skeleton = armatureCreate();
     int boneCount = 0;
@@ -225,6 +229,6 @@ Armature *processSkeleton(struct aiScene *scene, Mesh **meshes,
         }
     }
     printf("boneCount = %d\n", boneCount);
-    armatureSetBoneMatrices(skeleton);
+    armatureSetOffsetMatrices(skeleton);
     return skeleton;
 }

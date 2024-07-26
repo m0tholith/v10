@@ -1,8 +1,12 @@
 #include "node.h"
-#include "material.h"
 
+#include "material.h"
 #include <cglm/struct/mat4.h>
+#include <stdio.h>
 #include <stdlib.h>
+
+void printParents(Node *node);
+void printMat(mat4s *matrix);
 
 Node *nodeCreate(Node *parent, int childCount) {
     Node *node = malloc(sizeof(Node));
@@ -30,9 +34,13 @@ void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
 mat4s nodeGetFinalTransform(Node *node) {
     if (node == NULL)
         return GLMS_MAT4_IDENTITY;
-    if (node->Parent == NULL)
-        return node->Transform;
-    return glms_mat4_mul(nodeGetFinalTransform(node->Parent), node->Transform);
+    return glms_mat4_mul(node->Transform, nodeGetFinalTransform(node->Parent));
+}
+void nodePrintInfo(Node *node) {
+    printParents(node);
+    printf("Node's Name = %s\n", node->Name);
+    mat4s transform = nodeGetFinalTransform(node);
+    printMat(&transform);
 }
 void nodeFree(Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
@@ -42,4 +50,30 @@ void nodeFree(Node *node) {
     free(node->Name);
     free(node->Meshes);
     free(node);
+}
+
+void printParents(Node *node) {
+    if (node->Parent == NULL) {
+        printf("No parents.\n");
+        return;
+    }
+    printf("Parents: ");
+    while (node->Parent != NULL) {
+        printf("%s -> ", ((Node *)node->Parent)->Name);
+        node = (Node *)node->Parent;
+    }
+    printf("\b\b\b\b    \n");
+}
+void printMat(mat4s *matrix) {
+    for (int j = 0; j < 4; j++) {
+        for (int k = 0; k < 4; k++) {
+            if (matrix->raw[k][j] == 0)
+                printf(" 0.0000    ");
+            else
+                printf("%s%.4f    ", matrix->raw[k][j] < 0 ? "" : " ",
+                       matrix->raw[k][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }

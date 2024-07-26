@@ -26,6 +26,7 @@ Node *nodeCreate(Node *parent, int childCount);
 void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
                 Material **materialArray);
 mat4s nodeGetFinalTransform(Node *node);
+void nodePrintInfo(Node *node);
 void nodeFree(Node *node);
 
 #endif // !NODE_H
