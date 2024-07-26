@@ -47,9 +47,6 @@ void armatureSetBoneMatrices(Armature *armature) {
         armature->BoneMatrices[i] =
             glms_mat4_mul(nodeGetFinalTransform(armature->Bones[i]),
                           armature->OffsetMatrices[i]);
-        printf("armature->Bones[%d]->Name = %s\n", i, armature->Bones[i]->Name);
-        printMatrix(&armature->OffsetMatrices[i]);
-        printMatrix(&armature->BoneMatrices[i]);
     }
 }
 void armatureFree(Armature *armature) { free(armature); }

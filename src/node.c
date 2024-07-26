@@ -40,7 +40,6 @@ void nodePrintInfo(Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
     mat4s transform = nodeGetFinalTransform(node);
-    printMat(&transform);
 }
 void nodeFree(Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
