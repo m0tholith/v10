@@ -8,7 +8,6 @@ set(SRC_FILES
     src/window.c
     src/input.c
     src/mesh.c
-    src/armature.c
     src/model.c
     src/model_presets.c
     src/node.c

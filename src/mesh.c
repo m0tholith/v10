@@ -45,13 +45,6 @@ void meshSendData(Mesh *mesh) {
     glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, Color));
     glEnableVertexAttribArray(attribIdx++);
-    // bone IDs
-    glVertexAttribIPointer(attribIdx, MAX_BONE_INFLUENCE, GL_INT,
-                           sizeof(Vertex), (void *)offsetof(Vertex, BoneIDs));
-    glEnableVertexAttribArray(attribIdx++);
-    // bone weights
-    glVertexAttribPointer(attribIdx, MAX_BONE_INFLUENCE, GL_FLOAT, GL_FALSE,
-                          sizeof(Vertex), (void *)offsetof(Vertex, Weights));
     glEnableVertexAttribArray(attribIdx++);
 
     // generate element buffer object which contains information about the order

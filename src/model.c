@@ -1,6 +1,5 @@
 #include "model.h"
 
-#include "armature.h"
 #include "assimp/postprocess.h"
 #include "material.h"
 #include "mesh.h"
@@ -18,8 +17,6 @@
 
 Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
-Armature *processSkeleton(const struct aiScene *scene, Mesh **meshes,
-                          Node *rootNode);
 
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -43,6 +40,7 @@ Model *modelLoad(const char *_modelPath) {
     model->Meshes = malloc(model->MeshCount * sizeof(Mesh *));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
+        meshSendData(model->Meshes[i]);
     }
 
     model->MaterialCount = scene->mNumMaterials;
@@ -56,11 +54,6 @@ Model *modelLoad(const char *_modelPath) {
     }
 
     model->RootNode = processNode(scene->mRootNode, NULL);
-
-    model->Skeleton = processSkeleton(scene, model->Meshes, model->RootNode);
-    for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        meshSendData(model->Meshes[i]);
-    }
 
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
@@ -90,13 +83,6 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    armatureSetBoneMatrices(model->Skeleton);
-    for (int i = 0; i < model->MaterialCount; i++) {
-        glUniformMatrix4fv(glGetUniformLocation(model->Materials[i]->Shader,
-                                                "boneTransformations"),
-                           MAX_BONES, GL_FALSE,
-                           (GLfloat *)model->Skeleton->BoneMatrices);
-    }
     nodeRender(model->Transform, model->RootNode, model->Meshes,
                model->Materials);
 }
@@ -114,7 +100,6 @@ void _modelDelete(void *_model) {
         animationFree(model->Animations[i]);
     }
     free(model->Animations);
-    armatureFree(model->Skeleton);
     free(model);
 }
 void _modelFreeMaterials(void *_model) {
@@ -197,38 +182,4 @@ Node *searchForNode(char *name, Node *rootNode) {
             return result;
     }
     return NULL;
-}
-Armature *processSkeleton(const struct aiScene *scene, Mesh **meshes,
-                          Node *rootNode) {
-    Armature *skeleton = armatureCreate();
-    int boneCount = 0;
-    for (int i = 0; i < scene->mNumMeshes; i++) {
-        struct aiMesh *assimpMesh = scene->mMeshes[i];
-        Mesh *mesh = meshes[i];
-        for (int j = 0; j < assimpMesh->mNumBones; j++) {
-            struct aiBone *assimpBone = assimpMesh->mBones[j];
-            skeleton->Bones[boneCount] =
-                searchForNode(assimpBone->mNode->mName.data, rootNode);
-            if (skeleton->Bones[boneCount] == NULL) {
-                boneCount++;
-                continue;
-            }
-            for (int k = 0; k < assimpBone->mNumWeights; k++) {
-                Vertex *vertex =
-                    &mesh->Vertices[assimpBone->mWeights[k].mVertexId];
-                int boneIndex = 0;
-                while (boneIndex < MAX_BONE_INFLUENCE &&
-                       vertex->BoneIDs[boneIndex] != -1)
-                    boneIndex++;
-                if (boneIndex == MAX_BONE_INFLUENCE)
-                    continue;
-                vertex->BoneIDs[boneIndex] = boneCount;
-                vertex->Weights[boneIndex] = assimpBone->mWeights[k].mWeight;
-            }
-            boneCount++;
-        }
-    }
-    printf("boneCount = %d\n", boneCount);
-    armatureSetOffsetMatrices(skeleton);
-    return skeleton;
 }
