@@ -9,6 +9,7 @@
 #include "input.h"
 #include "model_presets.h"
 #include "rendering.h"
+#include <stdio.h>
 #include <string.h>
 
 #define MOVE_SPEED 10.0f
@@ -29,10 +30,13 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model = modelLoad("RiggedFigure.glb");
+    Model *model = modelLoad("SM_Deccer_Cubes_Textured_Complex.gltf");
     for (int i = 0; i < model->MaterialCount; i++) {
         model->Materials[i] = materialCreate(
-            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 0);
+            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 1,
+            materialPropertyCreate(
+                "_texture", MATTYPE_TEXTURE2D,
+                (void *)materialTextureDataCreate(model->Textures[i], 0)));
     }
     model->OnDelete = &modelFreeWithMaterials;
 

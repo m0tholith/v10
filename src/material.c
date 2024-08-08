@@ -1,6 +1,7 @@
 #include "material.h"
 
 #include "glad/glad.h"
+#include "texture.h"
 #include <GL/gl.h>
 #include <cglm/types-struct.h>
 #include <stdarg.h>
@@ -19,10 +20,9 @@ MaterialProperty *materialPropertyCreate(const char *name,
     return property;
 }
 void materialPropertyFree(MaterialProperty *property) { free(property); }
-MaterialTextureData *materialTextureDataCreate(unsigned int texture,
-                                               int index) {
+MaterialTextureData *materialTextureDataCreate(Texture *texture, int index) {
     MaterialTextureData *data = malloc(sizeof(MaterialTextureData));
-    data->TextureID = texture;
+    data->Texture = texture;
     data->Index = index;
     return data;
 }
@@ -87,7 +87,7 @@ void applyProperty(MaterialProperty *property, unsigned int shader) {
     case MATTYPE_TEXTURE2D:
         textureData = *(MaterialTextureData *)(property->Data);
         glActiveTexture(GL_TEXTURE0 + textureData.Index);
-        glBindTexture(GL_TEXTURE_2D, textureData.TextureID);
+        glBindTexture(GL_TEXTURE_2D, textureData.Texture->id);
         break;
     default:
         fprintf(stderr,

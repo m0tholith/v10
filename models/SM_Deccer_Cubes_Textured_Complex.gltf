@@ -303,11 +303,6 @@
                 0.009999999776482582,
                 0.009999999776482582,
                 0.009999999776482582
-            ],
-            "translation" : [
-                2,
-                1,
-                2
             ]
         },
         {
@@ -742,27 +737,27 @@
         {
             "bufferView" : 4,
             "mimeType" : "image/png",
-            "name" : "textures/T_Blue_D.png"
+            "name" : "T_Blue_D"
         },
         {
             "bufferView" : 8,
             "mimeType" : "image/png",
-            "name" : "textures/T_Orange_D.png"
+            "name" : "T_Orange_D"
         },
         {
             "bufferView" : 12,
             "mimeType" : "image/png",
-            "name" : "textures/T_Purple_D.png"
+            "name" : "T_Purple_D"
         },
         {
             "bufferView" : 16,
             "mimeType" : "image/png",
-            "name" : "textures/T_Red_D.png"
+            "name" : "T_Red_D"
         },
         {
             "bufferView" : 50,
             "mimeType" : "image/png",
-            "name" : "textures/T_LightGreen_D.png"
+            "name" : "T_LightGreen_D"
         }
     ],
     "accessors" : [

@@ -11,9 +11,14 @@ enum TEXTURETYPE {
     TEXTURETYPE_RGBA = 1,
 };
 
+typedef struct {
+    unsigned int id;
+} Texture;
+
 /// @param const char *texturePath: path to texture; prepended with
 /// `TEXTURES_PATH`
-unsigned int textureCreate(const char *texturePath, enum TEXTURETYPE type,
-                           bool optional);
+Texture *textureCreate(const char *texturePath, enum TEXTURETYPE type,
+                       bool optional);
+void textureFree(Texture *texture);
 
 #endif // !TEXTURE_H

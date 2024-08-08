@@ -5,6 +5,7 @@
 
 #include "mesh.h"
 #include "node.h"
+#include "texture.h"
 
 #include "animation.h"
 #include <assimp/cimport.h>
@@ -22,7 +23,7 @@ typedef struct {
     Material **Materials;
 
     unsigned int TextureCount;
-    unsigned int *Textures;
+    Texture **Textures;
 
     Node *RootNode;
 

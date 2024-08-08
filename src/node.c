@@ -34,7 +34,7 @@ void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
 mat4s nodeGetFinalTransform(Node *node) {
     if (node == NULL)
         return GLMS_MAT4_IDENTITY;
-    return glms_mat4_mul(node->Transform, nodeGetFinalTransform(node->Parent));
+    return glms_mat4_mul(nodeGetFinalTransform(node->Parent), node->Transform);
 }
 void nodePrintInfo(Node *node) {
     printParents(node);

@@ -47,7 +47,7 @@ Model *modelLoad(const char *_modelPath) {
     model->Materials = malloc(model->MaterialCount * sizeof(Material *));
 
     model->TextureCount = scene->mNumTextures;
-    model->Textures = malloc(model->TextureCount * sizeof(unsigned int));
+    model->Textures = malloc(model->TextureCount * sizeof(Texture *));
     for (int i = 0; i < model->TextureCount; i++) {
         model->Textures[i] = textureCreate(scene->mTextures[i]->mFilename.data,
                                            TEXTURETYPE_RGB, true);
@@ -95,6 +95,9 @@ void _modelDelete(void *_model) {
         meshFree(model->Meshes[i]);
     }
     free(model->Meshes);
+    for (int i = 0; i < model->TextureCount; i++) {
+        textureFree(model->Textures[i]);
+    }
     free(model->Textures);
     for (int i = 0; i < model->AnimationCount; i++) {
         animationFree(model->Animations[i]);
