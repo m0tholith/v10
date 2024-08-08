@@ -12,7 +12,6 @@ struct Mesh *meshLoad(struct Vertex *vertices, unsigned int *indices,
     mesh->VertexCount = vertexCount;
     mesh->Indices = indices;
     mesh->IndexCount = indexCount;
-    mesh->Transform = GLMS_MAT4_IDENTITY;
 
     return mesh;
 }

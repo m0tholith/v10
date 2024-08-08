@@ -20,7 +20,6 @@ struct Mesh {
     int IndexCount;
 
     unsigned int VAO, VBO, EBO;
-    mat4s Transform;
     int MaterialIndex;
 };
 
