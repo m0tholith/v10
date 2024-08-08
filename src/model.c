@@ -107,7 +107,7 @@ void _modelDelete(void *_model) {
 }
 void _modelFreeMaterials(void *_model) {
     Model *model = (Model *)_model;
-    for (int i = 0; i < model->MaterialCount - 1; i++) {
+    for (int i = 0; i < model->MaterialCount; i++) {
         materialFree(model->Materials[i]);
     }
 }

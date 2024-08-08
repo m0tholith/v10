@@ -128,8 +128,11 @@ void materialChangeProperty(Material *material, const char *propertyName,
             propertyName);
 }
 void materialFree(Material *material) {
-    for (int i = 0; i < material->PropertyCount; i++)
+    for (int i = 0; i < material->PropertyCount; i++) {
+        free(material->Properties[i]->Name);
+        free(material->Properties[i]->Data);
         free(material->Properties[i]);
+    }
     free(material->Properties);
     free(material);
 }
