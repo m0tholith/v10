@@ -34,7 +34,7 @@ Model *modelLoad(const char *_modelPath) {
 
     Model *model = malloc(sizeof(Model));
 
-    model->Transform = GLMS_MAT4_IDENTITY;
+    model->WorldTransform = GLMS_MAT4_IDENTITY;
 
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
@@ -83,7 +83,7 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    nodeRender(model->Transform, model->RootNode, model->Meshes,
+    nodeRender(model->WorldTransform, model->RootNode, model->Meshes,
                model->Materials);
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
@@ -164,7 +164,7 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
         printf("Root node is \'%s\'\n", node->mName.data);
     }
     Node *newNode = nodeCreate(parentNode, node->mNumChildren);
-    newNode->Transform = aiMatrixToGLMS(node->mTransformation);
+    newNode->ParentFromLocal = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
     newNode->Meshes = malloc(node->mNumMeshes * sizeof(unsigned int));
     memcpy(newNode->Meshes, node->mMeshes,

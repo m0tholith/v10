@@ -16,7 +16,7 @@
 
 GLFWwindow *window;
 
-mat4s ViewMatrix, ProjectionMatrix;
+mat4s ViewFromWorldMatrix, ProjectionFromViewMatrix;
 vec3s movementInput;
 vec2s mousePosition;
 vec2s mouseDelta;
@@ -40,7 +40,7 @@ int main(void) {
     }
     model->OnDelete = &modelFreeWithMaterials;
 
-    ProjectionMatrix = glms_perspective(
+    ProjectionFromViewMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
         100.0f);
 
@@ -71,7 +71,7 @@ int main(void) {
             camera.Position,
             glms_vec3_scale(positionDelta, MOVE_SPEED * deltaTime));
         cameraCalculateViewMatrix(&camera);
-        ViewMatrix = camera.ViewMatrix;
+        ViewFromWorldMatrix = camera.ViewFromWorldMatrix;
 
         lastTime = currentTime;
 

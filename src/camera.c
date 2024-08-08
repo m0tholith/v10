@@ -13,7 +13,8 @@ Camera cameraCreate(vec3s position, versors quaternion) {
     return camera;
 }
 void cameraCalculateViewMatrix(Camera *camera) {
-    camera->ViewMatrix = glms_quat_look(camera->Position, camera->Quaternion);
+    camera->ViewFromWorldMatrix =
+        glms_quat_look(camera->Position, camera->Quaternion);
 }
 void cameraSetPosition(Camera *camera, vec3s position) {
     camera->Position = position;

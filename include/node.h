@@ -7,7 +7,7 @@
 
 /// to be used with the model class
 typedef struct {
-    mat4s Transform;
+    mat4s ParentFromLocal;
     Material Material;
 
     int MeshCount;
@@ -23,9 +23,9 @@ typedef struct {
 
 /// free with `nodeFree`
 Node *nodeCreate(Node *parent, int childCount);
-void nodeRender(mat4s transform, Node *node, struct Mesh **meshArray,
+void nodeRender(mat4s worldTransform, Node *node, struct Mesh **meshArray,
                 Material **materialArray);
-mat4s nodeGetFinalTransform(Node *node);
+mat4s nodeGetParentTransform(Node *node);
 void nodePrintInfo(Node *node);
 void nodeFree(Node *node);
 

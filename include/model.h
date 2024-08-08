@@ -14,7 +14,7 @@
 #include <cglm/struct/mat4.h>
 
 typedef struct {
-    mat4s Transform;
+    mat4s WorldTransform;
 
     unsigned int MeshCount;
     struct Mesh **Meshes;

@@ -29,7 +29,7 @@ struct Mesh {
 struct Mesh *meshLoad(struct Vertex *vertices, unsigned int *indices,
                       int vertexCount, int indexCount);
 void meshSendData(struct Mesh *mesh);
-void meshRender(struct Mesh *mesh, mat4s transformation, unsigned int shader);
+void meshRender(struct Mesh *mesh, mat4s worldTransform, unsigned int shader);
 void meshFree(struct Mesh *mesh);
 
 #endif // !MESH_H

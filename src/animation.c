@@ -183,7 +183,7 @@ void animationStep(Animation *animation, float deltaTime) {
             newTransform =
                 glms_translate(newTransform, animNode->PositionKeys[0].Value);
 
-        animNode->Node->Transform = newTransform;
+        animNode->Node->ParentFromLocal = newTransform;
     }
 }
 void animationFree(Animation *animation) {

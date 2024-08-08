@@ -6,7 +6,7 @@
 typedef struct {
     vec3s Position;
     versors Quaternion;
-    mat4s ViewMatrix;
+    mat4s ViewFromWorldMatrix;
 } Camera;
 
 Camera cameraCreate(vec3s position, versors quaternion);

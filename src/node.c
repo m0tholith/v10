@@ -10,16 +10,16 @@ void printMat(mat4s *matrix);
 
 Node *nodeCreate(Node *parent, int childCount) {
     Node *node = malloc(sizeof(Node));
-    node->Transform = GLMS_MAT4_IDENTITY;
+    node->ParentFromLocal = GLMS_MAT4_IDENTITY;
     node->Parent = parent;
     node->ChildCount = childCount;
     node->Children = malloc(childCount * sizeof(Node *));
     return node;
 }
-void nodeRender(mat4s transform, Node *node, struct Mesh **meshArray,
+void nodeRender(mat4s worldTransform, Node *node, struct Mesh **meshArray,
                 Material **materialArray) {
     mat4s transformation =
-        glms_mat4_mul(transform, nodeGetFinalTransform(node));
+        glms_mat4_mul(worldTransform, nodeGetParentTransform(node));
     for (int i = 0; i < node->MeshCount; i++) {
         struct Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
@@ -28,18 +28,19 @@ void nodeRender(mat4s transform, Node *node, struct Mesh **meshArray,
         meshRender(mesh, transformation, material->Shader);
     }
     for (int i = 0; i < node->ChildCount; i++) {
-        nodeRender(transform, node->Children[i], meshArray, materialArray);
+        nodeRender(worldTransform, node->Children[i], meshArray, materialArray);
     }
 }
-mat4s nodeGetFinalTransform(Node *node) {
+mat4s nodeGetParentTransform(Node *node) {
     if (node == NULL)
         return GLMS_MAT4_IDENTITY;
-    return glms_mat4_mul(nodeGetFinalTransform(node->Parent), node->Transform);
+    return glms_mat4_mul(nodeGetParentTransform(node->Parent),
+                         node->ParentFromLocal);
 }
 void nodePrintInfo(Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
-    mat4s transform = nodeGetFinalTransform(node);
+    mat4s transform = nodeGetParentTransform(node);
 }
 void nodeFree(Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
