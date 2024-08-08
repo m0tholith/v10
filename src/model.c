@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
+struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 Node *processNode(struct aiNode *node, Node *parentNode);
 
 Model *modelLoad(const char *_modelPath) {
@@ -37,7 +37,7 @@ Model *modelLoad(const char *_modelPath) {
     model->Transform = GLMS_MAT4_IDENTITY;
 
     model->MeshCount = scene->mNumMeshes;
-    model->Meshes = malloc(model->MeshCount * sizeof(Mesh *));
+    model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
         meshSendData(model->Meshes[i]);
@@ -112,11 +112,12 @@ void _modelFreeMaterials(void *_model) {
     }
 }
 
-Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
-    Vertex *vertices = malloc(mesh->mNumVertices * sizeof(Vertex));
+struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
+    struct Vertex *vertices =
+        malloc(mesh->mNumVertices * sizeof(struct Vertex));
     unsigned int *indices = malloc(mesh->mNumFaces * 3 * sizeof(unsigned int));
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-        Vertex v = {0};
+        struct Vertex v = {0};
 
         v.Position = (vec3s){
             {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}};
@@ -148,7 +149,7 @@ Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
         }
     }
 
-    Mesh *newMesh =
+    struct Mesh *newMesh =
         meshLoad(vertices, indices, mesh->mNumVertices, mesh->mNumFaces * 3);
     newMesh->MaterialIndex = mesh->mMaterialIndex;
     return newMesh;

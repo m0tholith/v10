@@ -5,9 +5,9 @@
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
-Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
-               int indexCount) {
-    Mesh *mesh = malloc(sizeof(Mesh));
+struct Mesh *meshLoad(struct Vertex *vertices, unsigned int *indices,
+                      int vertexCount, int indexCount) {
+    struct Mesh *mesh = malloc(sizeof(struct Mesh));
     mesh->Vertices = vertices;
     mesh->VertexCount = vertexCount;
     mesh->Indices = indices;
@@ -16,7 +16,7 @@ Mesh *meshLoad(Vertex *vertices, unsigned int *indices, int vertexCount,
 
     return mesh;
 }
-void meshSendData(Mesh *mesh) {
+void meshSendData(struct Mesh *mesh) {
     // generate vertex array object which contains information about all the
     // vertices
     glGenVertexArrays(1, &mesh->VAO);
@@ -25,26 +25,29 @@ void meshSendData(Mesh *mesh) {
     // generate vertex buffer object which is the actual vertex data
     glGenBuffers(1, &mesh->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
-    glBufferData(GL_ARRAY_BUFFER, mesh->VertexCount * sizeof(Vertex),
+    glBufferData(GL_ARRAY_BUFFER, mesh->VertexCount * sizeof(struct Vertex),
                  mesh->Vertices, GL_STATIC_DRAW);
 
     int attribIdx = 0;
     // position vertex attribute
-    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, Position));
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(struct Vertex),
+                          (void *)offsetof(struct Vertex, Position));
     glEnableVertexAttribArray(attribIdx++);
     // normals
-    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, Normal));
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(struct Vertex),
+                          (void *)offsetof(struct Vertex, Normal));
     glEnableVertexAttribArray(attribIdx++);
     // texcoords
-    glVertexAttribPointer(attribIdx, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, TexCoords));
+    glVertexAttribPointer(attribIdx, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(struct Vertex),
+                          (void *)offsetof(struct Vertex, TexCoords));
     glEnableVertexAttribArray(attribIdx++);
     // vertex colors
-    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-                          (void *)offsetof(Vertex, Color));
-    glEnableVertexAttribArray(attribIdx++);
+    glVertexAttribPointer(attribIdx, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(struct Vertex),
+                          (void *)offsetof(struct Vertex, Color));
     glEnableVertexAttribArray(attribIdx++);
 
     // generate element buffer object which contains information about the order
@@ -55,7 +58,7 @@ void meshSendData(Mesh *mesh) {
                  mesh->IndexCount * sizeof(unsigned int), mesh->Indices,
                  GL_STATIC_DRAW);
 }
-void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
+void meshRender(struct Mesh *mesh, mat4s transformation, unsigned int shader) {
     glUseProgram(shader);
 
     // assign projectionFromModel matrix
@@ -73,7 +76,7 @@ void meshRender(Mesh *mesh, mat4s transformation, unsigned int shader) {
     glDrawElements(GL_TRIANGLES, mesh->IndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
-void meshFree(Mesh *mesh) {
+void meshFree(struct Mesh *mesh) {
     free(mesh->Vertices);
     free(mesh->Indices);
     free(mesh);

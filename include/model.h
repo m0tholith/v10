@@ -17,7 +17,7 @@ typedef struct {
     mat4s Transform;
 
     unsigned int MeshCount;
-    Mesh **Meshes;
+    struct Mesh **Meshes;
 
     unsigned int MaterialCount;
     Material **Materials;

@@ -16,12 +16,12 @@ Node *nodeCreate(Node *parent, int childCount) {
     node->Children = malloc(childCount * sizeof(Node *));
     return node;
 }
-void nodeRender(mat4s transform, Node *node, Mesh **meshArray,
+void nodeRender(mat4s transform, Node *node, struct Mesh **meshArray,
                 Material **materialArray) {
     mat4s transformation =
         glms_mat4_mul(transform, nodeGetFinalTransform(node));
     for (int i = 0; i < node->MeshCount; i++) {
-        Mesh *mesh = meshArray[node->Meshes[i]];
+        struct Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
         materialApplyProperties(material);
