@@ -25,7 +25,7 @@ struct Node {
 struct Node *nodeCreate(struct Node *parent, int childCount);
 void nodeRender(mat4s worldTransform, struct Node *node,
                 struct Mesh **meshArray, Material **materialArray);
-mat4s nodeGetParentTransform(struct Node *node);
+mat4s nodeGetWorldTransform(struct Node *node);
 void nodePrintInfo(struct Node *node);
 void nodeFree(struct Node *node);
 
