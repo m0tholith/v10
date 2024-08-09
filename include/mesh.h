@@ -11,8 +11,6 @@ struct Vertex {
     vec3s Normal;
     vec2s TexCoords;
     vec3s Color;
-    int BoneIDs[MAX_BONE_INFLUENCE];
-    float Weights[MAX_BONE_INFLUENCE];
 };
 struct Mesh {
     struct Vertex *Vertices;
