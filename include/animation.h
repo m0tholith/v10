@@ -19,7 +19,7 @@ typedef struct {
     AnimationVectorKey *PositionKeys;
     AnimationQuaternionKey *RotationKeys;
     AnimationVectorKey *ScalingKeys;
-    Node *Node;
+    struct Node *Node;
     /// interpolation function to use for this animation node; set with
     /// `animationCreate`
     float (*InterpFunction)(float);
@@ -39,7 +39,8 @@ float LinearInterp(float x);
 float SmoothStepInterp(float x);
 
 /// free with `animationFree`
-Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode);
+Animation *animationCreate(struct aiScene *scene, char *name,
+                           struct Node *rootNode);
 /// step animation using `InterpFunction` defined by each node
 void animationStep(Animation *animation, float deltaTime);
 void animationFree(Animation *animation);

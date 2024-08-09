@@ -6,27 +6,27 @@
 #include <cglm/types-struct.h>
 
 /// to be used with the model class
-typedef struct {
+struct Node {
     mat4s ParentFromLocal;
     Material Material;
 
     int MeshCount;
     uint32_t *Meshes;
 
-    void *Parent;
+    struct Node *Parent;
 
     int ChildCount;
-    void **Children;
+    struct Node **Children;
 
     char *Name;
-} Node;
+};
 
 /// free with `nodeFree`
-Node *nodeCreate(Node *parent, int childCount);
-void nodeRender(mat4s worldTransform, Node *node, struct Mesh **meshArray,
-                Material **materialArray);
-mat4s nodeGetParentTransform(Node *node);
-void nodePrintInfo(Node *node);
-void nodeFree(Node *node);
+struct Node *nodeCreate(struct Node *parent, int childCount);
+void nodeRender(mat4s worldTransform, struct Node *node,
+                struct Mesh **meshArray, Material **materialArray);
+mat4s nodeGetParentTransform(struct Node *node);
+void nodePrintInfo(struct Node *node);
+void nodeFree(struct Node *node);
 
 #endif // !NODE_H

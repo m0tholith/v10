@@ -16,7 +16,7 @@
 #include <string.h>
 
 struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
-Node *processNode(struct aiNode *node, Node *parentNode);
+struct Node *processNode(struct aiNode *node, struct Node *parentNode);
 
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -159,11 +159,11 @@ mat4s aiMatrixToGLMS(struct aiMatrix4x4 aiMat) {
     aiTransposeMatrix4(&aiMat);
     return *(mat4s *)&aiMat;
 }
-Node *processNode(struct aiNode *node, Node *parentNode) {
+struct Node *processNode(struct aiNode *node, struct Node *parentNode) {
     if (parentNode == NULL) {
         printf("Root node is \'%s\'\n", node->mName.data);
     }
-    Node *newNode = nodeCreate(parentNode, node->mNumChildren);
+    struct Node *newNode = nodeCreate(parentNode, node->mNumChildren);
     newNode->ParentFromLocal = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
     newNode->Meshes = malloc(node->mNumMeshes * sizeof(uint32_t));
@@ -176,11 +176,11 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
     return newNode;
 }
 
-Node *searchForNode(char *name, Node *rootNode) {
+struct Node *searchForNode(char *name, struct Node *rootNode) {
     if (!strcmp(name, rootNode->Name))
         return rootNode;
     for (int i = 0; i < rootNode->ChildCount; i++) {
-        Node *result = searchForNode(name, rootNode->Children[i]);
+        struct Node *result = searchForNode(name, rootNode->Children[i]);
         if (result != NULL)
             return result;
     }

@@ -33,8 +33,9 @@ versors aiQuatToVersors(struct aiQuaternion quat) {
         .w = quat.w,
     };
 }
-Node *getAnimationNode(char *nodeName, Node *rootNode);
-Animation *animationCreate(struct aiScene *scene, char *name, Node *rootNode) {
+struct Node *getAnimationNode(char *nodeName, struct Node *rootNode);
+Animation *animationCreate(struct aiScene *scene, char *name,
+                           struct Node *rootNode) {
     int animIndex = 0;
     printf("looking for animation \"%s\"\n", name);
     for (; animIndex < scene->mNumAnimations; animIndex++) {
@@ -197,12 +198,12 @@ void animationFree(Animation *animation) {
     free(animation);
 }
 
-Node *getAnimationNode(char *nodeName, Node *rootNode) {
+struct Node *getAnimationNode(char *nodeName, struct Node *rootNode) {
     if (!strcmp(rootNode->Name, nodeName))
         return rootNode;
     for (int i = 0; i < rootNode->ChildCount; i++) {
-        Node *childNode = (Node *)rootNode->Children[i];
-        Node *returnValue = getAnimationNode(nodeName, childNode);
+        struct Node *returnValue =
+            getAnimationNode(nodeName, rootNode->Children[i]);
         if (returnValue != NULL)
             return returnValue;
     }
