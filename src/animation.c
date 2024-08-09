@@ -1,11 +1,11 @@
 #include "animation.h"
 
-#include "assimp/anim.h"
-#include "assimp/quaternion.h"
-#include "cglm/struct/affine-pre.h"
-#include "cglm/struct/affine.h"
-#include "cglm/struct/mat4.h"
-#include "cglm/struct/quat.h"
+#include <assimp/anim.h>
+#include <assimp/quaternion.h>
+#include <cglm/struct/affine-pre.h>
+#include <cglm/struct/affine.h>
+#include <cglm/struct/mat4.h>
+#include <cglm/struct/quat.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,7 +1,8 @@
 #include "mesh.h"
 
-#include "glad/glad.h"
 #include "rendering.h"
+
+#include "glad/glad.h"
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
 

@@ -1,13 +1,13 @@
 #include "model.h"
 
-#include "assimp/postprocess.h"
 #include "material.h"
 #include "mesh.h"
 #include "node.h"
 #include "texture.h"
-#include <glad/glad.h>
 
+#include "glad/glad.h"
 #include <GL/gl.h>
+#include <assimp/postprocess.h>
 #include <cglm/struct/mat4.h>
 #include <cglm/struct/vec2.h>
 #include <stdarg.h>

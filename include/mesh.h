@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "cglm/types-struct.h"
+#include <cglm/types-struct.h>
 #include <stdint.h>
 
 #define MAX_BONE_INFLUENCE 4

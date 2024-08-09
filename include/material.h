@@ -1,12 +1,13 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "texture.h"
+
 /// all types that can be defined as uniforms in shaders. if you want to add
 /// more, you need to define a case for your new type in
 /// `materialApplyProperties`.
 ///
 /// `MATTYPE_TEXTURE2D` is used with `MaterialTextureData` type
-#include "texture.h"
 enum MaterialType {
     MATTYPE_INT,
     MATTYPE_FLOAT,

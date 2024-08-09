@@ -1,9 +1,9 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "assimp/scene.h"
-#include "cglm/types-struct.h"
 #include "node.h"
+#include <assimp/scene.h>
+#include <cglm/types-struct.h>
 
 typedef struct {
     int Time;

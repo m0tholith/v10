@@ -1,7 +1,8 @@
 #include "material.h"
 
-#include "glad/glad.h"
 #include "texture.h"
+
+#include "glad/glad.h"
 #include <GL/gl.h>
 #include <cglm/types-struct.h>
 #include <stdarg.h>

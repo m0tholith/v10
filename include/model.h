@@ -3,11 +3,11 @@
 
 #define MODELS_PATH "models/"
 
+#include "animation.h"
 #include "mesh.h"
 #include "node.h"
 #include "texture.h"
 
-#include "animation.h"
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>

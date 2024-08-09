@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include "material.h"
+
 #include <cglm/struct/mat4.h>
 #include <stdio.h>
 #include <stdlib.h>
