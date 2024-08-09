@@ -17,8 +17,8 @@
 
 struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 struct Node *processNode(struct aiNode *node, struct Node *parentNode);
-void processNodeArray(struct Node **nodeArray, struct Node *rootNode,
-                      int *index);
+void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
+                      int *index, int parentIndex);
 
 int totalNodeChildCount(struct Node *node);
 
@@ -59,15 +59,16 @@ Model *modelLoad(const char *_modelPath) {
 
     struct Node *rootNode = processNode(scene->mRootNode, NULL);
     model->NodeCount = totalNodeChildCount(rootNode) + 1; // +1 for root node
-    model->Nodes = malloc(model->NodeCount * sizeof(struct Node *));
+    model->NodeEntries = malloc(model->NodeCount * sizeof(struct NodeEntry));
     int index = 0;
-    processNodeArray(model->Nodes, rootNode, &index);
+    processNodeArray(model->NodeEntries, rootNode, &index, -1);
 
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
     for (int i = 0; i < model->AnimationCount; i++) {
-        model->Animations[i] = animationCreate(
-            scene, scene->mAnimations[i]->mName.data, model->Nodes[0]);
+        model->Animations[i] =
+            animationCreate(scene, scene->mAnimations[i]->mName.data,
+                            model->NodeEntries[0].Node);
     }
 
     model->OnDelete = &_modelDelete;
@@ -91,14 +92,14 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    nodeRender(model->WorldTransform, model->Nodes[0], model->Meshes,
+    nodeRender(model->WorldTransform, model->NodeEntries[0].Node, model->Meshes,
                model->Materials);
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
 void _modelDelete(void *_model) {
     Model *model = (Model *)_model;
-    nodeFree(model->Nodes[0]);
-    free(model->Nodes);
+    nodeFree(model->NodeEntries[0].Node);
+    free(model->NodeEntries);
     free(model->Materials);
     for (int i = 0; i < model->MeshCount; i++) {
         meshFree(model->Meshes[i]);
@@ -180,11 +181,20 @@ struct Node *processNode(struct aiNode *node, struct Node *parentNode) {
     }
     return newNode;
 }
-void processNodeArray(struct Node **nodeArray, struct Node *rootNode,
-                      int *indexPtr) {
-    nodeArray[(*indexPtr)++] = rootNode;
+void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
+                      int *indexPtr, int parentIndex) {
+    int index = (*indexPtr)++;
+    nodeArray[index].Node = rootNode;
+    nodeArray[index].ParentIndex = parentIndex;
+
+    if (parentIndex == -1)
+        nodeArray[index].WorldFromLocal = GLMS_MAT4_IDENTITY;
+    else
+        nodeArray[index].WorldFromLocal = glms_mat4_mul(
+            nodeArray[parentIndex].WorldFromLocal, rootNode->ParentFromLocal);
+
     for (int i = 0; i < rootNode->ChildCount; i++) {
-        processNodeArray(nodeArray, rootNode->Children[i], indexPtr);
+        processNodeArray(nodeArray, rootNode->Children[i], indexPtr, index);
     }
 }
 int totalNodeChildCount(struct Node *node) {

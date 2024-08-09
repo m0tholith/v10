@@ -13,6 +13,11 @@
 #include <assimp/scene.h>
 #include <cglm/struct/mat4.h>
 
+struct NodeEntry {
+    struct Node *Node;
+    int ParentIndex;
+    mat4s WorldFromLocal;
+};
 typedef struct {
     mat4s WorldTransform;
 
@@ -26,7 +31,7 @@ typedef struct {
     Texture **Textures;
 
     int NodeCount;
-    struct Node **Nodes;
+    struct NodeEntry *NodeEntries;
 
     int AnimationCount;
     Animation **Animations;
