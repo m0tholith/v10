@@ -17,19 +17,16 @@ struct Node *nodeCreate(struct Node *parent, int childCount) {
     node->Children = malloc(childCount * sizeof(struct Node *));
     return node;
 }
-void nodeRender(mat4s worldTransform, struct Node *node,
+void nodeRender(mat4s worldFromParent, struct Node *node,
                 struct Mesh **meshArray, Material **materialArray) {
     mat4s transformation =
-        glms_mat4_mul(worldTransform, nodeGetWorldTransform(node));
+        glms_mat4_mul(worldFromParent, node->ParentFromLocal);
     for (int i = 0; i < node->MeshCount; i++) {
         struct Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
         materialApplyProperties(material);
         meshRender(mesh, transformation, material->Shader);
-    }
-    for (int i = 0; i < node->ChildCount; i++) {
-        nodeRender(worldTransform, node->Children[i], meshArray, materialArray);
     }
 }
 mat4s nodeGetWorldTransform(struct Node *node) {

@@ -92,8 +92,19 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    nodeRender(model->WorldTransform, model->NodeEntries[0].Node, model->Meshes,
-               model->Materials);
+    for (int i = 0; i < model->NodeCount; i++) {
+        struct NodeEntry *nodeEntry = &model->NodeEntries[i];
+        mat4s worldFromParent;
+        if (i == 0)
+            worldFromParent = model->WorldTransform;
+        else
+            worldFromParent = model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
+
+        nodeRender(worldFromParent, nodeEntry->Node, model->Meshes,
+                   model->Materials);
+        nodeEntry->WorldFromLocal = glms_mat4_mul(
+            worldFromParent, nodeEntry->Node->ParentFromLocal);
+    }
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
 void _modelDelete(void *_model) {
