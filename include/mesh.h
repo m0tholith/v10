@@ -13,10 +13,11 @@ struct Vertex {
     vec3s Color;
 };
 struct Mesh {
-    struct Vertex *Vertices;
     int VertexCount;
-    uint32_t *Indices;
+    struct Vertex *Vertices;
+
     int IndexCount;
+    uint32_t *Indices;
 
     uint32_t VAO, VBO, EBO;
     int MaterialIndex;

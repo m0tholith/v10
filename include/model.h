@@ -16,19 +16,19 @@
 typedef struct {
     mat4s WorldTransform;
 
-    uint32_t MeshCount;
+    int MeshCount;
     struct Mesh **Meshes;
 
-    uint32_t MaterialCount;
+    int MaterialCount;
     Material **Materials;
 
-    uint32_t TextureCount;
+    int TextureCount;
     Texture **Textures;
 
     int NodeCount;
     struct Node **Nodes;
 
-    uint32_t AnimationCount;
+    int AnimationCount;
     Animation **Animations;
 
     void (*OnDelete)(void *model);

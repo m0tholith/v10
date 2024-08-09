@@ -42,7 +42,7 @@ Model *modelLoad(const char *_modelPath) {
 
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
-    for (uint32_t i = 0; i < scene->mNumMeshes; i++) {
+    for (int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
         meshSendData(model->Meshes[i]);
     }
@@ -125,7 +125,7 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     struct Vertex *vertices =
         malloc(mesh->mNumVertices * sizeof(struct Vertex));
     uint32_t *indices = malloc(mesh->mNumFaces * 3 * sizeof(uint32_t));
-    for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
+    for (int i = 0; i < mesh->mNumVertices; i++) {
         struct Vertex v = {0};
 
         v.Position = (vec3s){
@@ -147,9 +147,9 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
             v.Color = GLMS_VEC3_ONE;
         vertices[i] = v;
     }
-    for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
+    for (int i = 0; i < mesh->mNumFaces; i++) {
         struct aiFace face = mesh->mFaces[i];
-        for (uint32_t j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) {
             indices[3 * i + j] = face.mIndices[j];
         }
     }

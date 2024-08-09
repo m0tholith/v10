@@ -11,7 +11,7 @@ struct Node {
     Material Material;
 
     int MeshCount;
-    uint32_t *Meshes;
+    int *Meshes;
 
     struct Node *Parent;
 
