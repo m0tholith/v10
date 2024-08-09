@@ -23,10 +23,13 @@ struct Node {
 
 /// free with `nodeFree`
 struct Node *nodeCreate(struct Node *parent, int childCount);
+/// only renders this specific node
 void nodeRender(mat4s worldTransform, struct Node *node,
                 struct Mesh **meshArray, Material **materialArray);
+/// gets world transform of parent node
 mat4s nodeGetWorldTransform(struct Node *node);
 void nodePrintInfo(struct Node *node);
+/// recursively frees node and children
 void nodeFree(struct Node *node);
 
 #endif // !NODE_H
