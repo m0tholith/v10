@@ -25,7 +25,8 @@ typedef struct {
     uint32_t TextureCount;
     Texture **Textures;
 
-    struct Node *RootNode;
+    int NodeCount;
+    struct Node **Nodes;
 
     uint32_t AnimationCount;
     Animation **Animations;

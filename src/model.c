@@ -17,6 +17,10 @@
 
 struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
 struct Node *processNode(struct aiNode *node, struct Node *parentNode);
+void processNodeArray(struct Node **nodeArray, struct Node *rootNode,
+                      int *index);
+
+int totalNodeChildCount(struct Node *node);
 
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -53,13 +57,17 @@ Model *modelLoad(const char *_modelPath) {
                                            TEXTURETYPE_RGB, true);
     }
 
-    model->RootNode = processNode(scene->mRootNode, NULL);
+    struct Node *rootNode = processNode(scene->mRootNode, NULL);
+    model->NodeCount = totalNodeChildCount(rootNode) + 1; // +1 for root node
+    model->Nodes = malloc(model->NodeCount * sizeof(struct Node *));
+    int index = 0;
+    processNodeArray(model->Nodes, rootNode, &index);
 
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
     for (int i = 0; i < model->AnimationCount; i++) {
         model->Animations[i] = animationCreate(
-            scene, scene->mAnimations[i]->mName.data, model->RootNode);
+            scene, scene->mAnimations[i]->mName.data, model->Nodes[0]);
     }
 
     model->OnDelete = &_modelDelete;
@@ -83,13 +91,14 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
     }
 }
 void modelRender(Model *model) {
-    nodeRender(model->WorldTransform, model->RootNode, model->Meshes,
+    nodeRender(model->WorldTransform, model->Nodes[0], model->Meshes,
                model->Materials);
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
 void _modelDelete(void *_model) {
     Model *model = (Model *)_model;
-    nodeFree(model->RootNode);
+    nodeFree(model->Nodes[0]);
+    free(model->Nodes);
     free(model->Materials);
     for (int i = 0; i < model->MeshCount; i++) {
         meshFree(model->Meshes[i]);
@@ -174,6 +183,20 @@ struct Node *processNode(struct aiNode *node, struct Node *parentNode) {
         newNode->Children[i] = processNode(node->mChildren[i], newNode);
     }
     return newNode;
+}
+void processNodeArray(struct Node **nodeArray, struct Node *rootNode,
+                      int *indexPtr) {
+    nodeArray[(*indexPtr)++] = rootNode;
+    for (int i = 0; i < rootNode->ChildCount; i++) {
+        processNodeArray(nodeArray, rootNode->Children[i], indexPtr);
+    }
+}
+int totalNodeChildCount(struct Node *node) {
+    int result = node->ChildCount;
+    for (int i = 0; i < node->ChildCount; i++) {
+        result += totalNodeChildCount(node->Children[i]);
+    }
+    return result;
 }
 
 struct Node *searchForNode(char *name, struct Node *rootNode) {
