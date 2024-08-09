@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define TEXTURES_PATH "textures/"
 
@@ -12,7 +13,7 @@ enum TEXTURETYPE {
 };
 
 typedef struct {
-    unsigned int id;
+    uint32_t id;
 } Texture;
 
 /// @param const char *texturePath: path to texture; prepended with

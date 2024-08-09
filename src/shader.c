@@ -24,8 +24,8 @@ char *readFile(const char *fileName) {
     return string;
 }
 
-unsigned int shaderCreate(const char *_vertexShaderPath,
-                          const char *_fragmentShaderPath) {
+uint32_t shaderCreate(const char *_vertexShaderPath,
+                      const char *_fragmentShaderPath) {
     char *vertexShaderPath =
         malloc(strlen(_vertexShaderPath) + sizeof(SHADERS_PATH));
     strcpy(vertexShaderPath, SHADERS_PATH);
@@ -37,7 +37,7 @@ unsigned int shaderCreate(const char *_vertexShaderPath,
 
     char *vertexShaderContents = readFile(vertexShaderPath);
     const char *vertexShaderSource = vertexShaderContents;
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
     // error checking
@@ -52,7 +52,7 @@ unsigned int shaderCreate(const char *_vertexShaderPath,
 
     char *fragmentShaderContents = readFile(fragmentShaderPath);
     const char *fragmentShaderSource = fragmentShaderContents;
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -62,7 +62,7 @@ unsigned int shaderCreate(const char *_vertexShaderPath,
         exit(EXIT_FAILURE);
     }
 
-    unsigned int shaderProgram = glCreateProgram();
+    uint32_t shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);

@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "cglm/types-struct.h"
+#include <stdint.h>
 
 #define MAX_BONE_INFLUENCE 4
 
@@ -16,19 +17,19 @@ struct Vertex {
 struct Mesh {
     struct Vertex *Vertices;
     int VertexCount;
-    unsigned int *Indices;
+    uint32_t *Indices;
     int IndexCount;
 
-    unsigned int VAO, VBO, EBO;
+    uint32_t VAO, VBO, EBO;
     int MaterialIndex;
 };
 
 /// creates OpenGL buffers with supplied vertices and indices. free with
 /// `meshFree`
-struct Mesh *meshLoad(struct Vertex *vertices, unsigned int *indices,
+struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount);
 void meshSendData(struct Mesh *mesh);
-void meshRender(struct Mesh *mesh, mat4s worldTransform, unsigned int shader);
+void meshRender(struct Mesh *mesh, mat4s worldTransform, uint32_t shader);
 void meshFree(struct Mesh *mesh);
 
 #endif // !MESH_H

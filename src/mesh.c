@@ -5,7 +5,7 @@
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
-struct Mesh *meshLoad(struct Vertex *vertices, unsigned int *indices,
+struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount) {
     struct Mesh *mesh = malloc(sizeof(struct Mesh));
     mesh->Vertices = vertices;
@@ -53,11 +53,10 @@ void meshSendData(struct Mesh *mesh) {
     // of vertices to draw
     glGenBuffers(1, &mesh->EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 mesh->IndexCount * sizeof(unsigned int), mesh->Indices,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->IndexCount * sizeof(uint32_t),
+                 mesh->Indices, GL_STATIC_DRAW);
 }
-void meshRender(struct Mesh *mesh, mat4s worldTransform, unsigned int shader) {
+void meshRender(struct Mesh *mesh, mat4s worldTransform, uint32_t shader) {
     glUseProgram(shader);
 
     // assign projectionFromModel matrix

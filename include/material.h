@@ -40,7 +40,7 @@ MaterialTextureData *materialTextureDataCreate(Texture *texture, int index);
 void materialTextureDataFree(MaterialTextureData *data);
 
 typedef struct {
-    unsigned int Shader;
+    uint32_t Shader;
 
     int PropertyCount;
     MaterialProperty **Properties;
@@ -49,7 +49,7 @@ typedef struct {
 /// returns material for use with models
 /// @param int `propertyCount`: the number of properties to allocate for
 /// @param MaterialProperty *...: x number of properties to set
-Material *materialCreate(unsigned int shader, int propertyCount, ...);
+Material *materialCreate(uint32_t shader, int propertyCount, ...);
 void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
 void materialChangeProperty(Material *material, const char *propertyName,

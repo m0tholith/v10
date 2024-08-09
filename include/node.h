@@ -11,7 +11,7 @@ typedef struct {
     Material Material;
 
     int MeshCount;
-    unsigned int *Meshes;
+    uint32_t *Meshes;
 
     void *Parent;
 

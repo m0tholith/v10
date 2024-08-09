@@ -28,7 +28,7 @@ MaterialTextureData *materialTextureDataCreate(Texture *texture, int index) {
 }
 void materialTextureDataFree(MaterialTextureData *data) { free(data); }
 
-Material *materialCreate(unsigned int shader, int propertyCount, ...) {
+Material *materialCreate(uint32_t shader, int propertyCount, ...) {
     Material *material = malloc(sizeof(Material));
     material->Shader = shader;
     material->PropertyCount = propertyCount;
@@ -42,7 +42,7 @@ Material *materialCreate(unsigned int shader, int propertyCount, ...) {
     return material;
 }
 
-void applyProperty(MaterialProperty *property, unsigned int shader) {
+void applyProperty(MaterialProperty *property, uint32_t shader) {
     float floatValue;
     vec2s vec2;
     vec3s vec3;

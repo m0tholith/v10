@@ -38,7 +38,7 @@ Model *modelLoad(const char *_modelPath) {
 
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
-    for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
+    for (uint32_t i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
         meshSendData(model->Meshes[i]);
     }
@@ -115,8 +115,8 @@ void _modelFreeMaterials(void *_model) {
 struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
     struct Vertex *vertices =
         malloc(mesh->mNumVertices * sizeof(struct Vertex));
-    unsigned int *indices = malloc(mesh->mNumFaces * 3 * sizeof(unsigned int));
-    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+    uint32_t *indices = malloc(mesh->mNumFaces * 3 * sizeof(uint32_t));
+    for (uint32_t i = 0; i < mesh->mNumVertices; i++) {
         struct Vertex v = {0};
 
         v.Position = (vec3s){
@@ -142,9 +142,9 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
         }
         vertices[i] = v;
     }
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+    for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
         struct aiFace face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < 3; j++) {
+        for (uint32_t j = 0; j < 3; j++) {
             indices[3 * i + j] = face.mIndices[j];
         }
     }
@@ -166,9 +166,8 @@ Node *processNode(struct aiNode *node, Node *parentNode) {
     Node *newNode = nodeCreate(parentNode, node->mNumChildren);
     newNode->ParentFromLocal = aiMatrixToGLMS(node->mTransformation);
     newNode->MeshCount = node->mNumMeshes;
-    newNode->Meshes = malloc(node->mNumMeshes * sizeof(unsigned int));
-    memcpy(newNode->Meshes, node->mMeshes,
-           node->mNumMeshes * sizeof(unsigned int));
+    newNode->Meshes = malloc(node->mNumMeshes * sizeof(uint32_t));
+    memcpy(newNode->Meshes, node->mMeshes, node->mNumMeshes * sizeof(uint32_t));
     newNode->Name = malloc(node->mName.length * sizeof(char) + 1);
     strcpy(newNode->Name, node->mName.data);
     for (int i = 0; i < node->mNumChildren; i++) {

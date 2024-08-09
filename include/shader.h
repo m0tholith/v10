@@ -3,7 +3,9 @@
 
 #define SHADERS_PATH "shaders/"
 
-unsigned int shaderCreate(const char *vertexShaderPath,
-                          const char *fragmentShaderPath);
+#include <stdint.h>
+
+uint32_t shaderCreate(const char *vertexShaderPath,
+                      const char *fragmentShaderPath);
 
 #endif // !SHADER_H

@@ -13,7 +13,7 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     strcpy(textureFile, TEXTURES_PATH);
     strcat(textureFile, _texturePath);
 
-    unsigned int textureId;
+    uint32_t textureId;
 
     bool success;
 
