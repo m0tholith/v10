@@ -57,13 +57,13 @@ void meshSendData(struct Mesh *mesh) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->IndexCount * sizeof(uint32_t),
                  mesh->Indices, GL_STATIC_DRAW);
 }
-void meshRender(struct Mesh *mesh, mat4s worldTransform, uint32_t shader) {
+void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
     glUseProgram(shader);
 
     // assign projectionFromModel matrix
     mat4s projectionFromModel =
         glms_mat4_mul(ProjectionFromViewMatrix,
-                      glms_mat4_mul(ViewFromWorldMatrix, worldTransform));
+                      glms_mat4_mul(ViewFromWorldMatrix, worldFromModel));
     // `projectionFromModel` should probably always be defined and used in the
     // vertex shader
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionFromModel"), 1,

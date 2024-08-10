@@ -19,26 +19,26 @@ struct Node *nodeCreate(struct Node *parent, int childCount) {
 }
 void nodeRender(mat4s worldFromParent, struct Node *node,
                 struct Mesh **meshArray, Material **materialArray) {
-    mat4s transformation =
+    mat4s worldFromLocal =
         glms_mat4_mul(worldFromParent, node->ParentFromLocal);
     for (int i = 0; i < node->MeshCount; i++) {
         struct Mesh *mesh = meshArray[node->Meshes[i]];
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
         materialApplyProperties(material);
-        meshRender(mesh, transformation, material->Shader);
+        meshRender(mesh, worldFromLocal, material->Shader);
     }
 }
-mat4s nodeGetWorldTransform(struct Node *node) {
+mat4s nodeGetWorldFromLocal(struct Node *node) {
     if (node == NULL)
         return GLMS_MAT4_IDENTITY;
-    return glms_mat4_mul(nodeGetWorldTransform(node->Parent),
+    return glms_mat4_mul(nodeGetWorldFromLocal(node->Parent),
                          node->ParentFromLocal);
 }
 void nodePrintInfo(struct Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
-    mat4s transform = nodeGetWorldTransform(node);
+    mat4s transform = nodeGetWorldFromLocal(node);
 }
 void nodeFree(struct Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {

@@ -19,7 +19,7 @@ struct NodeEntry {
     mat4s WorldFromLocal;
 };
 typedef struct {
-    mat4s WorldTransform;
+    mat4s WorldFromModel;
 
     int MeshCount;
     struct Mesh **Meshes;

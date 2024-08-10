@@ -38,7 +38,7 @@ Model *modelLoad(const char *_modelPath) {
 
     Model *model = malloc(sizeof(Model));
 
-    model->WorldTransform = GLMS_MAT4_IDENTITY;
+    model->WorldFromModel = GLMS_MAT4_IDENTITY;
 
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
@@ -96,7 +96,7 @@ void modelRender(Model *model) {
         struct NodeEntry *nodeEntry = &model->NodeEntries[i];
         mat4s worldFromParent;
         if (i == 0)
-            worldFromParent = model->WorldTransform;
+            worldFromParent = model->WorldFromModel;
         else
             worldFromParent = model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
 
