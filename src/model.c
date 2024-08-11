@@ -20,8 +20,6 @@ struct Node *processNode(struct aiNode *node, struct Node *parentNode);
 void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
                       int *index, int parentIndex);
 
-int totalNodeChildCount(struct Node *node);
-
 Model *modelLoad(const char *_modelPath) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
     strcpy(modelFile, MODELS_PATH);
@@ -58,7 +56,7 @@ Model *modelLoad(const char *_modelPath) {
     }
 
     struct Node *rootNode = processNode(scene->mRootNode, NULL);
-    model->NodeCount = totalNodeChildCount(rootNode) + 1; // +1 for root node
+    model->NodeCount = nodeChildCount(rootNode) + 1; // +1 for root node
     model->NodeEntries = malloc(model->NodeCount * sizeof(struct NodeEntry));
     int index = 0;
     processNodeArray(model->NodeEntries, rootNode, &index, -1);
@@ -207,13 +205,6 @@ void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
     for (int i = 0; i < rootNode->ChildCount; i++) {
         processNodeArray(nodeArray, rootNode->Children[i], indexPtr, index);
     }
-}
-int totalNodeChildCount(struct Node *node) {
-    int result = node->ChildCount;
-    for (int i = 0; i < node->ChildCount; i++) {
-        result += totalNodeChildCount(node->Children[i]);
-    }
-    return result;
 }
 
 struct Node *searchForNode(char *name, struct Node *rootNode) {

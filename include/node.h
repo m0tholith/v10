@@ -28,6 +28,7 @@ void nodeRender(mat4s worldFromParent, struct Node *node,
                 struct Mesh **meshArray, Material **materialArray);
 /// gets world transform of parent node
 mat4s nodeGetWorldFromLocal(struct Node *node);
+int nodeChildCount(struct Node *node);
 void nodePrintInfo(struct Node *node);
 /// recursively frees node and children
 void nodeFree(struct Node *node);

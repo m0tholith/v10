@@ -35,6 +35,13 @@ mat4s nodeGetWorldFromLocal(struct Node *node) {
     return glms_mat4_mul(nodeGetWorldFromLocal(node->Parent),
                          node->ParentFromLocal);
 }
+int nodeChildCount(struct Node *node) {
+    int result = node->ChildCount;
+    for (int i = 0; i < node->ChildCount; i++) {
+        result += nodeChildCount(node->Children[i]);
+    }
+    return result;
+}
 void nodePrintInfo(struct Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
