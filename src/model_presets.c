@@ -54,6 +54,21 @@ void modelPresetTexturedFree(void *_model) {
     _modelDelete(model);
 }
 
+Model *modelPresetTexturedAll(const char *modelFilename,
+                              const char *vertexShaderPath,
+                              const char *fragmentShaderPath) {
+    Model *model = modelLoad(modelFilename);
+    for (int i = 0; i < model->MaterialCount; i++) {
+        model->Materials[i] = materialCreate(
+            shaderCreate(vertexShaderPath, fragmentShaderPath), 1,
+            materialPropertyCreate(
+                "_texture", MATTYPE_TEXTURE2D,
+                (void *)materialTextureDataCreate(model->Textures[i], 0)));
+    }
+    model->OnDelete = &modelFreeWithMaterials;
+    return model;
+}
+
 void modelFreeWithMaterials(void *_model) {
     _modelFreeMaterials(_model);
     _modelDelete(_model);

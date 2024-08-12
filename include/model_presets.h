@@ -13,6 +13,10 @@ Model *modelPresetTextured(const char *modelFilename,
                            const char *vertexShaderPath,
                            const char *fragmentShaderPath,
                            const char *texturePath);
+/// sets all materials of model to use texture array of model
+Model *modelPresetTexturedAll(const char *modelFilename,
+                              const char *vertexShaderPath,
+                              const char *fragmentShaderPath);
 
 /// callback for `modelFree`, calls `_modelDelete` and `_modelFreeMaterials`
 void modelFreeWithMaterials(void *model);

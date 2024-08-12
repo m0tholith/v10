@@ -30,15 +30,9 @@ int main(void) {
         cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model = modelLoad("SM_Deccer_Cubes_Textured_Complex.gltf");
-    for (int i = 0; i < model->MaterialCount; i++) {
-        model->Materials[i] = materialCreate(
-            shaderCreate("vertex_shader.glsl", "fragment_shader.glsl"), 1,
-            materialPropertyCreate(
-                "_texture", MATTYPE_TEXTURE2D,
-                (void *)materialTextureDataCreate(model->Textures[i], 0)));
-    }
-    model->OnDelete = &modelFreeWithMaterials;
+    Model *model =
+        modelPresetTexturedAll("SM_Deccer_Cubes_Textured_Complex.gltf",
+                               "vertex_shader.glsl", "fragment_shader.glsl");
 
     ProjectionFromViewMatrix = glms_perspective(
         glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
