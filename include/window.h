@@ -9,6 +9,7 @@
 #define WINDOW_HEIGHT 800
 
 GLFWwindow *windowCreate();
+void windowSetSkybox(float r, float g, float b);
 void windowDraw(GLFWwindow *window);
 void windowClose();
 

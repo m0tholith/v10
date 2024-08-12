@@ -24,6 +24,7 @@ vec2s mouseSensitivity;
 
 int main(void) {
     window = windowCreate();
+    windowSetSkybox(0.117f, 0.117f, 0.18f);
     inputInit(window);
 
     Camera camera =
@@ -64,11 +65,6 @@ int main(void) {
         cameraCalculateViewMatrix(&camera);
 
         lastTime = currentTime;
-
-        // HINT: drawing goes here
-        // glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         modelRender(model);
 
