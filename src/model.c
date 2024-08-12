@@ -1,5 +1,6 @@
 #include "model.h"
 
+#include "assimp/matrix4x4.h"
 #include "material.h"
 #include "mesh.h"
 #include "node.h"
@@ -76,10 +77,10 @@ Model *modelLoad(const char *_modelPath) {
 
     return model;
 }
-void modelSetMaterials(Model *model, ...) {
+void modelSetMaterials(Model *model, int materialCount, ...) {
     va_list materials;
-    va_start(materials, model->MaterialCount);
-    for (int i = 0; i < model->MaterialCount; i++) {
+    va_start(materials, materialCount);
+    for (int i = 0; i < materialCount; i++) {
         model->Materials[i] = va_arg(materials, Material *);
     }
     va_end(materials);
@@ -96,12 +97,13 @@ void modelRender(Model *model) {
         if (i == 0)
             worldFromParent = model->WorldFromModel;
         else
-            worldFromParent = model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
+            worldFromParent =
+                model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
 
         nodeRender(worldFromParent, nodeEntry->Node, model->Meshes,
                    model->Materials);
-        nodeEntry->WorldFromLocal = glms_mat4_mul(
-            worldFromParent, nodeEntry->Node->ParentFromLocal);
+        nodeEntry->WorldFromLocal =
+            glms_mat4_mul(worldFromParent, nodeEntry->Node->ParentFromLocal);
     }
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
@@ -171,8 +173,24 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
 }
 
 mat4s aiMatrixToGLMS(struct aiMatrix4x4 aiMat) {
-    aiTransposeMatrix4(&aiMat);
-    return *(mat4s *)&aiMat;
+    mat4s mat;
+    mat.raw[0][0] = aiMat.a1;
+    mat.raw[0][2] = aiMat.c1;
+    mat.raw[0][1] = aiMat.b1;
+    mat.raw[0][3] = aiMat.d1;
+    mat.raw[1][0] = aiMat.a2;
+    mat.raw[1][1] = aiMat.b2;
+    mat.raw[1][2] = aiMat.c2;
+    mat.raw[1][3] = aiMat.d2;
+    mat.raw[2][0] = aiMat.a3;
+    mat.raw[2][1] = aiMat.b3;
+    mat.raw[2][2] = aiMat.c3;
+    mat.raw[2][3] = aiMat.d3;
+    mat.raw[3][0] = aiMat.a4;
+    mat.raw[3][1] = aiMat.b4;
+    mat.raw[3][2] = aiMat.c4;
+    mat.raw[3][3] = aiMat.d4;
+    return mat;
 }
 struct Node *processNode(struct aiNode *node, struct Node *parentNode) {
     if (parentNode == NULL) {

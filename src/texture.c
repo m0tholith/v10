@@ -15,8 +15,6 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
 
     uint32_t textureId;
 
-    bool success;
-
     int width, height, numColorChannels;
     unsigned char *data;
     // load default texture (white)

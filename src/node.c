@@ -45,7 +45,6 @@ int nodeChildCount(struct Node *node) {
 void nodePrintInfo(struct Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
-    mat4s transform = nodeGetWorldFromLocal(node);
 }
 void nodeFree(struct Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {

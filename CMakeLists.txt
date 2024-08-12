@@ -22,6 +22,8 @@ set(SRC_FILES
 if(BUILD_DEBUG)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     add_compile_options("-g")
+    add_compile_options("-Wall")
+    add_compile_options("-Werror")
 endif()
 
 project(game)

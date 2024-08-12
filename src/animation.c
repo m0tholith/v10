@@ -34,7 +34,7 @@ versors aiQuatToVersors(struct aiQuaternion quat) {
     };
 }
 struct Node *getAnimationNode(char *nodeName, struct Node *rootNode);
-Animation *animationCreate(struct aiScene *scene, char *name,
+Animation *animationCreate(const struct aiScene *scene, char *name,
                            struct Node *rootNode) {
     int animIndex = 0;
     printf("looking for animation \"%s\"\n", name);

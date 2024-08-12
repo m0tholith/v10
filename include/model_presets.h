@@ -6,7 +6,8 @@
 /// arguments are vec3s for each material's color for the model
 Model *modelPresetTinted(const char *modelFilename,
                          const char *vertexShaderPath,
-                         const char *fragmentShaderPath, ...);
+                         const char *fragmentShaderPath, int materialCount,
+                         ...);
 /// sets all materials of model to speified texture path using a single material
 Model *modelPresetTextured(const char *modelFilename,
                            const char *vertexShaderPath,

@@ -39,7 +39,7 @@ float LinearInterp(float x);
 float SmoothStepInterp(float x);
 
 /// free with `animationFree`
-Animation *animationCreate(struct aiScene *scene, char *name,
+Animation *animationCreate(const struct aiScene *scene, char *name,
                            struct Node *rootNode);
 /// step animation using `InterpFunction` defined by each node
 void animationStep(Animation *animation, float deltaTime);

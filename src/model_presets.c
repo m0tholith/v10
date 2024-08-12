@@ -11,11 +11,12 @@
 void modelPresetTintedFree(void *_model);
 Model *modelPresetTinted(const char *modelFilename,
                          const char *vertexShaderPath,
-                         const char *fragmentShaderPath, ...) {
+                         const char *fragmentShaderPath, int materialCount,
+                         ...) {
     Model *model = modelLoad(modelFilename);
     va_list colors;
-    va_start(colors, model->MaterialCount);
-    for (int i = 0; i < model->MaterialCount - 1; i++) {
+    va_start(colors, materialCount);
+    for (int i = 0; i < materialCount; i++) {
         vec3s color = va_arg(colors, vec3s);
         model->Materials[i] = materialCreate(
             shaderCreate(vertexShaderPath, fragmentShaderPath), 1,

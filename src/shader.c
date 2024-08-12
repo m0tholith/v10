@@ -17,7 +17,10 @@ char *readFile(const char *fileName) {
     fseek(file, 0, SEEK_SET);
 
     char *string = malloc(fsize + 1);
-    fread(string, fsize, 1, file);
+    if (fread(string, fsize, 1, file) < 1) {
+        fprintf(stderr, "couldn't read file \"%s\"\n", fileName);
+        exit(1);
+    }
     fclose(file);
 
     string[fsize] = 0;

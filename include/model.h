@@ -43,7 +43,7 @@ typedef struct {
 Model *modelLoad(const char *modelFilename);
 /// @param Material *...: materials to set, needs to be `model->MaterialCount`
 /// number of them
-void modelSetMaterials(Model *model, ...);
+void modelSetMaterials(Model *model, int materialCount, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelRender(Model *model);
 /// calls `model->OnDelete`
