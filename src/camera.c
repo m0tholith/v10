@@ -1,5 +1,8 @@
 #include "camera.h"
 
+#include "rendering.h"
+#include "window.h"
+
 #define X_AXIS ((vec3s){{1.0f, 0.0f, 0.0f}})
 #define Y_AXIS ((vec3s){{0.0f, 1.0f, 0.0f}})
 #define Z_AXIS ((vec3s){{0.0f, 0.0f, 1.0f}})
@@ -12,9 +15,21 @@ Camera cameraCreate(vec3s position, versors quaternion) {
     cameraCalculateViewMatrix(&camera);
     return camera;
 }
+void cameraSetProjectionMatrixPersp(Camera *camera, float fov, float nearPlane,
+                                    float farPlane) {
+    ProjectionFromViewMatrix = glms_perspective(
+        glm_rad(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, nearPlane,
+        farPlane);
+}
+void cameraSetProjectionMatrixOrtho(Camera *camera, float x, float y,
+                                    float nearPlane, float farPlane) {
+#define INITIAL_SCALE 40.0f
+    ProjectionFromViewMatrix = glms_ortho(-x, x, y, -y, nearPlane, farPlane);
+}
 void cameraCalculateViewMatrix(Camera *camera) {
     camera->ViewFromWorldMatrix =
         glms_quat_look(camera->Position, camera->Quaternion);
+    ViewFromWorldMatrix = camera->ViewFromWorldMatrix;
 }
 void cameraSetPosition(Camera *camera, vec3s position) {
     camera->Position = position;

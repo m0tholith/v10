@@ -28,15 +28,12 @@ int main(void) {
 
     Camera camera =
         cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
+    cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     Model *model =
         modelPresetTexturedAll("SM_Deccer_Cubes_Textured_Complex.gltf",
                                "vertex_shader.glsl", "fragment_shader.glsl");
-
-    ProjectionFromViewMatrix = glms_perspective(
-        glm_rad(60.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f,
-        100.0f);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
@@ -65,7 +62,6 @@ int main(void) {
             camera.Position,
             glms_vec3_scale(positionDelta, MOVE_SPEED * deltaTime));
         cameraCalculateViewMatrix(&camera);
-        ViewFromWorldMatrix = camera.ViewFromWorldMatrix;
 
         lastTime = currentTime;
 
