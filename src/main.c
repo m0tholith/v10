@@ -16,7 +16,6 @@
 
 GLFWwindow *window;
 
-mat4s ViewFromWorldMatrix, ProjectionFromViewMatrix;
 vec3s movementInput;
 vec2s mousePosition;
 vec2s mouseDelta;

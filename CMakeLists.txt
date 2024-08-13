@@ -5,6 +5,7 @@ set(BUILD_DEBUG ON)
 set(SRC_FILES
     src/main.c
     src/glad.c
+    src/rendering.c
     src/window.c
     src/input.c
     src/mesh.c
