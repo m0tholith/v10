@@ -1,6 +1,6 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-void errorHandle();
+void errorInit();
 
 #endif // !ERROR_H

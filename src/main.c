@@ -26,6 +26,7 @@ int main(void) {
     window = windowCreate();
     windowSetSkybox(0.117f, 0.117f, 0.18f);
     inputInit(window);
+    errorInit();
 
     Camera camera =
         cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
@@ -68,7 +69,6 @@ int main(void) {
         modelRender(model);
 
         windowDraw(window);
-        errorHandle();
     }
 
     modelFree(model);
