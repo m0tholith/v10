@@ -5,6 +5,7 @@
 #include "rendering.h"
 
 #include "animation.h"
+#include "error.h"
 #include "material.h"
 #include "model.h"
 #include "model_presets.h"
@@ -38,7 +39,6 @@ int main(void) {
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
     vec3s positionDelta = GLMS_VEC3_ZERO;
-    GLenum err;
     while (!glfwWindowShouldClose(window)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
@@ -68,10 +68,7 @@ int main(void) {
         modelRender(model);
 
         windowDraw(window);
-
-        while ((err = glGetError()) != GL_NO_ERROR) {
-            fprintf(stderr, "gl error 0x%04X\n", err);
-        }
+        errorHandle();
     }
 
     modelFree(model);
