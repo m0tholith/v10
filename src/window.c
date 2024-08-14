@@ -5,10 +5,14 @@
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
+void glfwErrorCallback(int errorCode, const char *description) {
+    printf("GLFW error code 0x%04X:\n	%s\n", errorCode, description);
+}
 
 GLFWwindow *windowCreate() {
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
     glfwInit();
+    glfwSetErrorCallback(glfwErrorCallback);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
