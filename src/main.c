@@ -44,10 +44,6 @@ int main(void) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
-        for (int i = 0; i < model->AnimationCount; i++) {
-            animationStep(model->Animations[i], deltaTime);
-        }
-
         inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
             eulerAngles,
