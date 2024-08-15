@@ -37,7 +37,6 @@ struct Node *getAnimationNode(char *nodeName, struct Node *rootNode);
 Animation *animationCreate(const struct aiScene *scene, char *name,
                            struct Node *rootNode) {
     int animIndex = 0;
-    printf("looking for animation \"%s\"\n", name);
     for (; animIndex < scene->mNumAnimations; animIndex++) {
         if (strcmp(name, scene->mAnimations[animIndex]->mName.data) == 0)
             break;
@@ -56,6 +55,8 @@ Animation *animationCreate(const struct aiScene *scene, char *name,
     resultAnimation->Duration = animation->mDuration;
     resultAnimation->TicksPerSec = animation->mTicksPerSecond;
     resultAnimation->Time = 0;
+    printf("found animation \"%s\"\n    duration: %d, ticks per sec: %d\n",
+           name, resultAnimation->Duration, resultAnimation->TicksPerSec);
 
     float (*interpFunction)(float);
     if (!strncmp(resultAnimation->Name, "Step", 4))
