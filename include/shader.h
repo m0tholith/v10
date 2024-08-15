@@ -7,5 +7,6 @@
 
 uint32_t shaderCreate(const char *vertexShaderPath,
                       const char *fragmentShaderPath);
+void shaderFree(uint32_t shader);
 
 #endif // !SHADER_H

@@ -86,3 +86,4 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     free(fragmentShaderPath);
     return shaderProgram;
 }
+void shaderFree(uint32_t shader) { glDeleteProgram(shader); }
