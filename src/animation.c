@@ -123,26 +123,25 @@ void animationStep(Animation *animation, float deltaTime) {
         AnimationNode *animNode = &animation->Nodes[i];
         mat4s newTransform = GLMS_MAT4_IDENTITY;
 
-        if (animNode->ScalingKeyCount > 1) {
-            int nextScaleKeyIdx =
-                getNextIndexVec(animation->Time, animNode->ScalingKeys,
-                                animNode->ScalingKeyCount);
-            int prevScaleKeyIdx =
-                (nextScaleKeyIdx + animNode->ScalingKeyCount - 1) %
-                animNode->ScalingKeyCount;
-            AnimationVectorKey nextScaleKey =
-                animNode->ScalingKeys[nextScaleKeyIdx];
-            AnimationVectorKey prevScaleKey =
-                animNode->ScalingKeys[prevScaleKeyIdx];
-            float t = (animation->Time - prevScaleKey.Time) /
-                      (nextScaleKey.Time - prevScaleKey.Time);
-            newTransform = glms_scale(
-                newTransform,
-                glms_vec3_lerp(prevScaleKey.Value, nextScaleKey.Value,
-                               animNode->InterpFunction(t)));
+        if (animNode->PositionKeyCount > 1) {
+            int nextPosKeyIdx =
+                getNextIndexVec(animation->Time, animNode->PositionKeys,
+                                animNode->PositionKeyCount);
+            int prevPosKeyIdx =
+                (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
+                animNode->PositionKeyCount;
+            AnimationVectorKey nextPosKey =
+                animNode->PositionKeys[nextPosKeyIdx];
+            AnimationVectorKey prevPosKey =
+                animNode->PositionKeys[prevPosKeyIdx];
+            float t = (animation->Time - prevPosKey.Time) /
+                      (nextPosKey.Time - prevPosKey.Time);
+            newTransform = glms_translate(
+                newTransform, glms_vec3_lerp(prevPosKey.Value, nextPosKey.Value,
+                                             animNode->InterpFunction(t)));
         } else
             newTransform =
-                glms_scale(newTransform, animNode->ScalingKeys[0].Value);
+                glms_translate(newTransform, animNode->PositionKeys[0].Value);
 
         if (animNode->RotationKeyCount > 1) {
             int nextRotKeyIdx =
@@ -165,25 +164,26 @@ void animationStep(Animation *animation, float deltaTime) {
             newTransform =
                 glms_quat_rotate(newTransform, animNode->RotationKeys[0].Value);
 
-        if (animNode->PositionKeyCount > 1) {
-            int nextPosKeyIdx =
-                getNextIndexVec(animation->Time, animNode->PositionKeys,
-                                animNode->PositionKeyCount);
-            int prevPosKeyIdx =
-                (nextPosKeyIdx + animNode->PositionKeyCount - 1) %
-                animNode->PositionKeyCount;
-            AnimationVectorKey nextPosKey =
-                animNode->PositionKeys[nextPosKeyIdx];
-            AnimationVectorKey prevPosKey =
-                animNode->PositionKeys[prevPosKeyIdx];
-            float t = (animation->Time - prevPosKey.Time) /
-                      (nextPosKey.Time - prevPosKey.Time);
-            newTransform = glms_translate(
-                newTransform, glms_vec3_lerp(prevPosKey.Value, nextPosKey.Value,
-                                             animNode->InterpFunction(t)));
+        if (animNode->ScalingKeyCount > 1) {
+            int nextScaleKeyIdx =
+                getNextIndexVec(animation->Time, animNode->ScalingKeys,
+                                animNode->ScalingKeyCount);
+            int prevScaleKeyIdx =
+                (nextScaleKeyIdx + animNode->ScalingKeyCount - 1) %
+                animNode->ScalingKeyCount;
+            AnimationVectorKey nextScaleKey =
+                animNode->ScalingKeys[nextScaleKeyIdx];
+            AnimationVectorKey prevScaleKey =
+                animNode->ScalingKeys[prevScaleKeyIdx];
+            float t = (animation->Time - prevScaleKey.Time) /
+                      (nextScaleKey.Time - prevScaleKey.Time);
+            newTransform = glms_scale(
+                newTransform,
+                glms_vec3_lerp(prevScaleKey.Value, nextScaleKey.Value,
+                               animNode->InterpFunction(t)));
         } else
             newTransform =
-                glms_translate(newTransform, animNode->PositionKeys[0].Value);
+                glms_scale(newTransform, animNode->ScalingKeys[0].Value);
 
         animNode->Node->ParentFromLocal = newTransform;
     }
