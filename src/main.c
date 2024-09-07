@@ -33,9 +33,11 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    Model *model =
-        modelPresetTexturedAll("SM_Deccer_Cubes_Textured_Complex.gltf",
-                               "vertex_shader.glsl", "fragment_shader.glsl");
+    uint16_t shader =
+        shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
+    Model *model = modelLoad("untitled.glb");
+    model->Materials[0] = materialCreate(shader, 0);
+    modelSetDefaultMaterial(model, model->Materials[0]);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
@@ -43,6 +45,8 @@ int main(void) {
     while (!glfwWindowShouldClose(window)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
+
+        animationStep(model->Animations[0], deltaTime);
 
         inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
@@ -67,7 +71,9 @@ int main(void) {
         windowDraw(window);
     }
 
+    materialFree(model->Materials[0]);
     modelFree(model);
+    shaderFree(shader);
 
     windowClose();
     return 0;

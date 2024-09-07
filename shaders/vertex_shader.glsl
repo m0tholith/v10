@@ -7,6 +7,7 @@ layout(location = 3) in vec3 vertColor;
 
 out vec3 vColor;
 out vec2 vTexCoord;
+out vec3 vNormal;
 
 uniform mat4 projectionFromModel;
 
@@ -14,6 +15,7 @@ void main()
 {
     vColor = vertColor;
     vTexCoord = vertTexCoord;
+    vNormal = vertNormal;
 
     gl_Position = projectionFromModel * vec4(vertPos, 1.0f);
 }
