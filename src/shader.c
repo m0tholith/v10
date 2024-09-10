@@ -49,7 +49,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vertexShader, sizeof(infoLog), NULL, infoLog);
-        printf("vertex shader could not compile: %s", infoLog);
+        fprintf(stderr, "vertex shader could not compile: %s", infoLog);
         exit(EXIT_FAILURE);
     }
 
@@ -61,7 +61,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(fragmentShader, sizeof(infoLog), NULL, infoLog);
-        printf("fragment shader could not compile: %s", infoLog);
+        fprintf(stderr, "fragment shader could not compile: %s", infoLog);
         exit(EXIT_FAILURE);
     }
 
@@ -73,7 +73,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &shaderSuccess);
     if (success != GL_TRUE) {
         glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
-        printf("shader program could not be linked: %s", infoLog);
+        fprintf(stderr, "shader program could not be linked: %s", infoLog);
         exit(EXIT_FAILURE);
     }
     glUseProgram(shaderProgram);
