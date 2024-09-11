@@ -39,7 +39,7 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    uint16_t shader =
+    uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
     Model *model = modelLoad("untitled.glb");
     model->Materials[0] = materialCreate(shader, 0);
@@ -97,7 +97,7 @@ int main(void) {
 
     materialFree(model->Materials[0]);
     modelFree(model);
-    shaderFree(shader);
+    shaderFreeCache();
 
     windowClose();
 
