@@ -143,7 +143,7 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
         v.Position = (vec3s){
             {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}};
         v.Normal = (vec3s){
-            {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}};
+            {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}};
         if (mesh->mTextureCoords[0])
             v.TexCoords = (vec2s){
                 {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}};
