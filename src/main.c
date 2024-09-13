@@ -11,6 +11,7 @@
 #include "model_presets.h"
 #include "shader.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,11 +40,24 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
+    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
+    Model *light = modelLoad("light.glb");
+    light->Materials[0] = materialCreate(lightShader, 0);
+    vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
+    vec3s lightColor = GLMS_VEC3_ONE;
+    light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
+
     uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
-    Model *model = modelLoad("untitled.glb");
-    model->Materials[0] = materialCreate(shader, 0);
-    modelSetDefaultMaterial(model, model->Materials[0]);
+    Model *model = modelLoad("home.glb");
+    model->Materials[0] =
+        materialCreate(shader, 2,
+                       materialPropertyCreate("light_position", MATTYPE_VEC3,
+                                              (void *)&lightPos),
+                       materialPropertyCreate("light_color", MATTYPE_VEC3,
+                                              (void *)&lightColor));
+
+    glEnable(GL_CULL_FACE);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
@@ -56,7 +70,9 @@ int main(void) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
-        animationStep(model->Animations[0], deltaTime);
+        for (int i = 0; i < model->AnimationCount; i++) {
+            animationStep(model->Animations[i], deltaTime);
+        }
 
         inputUpdate();
         if (exitEvent->State > 0)
@@ -90,13 +106,24 @@ int main(void) {
 
         lastTime = currentTime;
 
+        lightPos.x = sinf(currentTime * M_PI) * 1.3f + -2.7f;
+        lightPos.y = sinf(currentTime * M_PI * 0.8f) * 0.7f + 0.7f;
+        lightPos.z = sinf(currentTime * M_PI * 1.3f) * 1.8f + -1.2f;
+        lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+
+        light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
         modelRender(model);
+        modelRender(light);
 
         windowDraw(window);
     }
 
     materialFree(model->Materials[0]);
+    materialFree(light->Materials[0]);
     modelFree(model);
+    modelFree(light);
     shaderFreeCache();
 
     windowClose();

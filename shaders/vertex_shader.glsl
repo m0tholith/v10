@@ -8,10 +8,13 @@ layout(location = 3) in vec3 vertColor;
 out vec3 vColor;
 out vec2 vTexCoord;
 out vec3 vNormal;
+out vec3 vPos;
 
 uniform mat4 projectionFromModel;
+uniform mat4 worldFromModel;
+uniform mat3 worldNormalFromModel;
 
-const float strength = 20;
+const float strength = 5;
 vec4 vertex_warp(vec4 pos) {
     pos.xy = (pos.xy + vec2(1.0)) * vec2(320.0 / strength, 240.0 / strength) * 0.5;
     pos.xy = round(pos.xy);
@@ -22,7 +25,8 @@ vec4 vertex_warp(vec4 pos) {
 void main() {
     vColor = vertColor;
     vTexCoord = vertTexCoord;
-    vNormal = vertNormal;
+    vNormal = normalize(worldNormalFromModel * vertNormal);
+    vPos = vec3(worldFromModel * vec4(vertPos, 1.0f));
 
     gl_Position = vertex_warp(projectionFromModel * vec4(vertPos, 1.0f));
 }

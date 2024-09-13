@@ -3,6 +3,7 @@
 #include "rendering.h"
 
 #include "glad/glad.h"
+#include <cglm/struct/mat3.h>
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
@@ -60,12 +61,16 @@ void meshSendData(struct Mesh *mesh) {
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
     glUseProgram(shader);
 
-    // assign projectionFromModel matrix
+    glUniformMatrix4fv(glGetUniformLocation(shader, "worldFromModel"), 1,
+                       GL_FALSE, worldFromModel.raw[0]);
+    mat3s worldNormalFromModel = glms_mat4_pick3(worldFromModel);
+    glms_mat3_inv(worldNormalFromModel);
+    glms_mat3_transpose(worldNormalFromModel);
+    glUniformMatrix3fv(glGetUniformLocation(shader, "worldNormalFromModel"), 1,
+                       GL_FALSE, worldNormalFromModel.raw[0]);
     mat4s projectionFromModel =
         glms_mat4_mul(ProjectionFromViewMatrix,
                       glms_mat4_mul(ViewFromWorldMatrix, worldFromModel));
-    // `projectionFromModel` should probably always be defined and used in the
-    // vertex shader
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionFromModel"), 1,
                        GL_FALSE, projectionFromModel.raw[0]);
 
