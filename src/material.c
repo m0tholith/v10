@@ -44,6 +44,7 @@ Material *materialCreate(uint32_t shader, int propertyCount, ...) {
 }
 
 void applyProperty(MaterialProperty *property, uint32_t shader) {
+    glUseProgram(shader);
     float floatValue;
     vec2s vec2;
     vec3s vec3;
@@ -131,7 +132,6 @@ void materialChangeProperty(Material *material, const char *propertyName,
 void materialFree(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++) {
         free(material->Properties[i]->Name);
-        free(material->Properties[i]->Data);
         free(material->Properties[i]);
     }
     free(material->Properties);
