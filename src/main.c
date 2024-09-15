@@ -111,8 +111,11 @@ int main(void) {
         lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
 
         light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
-        modelRender(model);
+        modelSetNodeWorldMatrices(light);
         modelRender(light);
+
+        modelSetNodeWorldMatrices(model);
+        modelRender(model);
 
         windowDraw(window);
     }

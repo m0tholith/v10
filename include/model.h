@@ -45,6 +45,10 @@ Model *modelLoad(const char *modelFilename);
 /// number of them
 void modelSetMaterials(Model *model, int materialCount, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
+/// call this before rendering
+///
+/// useful for calculating bone transforms before rendering
+void modelSetNodeWorldMatrices(Model *model);
 void modelRender(Model *model);
 /// calls `model->OnDelete`
 void modelFree(Model *model);
