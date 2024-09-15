@@ -27,7 +27,6 @@
 
           # debugging
           pkgs-24-05.renderdoc
-          (pkgs.callPackage ./ugdb.nix { })
         ];
       };
     };
