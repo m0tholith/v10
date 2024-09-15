@@ -1,35 +1,34 @@
-# opengl-engine
+# v10
+![engine](./.github/engine.gif)
+
+an opengl game engine/framework
 ## cloning and building
-only tested for linux
+(only tested for linux)
 ### dependencies
-- opengl 3.3
+- opengl 4.6
 - glfw
 - cglm
 - assimp
 ### build and run
 ```bash
-git clone https://github.com/Motholith/opengl-engine
-cd opengl-engine
+git clone https://github.com/m0tholith/v10
+cd v10
 cmake CMakeLists.txt
 cmake --build .
 ```
 ### build and run (debug)
-this enables the `-g` option when running the compiler
+(this is already enabled by default)
+edit `CMakeLists.txt` and enable `BUILD_DEBUG`, then compile the project again
+## nix shell
+if you use nix you can use the `flake.nix` file to enter a devshell with all the required dependencies:
 ```bash
-cmake CMakeLists.txt -D CMAKE_BUILD_TYPE=DEBUG
-cmake --build .
+nix develop
 ```
-## nix-shell
-if you use nix you can use the `shell.nix` file to enter a devshell with all the required dependencies:
-```bash
-nix-shell
-```
-if you use `nix-direnv` then you probably don't need me to tell you that the devshell will automatically be enabled
-## future goals maybe (in no particular order)
-- [X] model animations
-    - [X] step "interpolation"
-    - [X] linear interpolation
-    - [X] smoothstep interpolation
-    - [X] skeletal animation
-- [ ] lighting
-- [ ] lua bindings
+if you use `nix-direnv` then you can call `direnv allow` to automatically enter a devshell when entering the project directory
+## goals
+- [X] model loading
+- [X] basic lighting
+- [ ] skinning `<------ WE ARE HERE`
+- [ ] physics engine
+- [ ] sound engine
+- [ ] bindings for some other language (maybe lua)
