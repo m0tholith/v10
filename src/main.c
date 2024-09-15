@@ -40,22 +40,10 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
-    Model *light = modelLoad("light.glb");
-    light->Materials[0] = materialCreate(lightShader, 0);
-    vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
-    vec3s lightColor = GLMS_VEC3_ONE;
-    light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
-
     uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
-    Model *model = modelLoad("home.glb");
-    model->Materials[0] =
-        materialCreate(shader, 2,
-                       materialPropertyCreate("light_position", MATTYPE_VEC3,
-                                              (void *)&lightPos),
-                       materialPropertyCreate("light_color", MATTYPE_VEC3,
-                                              (void *)&lightColor));
+    Model *model = modelLoad("RiggedSimple.glb");
+    model->Materials[0] = materialCreate(shader, 0);
 
     glEnable(GL_CULL_FACE);
 
@@ -103,17 +91,6 @@ int main(void) {
 
         lastTime = currentTime;
 
-        lightPos.x = sinf(currentTime * M_PI) * 1.3f + -2.7f;
-        lightPos.y = sinf(currentTime * M_PI * 0.8f) * 0.7f + 0.7f;
-        lightPos.z = sinf(currentTime * M_PI * 1.3f) * 1.8f + -1.2f;
-        lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-
-        light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
-        modelSetNodeWorldMatrices(light);
-        modelRender(light);
-
         modelSetNodeWorldMatrices(model);
         modelRender(model);
 
@@ -121,9 +98,7 @@ int main(void) {
     }
 
     materialFree(model->Materials[0]);
-    materialFree(light->Materials[0]);
     modelFree(model);
-    modelFree(light);
     shaderFreeCache();
 
     windowClose();
