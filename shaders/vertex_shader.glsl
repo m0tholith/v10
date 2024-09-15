@@ -10,9 +10,9 @@ out vec2 vTexCoord;
 out vec3 vNormal;
 out vec3 vPos;
 
-uniform mat4 projectionFromModel;
-uniform mat4 worldFromModel;
-uniform mat3 worldNormalFromModel;
+uniform mat4 _projectionFromModel;
+uniform mat4 _worldFromModel;
+uniform mat3 _worldNormalFromModel;
 
 const float strength = 5;
 vec4 vertex_warp(vec4 pos) {
@@ -25,8 +25,8 @@ vec4 vertex_warp(vec4 pos) {
 void main() {
     vColor = vertColor;
     vTexCoord = vertTexCoord;
-    vNormal = normalize(worldNormalFromModel * vertNormal);
-    vPos = vec3(worldFromModel * vec4(vertPos, 1.0f));
+    vNormal = normalize(_worldNormalFromModel * vertNormal);
+    vPos = vec3(_worldFromModel * vec4(vertPos, 1.0f));
 
-    gl_Position = vertex_warp(projectionFromModel * vec4(vertPos, 1.0f));
+    gl_Position = vertex_warp(_projectionFromModel * vec4(vertPos, 1.0f));
 }

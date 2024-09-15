@@ -61,17 +61,17 @@ void meshSendData(struct Mesh *mesh) {
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
     glUseProgram(shader);
 
-    glUniformMatrix4fv(glGetUniformLocation(shader, "worldFromModel"), 1,
+    glUniformMatrix4fv(glGetUniformLocation(shader, "_worldFromModel"), 1,
                        GL_FALSE, worldFromModel.raw[0]);
     mat3s worldNormalFromModel = glms_mat4_pick3(worldFromModel);
     glms_mat3_inv(worldNormalFromModel);
     glms_mat3_transpose(worldNormalFromModel);
-    glUniformMatrix3fv(glGetUniformLocation(shader, "worldNormalFromModel"), 1,
+    glUniformMatrix3fv(glGetUniformLocation(shader, "_worldNormalFromModel"), 1,
                        GL_FALSE, worldNormalFromModel.raw[0]);
     mat4s projectionFromModel =
         glms_mat4_mul(ProjectionFromViewMatrix,
                       glms_mat4_mul(ViewFromWorldMatrix, worldFromModel));
-    glUniformMatrix4fv(glGetUniformLocation(shader, "projectionFromModel"), 1,
+    glUniformMatrix4fv(glGetUniformLocation(shader, "_projectionFromModel"), 1,
                        GL_FALSE, projectionFromModel.raw[0]);
 
     // render triangles

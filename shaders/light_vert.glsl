@@ -7,10 +7,10 @@ layout(location = 3) in vec3 vertColor;
 
 out vec3 vColor;
 
-uniform mat4 projectionFromModel;
+uniform mat4 _projectionFromModel;
 
 void main() {
     vColor = vertColor;
 
-    gl_Position = projectionFromModel * vec4(vertPos, 1.0f);
+    gl_Position = _projectionFromModel * vec4(vertPos, 1.0f);
 }
