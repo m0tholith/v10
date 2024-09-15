@@ -12,6 +12,7 @@ set(SRC_FILES
     src/mesh.c
     src/model.c
     src/model_presets.c
+    src/armature.c
     src/node.c
     src/animation.c
     src/shader.c
