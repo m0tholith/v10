@@ -4,11 +4,15 @@
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
+#define MAX_BONE_INFLUENCE 4
+
 struct Vertex {
     vec3s Position;
     vec3s Normal;
     vec2s TexCoords;
     vec3s Color;
+    int BoneIDs[MAX_BONE_INFLUENCE];
+    float BoneWeights[MAX_BONE_INFLUENCE];
 };
 struct Mesh {
     int VertexCount;

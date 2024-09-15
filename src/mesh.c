@@ -50,6 +50,16 @@ void meshSendData(struct Mesh *mesh) {
                           sizeof(struct Vertex),
                           (void *)offsetof(struct Vertex, Color));
     glEnableVertexAttribArray(attribIdx++);
+    // bone IDs
+    glVertexAttribIPointer(attribIdx, MAX_BONE_INFLUENCE, GL_INT,
+                           sizeof(struct Vertex),
+                           (void *)offsetof(struct Vertex, BoneIDs));
+    glEnableVertexAttribArray(attribIdx++);
+    // bone weights
+    glVertexAttribPointer(attribIdx, MAX_BONE_INFLUENCE, GL_FLOAT, GL_FALSE,
+                          sizeof(struct Vertex),
+                          (void *)offsetof(struct Vertex, BoneWeights));
+    glEnableVertexAttribArray(attribIdx++);
 
     // generate element buffer object which contains information about the order
     // of vertices to draw

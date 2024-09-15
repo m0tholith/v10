@@ -169,6 +169,10 @@ struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
             }};
         else
             v.Color = GLMS_VEC3_ONE;
+        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+            v.BoneIDs[i] = -1;
+            v.BoneWeights[i] = 0;
+        }
         vertices[i] = v;
     }
     for (int i = 0; i < mesh->mNumFaces; i++) {
