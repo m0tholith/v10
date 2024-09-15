@@ -85,15 +85,12 @@ int main(void) {
         cameraSetEulerAngles(&camera, eulerAngles);
 
         movementInput = (vec3s){{
-            glm_clamp((movementEvent->State & (1 << 0)) -
-                          (movementEvent->State & (1 << 1)),
-                      -1, 1), // x axis
-            glm_clamp((movementEvent->State & (1 << 2)) -
-                          (movementEvent->State & (1 << 3)),
-                      -1, 1), // y axis
-            glm_clamp((movementEvent->State & (1 << 4)) -
-                          (movementEvent->State & (1 << 5)),
-                      -1, 1), // z axis
+            glm_clamp(movementEvent->State & (1 << 0), -1, 1) -
+                glm_clamp(movementEvent->State & (1 << 1), -1, 1),
+            glm_clamp(movementEvent->State & (1 << 2), -1, 1) -
+                glm_clamp(movementEvent->State & (1 << 3), -1, 1),
+            glm_clamp(movementEvent->State & (1 << 4), -1, 1) -
+                glm_clamp(movementEvent->State & (1 << 5), -1, 1),
         }};
         positionDelta = (vec3s){{movementInput.x, 0, -movementInput.z}};
         positionDelta = glms_quat_rotatev(camera.Quaternion, positionDelta);
