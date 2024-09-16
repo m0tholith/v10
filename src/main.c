@@ -1,3 +1,4 @@
+#include "armature.h"
 #include "window.h"
 
 #include "camera.h"
@@ -44,6 +45,10 @@ int main(void) {
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
     Model *model = modelLoad("RiggedSimple.glb");
     model->Materials[0] = materialCreate(shader, 0);
+    modelSetDefaultMaterial(model, model->Materials[0]);
+
+    Armature *armature = armatureCreate(model);
+    armatureSetOffsetMatrcies(armature);
 
     glEnable(GL_CULL_FACE);
 
@@ -92,6 +97,7 @@ int main(void) {
         lastTime = currentTime;
 
         modelSetNodeWorldMatrices(model);
+        armatureSendMatrixUniforms(armature);
         modelRender(model);
 
         windowDraw(window);
@@ -99,6 +105,7 @@ int main(void) {
 
     materialFree(model->Materials[0]);
     modelFree(model);
+    armatureFree(armature);
     shaderFreeCache();
 
     windowClose();
