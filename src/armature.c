@@ -26,7 +26,7 @@ Armature *armatureCreate(Model *model) {
 
     return armature;
 }
-void armatureSetMatrices(Armature *armature) {
+void armatureSetOffsetMatrcies(Armature *armature) {
     for (int i = 0; i < MAX_BONES; i++) {
         if (i >= armature->Model->NodeCount)
             continue;
@@ -37,6 +37,8 @@ void armatureSetMatrices(Armature *armature) {
 }
 void armatureSendMatrixUniforms(Armature *armature) {
     for (int i = 0; i < armature->Model->MaterialCount; i++) {
+        glUseProgram(armature->Model->Materials[i]->Shader);
+
         glUniformMatrix4fv(
             glGetUniformLocation(armature->Model->Materials[i]->Shader,
                                  "_boneTransformations"),

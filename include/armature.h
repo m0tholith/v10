@@ -18,7 +18,9 @@ typedef struct {
 ///
 /// @return `Armature *` armature with offset matrices set up
 Armature *armatureCreate(Model *model);
-void armatureSetMatrices(Armature *armature);
+/// call once; only right after creating armature (and preferably that would be
+/// right after creating its model)
+void armatureSetOffsetMatrcies(Armature *armature);
 void armatureSendMatrixUniforms(Armature *armature);
 void armatureFree(Armature *armature);
 
