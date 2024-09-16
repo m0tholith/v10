@@ -26,7 +26,8 @@
           assimp
 
           # debugging
-          pkgs-24-05.renderdoc
+          renderdoc
+          gdb
         ];
       };
     };
