@@ -18,10 +18,9 @@ typedef struct {
 ///
 /// @return `Armature *` armature with offset matrices set up
 Armature *armatureCreate(Model *model);
-/// call once; only right after creating armature (and preferably that would be
-/// right after creating its model)
-void armatureSetOffsetMatrcies(Armature *armature);
-void armatureSendMatrixUniforms(Armature *armature);
+/// call before rendering; calculates bone transformations and sends them to all
+/// shaders
+void armatureApplyTransformations(Armature *armature);
 void armatureFree(Armature *armature);
 
 #endif // !ARMATURE_H

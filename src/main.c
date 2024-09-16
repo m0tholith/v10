@@ -48,7 +48,6 @@ int main(void) {
     modelSetDefaultMaterial(model, model->Materials[0]);
 
     Armature *armature = armatureCreate(model);
-    armatureSetOffsetMatrcies(armature);
 
     glEnable(GL_CULL_FACE);
 
@@ -97,7 +96,7 @@ int main(void) {
         lastTime = currentTime;
 
         modelSetNodeWorldMatrices(model);
-        armatureSendMatrixUniforms(armature);
+        armatureApplyTransformations(armature);
         modelRender(model);
 
         windowDraw(window);

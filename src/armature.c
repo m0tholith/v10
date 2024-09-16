@@ -26,16 +26,12 @@ Armature *armatureCreate(Model *model) {
 
     return armature;
 }
-void armatureSetOffsetMatrcies(Armature *armature) {
-    for (int i = 0; i < MAX_BONES; i++) {
-        if (i >= armature->Model->NodeCount)
-            continue;
+void armatureApplyTransformations(Armature *armature) {
+    for (int i = 0; i < armature->Model->NodeCount; i++) {
         armature->BoneTransformations[i] =
             glms_mat4_mul(armature->Model->NodeEntries[i].WorldFromLocal,
                           armature->OffsetMatrices[i]);
     }
-}
-void armatureSendMatrixUniforms(Armature *armature) {
     for (int i = 0; i < armature->Model->MaterialCount; i++) {
         glUseProgram(armature->Model->Materials[i]->Shader);
 
