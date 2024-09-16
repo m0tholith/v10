@@ -1,6 +1,7 @@
 #include "model.h"
 
 #include "assimp/matrix4x4.h"
+#include "assimp/mesh.h"
 #include "material.h"
 #include "mesh.h"
 #include "node.h"
@@ -33,6 +34,11 @@ Model *modelLoad(const char *_modelPath) {
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !scene->mRootNode) {
         printf("assimp error: %s", aiGetErrorString());
+        exit(1);
+    }
+    if (scene->mNumSkeletons > 1) {
+        printf("model import error: more than 1 skeleton");
+        exit(1);
     }
 
     Model *model = malloc(sizeof(Model));
@@ -43,7 +49,6 @@ Model *modelLoad(const char *_modelPath) {
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
     for (int i = 0; i < scene->mNumMeshes; i++) {
         model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
-        meshSendData(model->Meshes[i]);
     }
 
     model->MaterialCount = scene->mNumMaterials;
@@ -61,6 +66,44 @@ Model *modelLoad(const char *_modelPath) {
     model->NodeEntries = malloc(model->NodeCount * sizeof(struct NodeEntry));
     int index = 0;
     processNodeArray(model->NodeEntries, rootNode, &index, -1);
+
+    for (int meshId = 0; meshId < model->MeshCount; meshId++) {
+        struct Mesh *mesh = model->Meshes[meshId];
+        struct aiMesh *assimpMesh = scene->mMeshes[meshId];
+
+        for (int aiBoneId = 0; aiBoneId < assimpMesh->mNumBones; aiBoneId++) {
+            struct aiBone *assimpBone = assimpMesh->mBones[aiBoneId];
+
+            for (int nodeId = 0; nodeId < model->NodeCount; nodeId++) {
+                struct Node *node = model->NodeEntries[nodeId].Node;
+
+                if (strncmp(node->Name, assimpBone->mNode->mName.data,
+                            assimpBone->mNode->mName.length)) {
+                    struct Vertex *vertices = mesh->Vertices;
+
+                    struct aiVertexWeight *assimpWeights = assimpBone->mWeights;
+                    for (int weightId = 0; weightId < assimpBone->mNumWeights;
+                         weightId++) {
+                        struct aiVertexWeight weight = assimpWeights[weightId];
+
+                        for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
+                            if (vertices[weight.mVertexId].BoneIDs[i] == -1) {
+                                vertices[weight.mVertexId].BoneIDs[i] = nodeId;
+                                vertices[weight.mVertexId].BoneWeights[i] = weight.mWeight;
+                                printf(
+                                    "mesh %d node %d vertex %d weight %.3f\n",
+                                    meshId, nodeId, weight.mVertexId,
+                                    weight.mWeight);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        meshSendData(mesh);
+    }
 
     model->AnimationCount = scene->mNumAnimations;
     model->Animations = malloc(model->AnimationCount * sizeof(Animation *));
