@@ -69,6 +69,7 @@ Model *modelLoad(const char *_modelPath) {
 
     for (int meshId = 0; meshId < model->MeshCount; meshId++) {
         struct Mesh *mesh = model->Meshes[meshId];
+        struct Vertex *vertices = mesh->Vertices;
         struct aiMesh *assimpMesh = scene->mMeshes[meshId];
 
         for (int aiBoneId = 0; aiBoneId < assimpMesh->mNumBones; aiBoneId++) {
@@ -78,26 +79,29 @@ Model *modelLoad(const char *_modelPath) {
                 struct Node *node = model->NodeEntries[nodeId].Node;
 
                 if (strncmp(node->Name, assimpBone->mNode->mName.data,
-                            assimpBone->mNode->mName.length)) {
-                    struct Vertex *vertices = mesh->Vertices;
-
+                            assimpBone->mNode->mName.length) == 0) {
                     struct aiVertexWeight *assimpWeights = assimpBone->mWeights;
+
                     for (int weightId = 0; weightId < assimpBone->mNumWeights;
                          weightId++) {
                         struct aiVertexWeight weight = assimpWeights[weightId];
 
                         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
-                            if (vertices[weight.mVertexId].BoneIDs[i] == -1) {
-                                vertices[weight.mVertexId].BoneIDs[i] = nodeId;
-                                vertices[weight.mVertexId].BoneWeights[i] = weight.mWeight;
-                                printf(
-                                    "mesh %d node %d vertex %d weight %.3f\n",
-                                    meshId, nodeId, weight.mVertexId,
-                                    weight.mWeight);
+                            struct Vertex *vertex = &vertices[weight.mVertexId];
+                            if (vertex->BoneIDs[i] != -1) {
+                                vertex->BoneIDs[i] = nodeId;
+                                vertex->BoneWeights[i] = weight.mWeight;
+                                printf("mesh %d bone %d (%s) node %d (%s) "
+                                       "vertex %d "
+                                       "weight %.3f\n",
+                                       meshId, aiBoneId, assimpBone->mName.data,
+                                       nodeId, node->Name, weight.mVertexId,
+                                       weight.mWeight);
                                 break;
                             }
                         }
                     }
+                    break;
                 }
             }
         }
