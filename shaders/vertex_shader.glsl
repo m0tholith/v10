@@ -39,10 +39,11 @@ void main() {
     }
 
     vec4 position = transformation * vec4(vertPos, 1.0f);
+    vec3 normal = vec3(transformation * vec4(vertNormal, 1.0f));
 
     vColor = vertColor;
     vTexCoord = vertTexCoord;
-    vNormal = normalize(_worldNormalFromModel * vertNormal);
+    vNormal = normalize(_worldNormalFromModel * normal);
     vPos = vec3(_worldFromModel * position);
 
     gl_Position = vertex_warp(_projectionFromModel * position);

@@ -41,10 +41,22 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
+    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
+    Model *light = modelLoad("light.glb");
+    light->Materials[0] = materialCreate(lightShader, 0);
+    vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
+    vec3s lightColor = GLMS_VEC3_ONE;
+    light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
+
     uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
     Model *model = modelLoad("RiggedFigure.glb");
-    model->Materials[0] = materialCreate(shader, 0);
+    model->Materials[0] =
+        materialCreate(shader, 2,
+                       materialPropertyCreate("light_position", MATTYPE_VEC3,
+                                              (void *)&lightPos),
+                       materialPropertyCreate("light_color", MATTYPE_VEC3,
+                                              (void *)&lightColor));
     modelSetDefaultMaterial(model, model->Materials[0]);
 
     Armature *armature = armatureCreate(model);
@@ -95,6 +107,10 @@ int main(void) {
 
         lastTime = currentTime;
 
+        light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
+        modelSetNodeWorldMatrices(light);
+        modelRender(light);
+
         modelSetNodeWorldMatrices(model);
         armatureApplyTransformations(armature);
         modelRender(model);
@@ -103,7 +119,9 @@ int main(void) {
     }
 
     materialFree(model->Materials[0]);
+    materialFree(light->Materials[0]);
     modelFree(model);
+    modelFree(light);
     armatureFree(armature);
     shaderFreeCache();
 
