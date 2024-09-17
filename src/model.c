@@ -88,7 +88,7 @@ Model *modelLoad(const char *_modelPath) {
 
                         for (int i = 0; i < MAX_BONE_INFLUENCE; i++) {
                             struct Vertex *vertex = &vertices[weight.mVertexId];
-                            if (vertex->BoneIDs[i] != -1) {
+                            if (vertex->BoneIDs[i] == -1) {
                                 vertex->BoneIDs[i] = nodeId;
                                 vertex->BoneWeights[i] = weight.mWeight;
                                 printf("mesh %d bone %d (%s) node %d (%s) "
