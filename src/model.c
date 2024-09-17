@@ -91,12 +91,6 @@ Model *modelLoad(const char *_modelPath) {
                             if (vertex->BoneIDs[i] == -1) {
                                 vertex->BoneIDs[i] = nodeId;
                                 vertex->BoneWeights[i] = weight.mWeight;
-                                printf("mesh %d bone %d (%s) node %d (%s) "
-                                       "vertex %d "
-                                       "weight %.3f\n",
-                                       meshId, aiBoneId, assimpBone->mName.data,
-                                       nodeId, node->Name, weight.mVertexId,
-                                       weight.mWeight);
                                 break;
                             }
                         }

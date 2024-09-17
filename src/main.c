@@ -43,7 +43,7 @@ int main(void) {
 
     uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
-    Model *model = modelLoad("RiggedSimple.glb");
+    Model *model = modelLoad("RiggedFigure.glb");
     model->Materials[0] = materialCreate(shader, 0);
     modelSetDefaultMaterial(model, model->Materials[0]);
 

@@ -16,6 +16,10 @@ uniform mat4 _projectionFromModel;
 uniform mat4 _worldFromModel;
 uniform mat3 _worldNormalFromModel;
 
+#define MAX_BONES 100
+
+uniform mat4 _boneTransformations[MAX_BONES];
+
 const float strength = 5;
 vec4 vertex_warp(vec4 pos) {
     pos.xy = (pos.xy + vec2(1.0)) * vec2(320.0 / strength, 240.0 / strength) * 0.5;
@@ -25,10 +29,21 @@ vec4 vertex_warp(vec4 pos) {
 }
 
 void main() {
+    mat4 transformation = mat4(1.0f);
+    for (int i = 0; i < 4; i++) {
+        if (vertBoneIDs[i] == -1)
+            break;
+        if (vertBoneIDs[i] >= MAX_BONES)
+            vColor = vec3(1.0f, 0.0f, 0.862f);
+        transformation += _boneTransformations[vertBoneIDs[i]] * vertBoneWeights[i];
+    }
+
+    vec4 position = transformation * vec4(vertPos, 1.0f);
+
     vColor = vertColor;
     vTexCoord = vertTexCoord;
     vNormal = normalize(_worldNormalFromModel * vertNormal);
-    vPos = vec3(_worldFromModel * vec4(vertPos, 1.0f));
+    vPos = vec3(_worldFromModel * position);
 
-    gl_Position = vertex_warp(_projectionFromModel * vec4(vertPos, 1.0f));
+    gl_Position = vertex_warp(_projectionFromModel * position);
 }
