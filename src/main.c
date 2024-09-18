@@ -1,4 +1,6 @@
 #include "armature.h"
+#include "cglm/struct/affine-pre.h"
+#include "cglm/struct/affine.h"
 #include "window.h"
 
 #include "camera.h"
@@ -50,7 +52,7 @@ int main(void) {
 
     uint32_t shader =
         shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
-    Model *model = modelLoad("RiggedFigure.glb");
+    Model *model = modelLoad("BrainStem.glb");
     model->Materials[0] =
         materialCreate(shader, 2,
                        materialPropertyCreate("light_position", MATTYPE_VEC3,
@@ -59,6 +61,7 @@ int main(void) {
                                               (void *)&lightColor));
     modelSetDefaultMaterial(model, model->Materials[0]);
 
+    model->WorldFromModel = glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)), glm_rad(180));
     Armature *armature = armatureCreate(model);
 
     glEnable(GL_CULL_FACE);
@@ -107,6 +110,9 @@ int main(void) {
 
         lastTime = currentTime;
 
+        lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
         modelSetNodeWorldMatrices(light);
         modelRender(light);

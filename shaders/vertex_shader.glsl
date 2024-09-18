@@ -29,22 +29,19 @@ vec4 vertex_warp(vec4 pos) {
 }
 
 void main() {
-    mat4 transformation = mat4(1.0f);
+    vec4 position = vec4(0.0f);
+    vec3 normal = vec3(0.0f);
     for (int i = 0; i < 4; i++) {
         if (vertBoneIDs[i] == -1)
             break;
-        if (vertBoneIDs[i] >= MAX_BONES)
-            vColor = vec3(1.0f, 0.0f, 0.862f);
-        transformation += _boneTransformations[vertBoneIDs[i]] * vertBoneWeights[i];
+        position += (_boneTransformations[vertBoneIDs[i]] * vec4(vertPos, 1.0f)) * vertBoneWeights[i];
+        normal += (mat3(_boneTransformations[vertBoneIDs[i]]) * vertNormal) * vertBoneWeights[i];
     }
-
-    vec4 position = transformation * vec4(vertPos, 1.0f);
-    vec3 normal = vec3(transformation * vec4(vertNormal, 1.0f));
 
     vColor = vertColor;
     vTexCoord = vertTexCoord;
     vNormal = normalize(_worldNormalFromModel * normal);
     vPos = vec3(_worldFromModel * position);
 
-    gl_Position = vertex_warp(_projectionFromModel * position);
+    gl_Position = _projectionFromModel * position;
 }
