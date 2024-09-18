@@ -64,7 +64,8 @@ int main(void) {
                                               (void *)&lightColor));
     modelSetDefaultMaterial(model, model->Materials[0]);
 
-    model->WorldFromModel = glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)), glm_rad(180));
+    model->WorldFromModel = glms_rotate_x(
+        glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)), glm_rad(180));
     Armature *armature = armatureCreate(model);
 
     glEnable(GL_CULL_FACE);
