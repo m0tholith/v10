@@ -43,11 +43,14 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
-    Model *light = modelLoad("light.glb");
-    light->Materials[0] = materialCreate(lightShader, 0);
     vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
     vec3s lightColor = GLMS_VEC3_ONE;
+    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
+    Model *light = modelLoad("light.glb");
+    light->Materials[0] =
+        materialCreate(lightShader, 1,
+                       materialPropertyCreate("light_color", MATTYPE_VEC3,
+                                              (void *)&lightColor));
     light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
 
     uint32_t shader =
