@@ -64,9 +64,23 @@ int main(void) {
                        materialPropertyCreate("light_color", MATTYPE_VEC3,
                                               (void *)&lightColor));
     modelSetDefaultMaterial(skinningModel, skinningModel->Materials[0]);
-    skinningModel->WorldFromModel = glms_rotate_x(
-        glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)), glm_rad(180));
+    skinningModel->WorldFromModel = glms_translate(
+        glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
+                                 glm_rad(180)),
+                   (vec3s){{1.5f, 1.5f, 1.5f}}),
+        (vec3s){{-3.0f, 0.0f, -1.4f}});
     Armature *armature = armatureCreate(skinningModel);
+
+    uint32_t homeShader =
+        shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
+    Model *homeModel = modelLoad("home.glb");
+    homeModel->Materials[0] =
+        materialCreate(homeShader, 2,
+                       materialPropertyCreate("light_position", MATTYPE_VEC3,
+                                              (void *)&lightPos),
+                       materialPropertyCreate("light_color", MATTYPE_VEC3,
+                                              (void *)&lightColor));
+    modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     glEnable(GL_CULL_FACE);
 
@@ -83,6 +97,9 @@ int main(void) {
 
         for (int i = 0; i < skinningModel->AnimationCount; i++) {
             animationStep(skinningModel->Animations[i], deltaTime);
+        }
+        for (int i = 0; i < homeModel->AnimationCount; i++) {
+            animationStep(homeModel->Animations[i], deltaTime);
         }
 
         inputUpdate();
@@ -114,6 +131,9 @@ int main(void) {
 
         lastTime = currentTime;
 
+        lightPos.x = sinf(currentTime * M_PI) * 1.3f + -2.7f;
+        lightPos.y = sinf(currentTime * M_PI * 0.8f) * 0.7f + 0.7f;
+        lightPos.z = sinf(currentTime * M_PI * 1.3f) * 1.8f + -1.2f;
         lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
@@ -125,13 +145,18 @@ int main(void) {
         armatureApplyTransformations(armature);
         modelRender(skinningModel);
 
+        modelSetNodeWorldMatrices(homeModel);
+        modelRender(homeModel);
+
         windowDraw(window);
     }
 
+    materialFree(homeModel->Materials[0]);
     materialFree(skinningModel->Materials[0]);
     materialFree(light->Materials[0]);
     modelFree(skinningModel);
     modelFree(light);
+    modelFree(homeModel);
     armatureFree(armature);
     shaderFreeCache();
 
