@@ -45,6 +45,27 @@ int nodeChildCount(struct Node *node) {
 void nodePrintInfo(struct Node *node) {
     printParents(node);
     printf("Node's Name = %s\n", node->Name);
+    mat4s *m = &node->ParentFromLocal;
+    printf("	┌╴ %c%.03f  %c%.03f  %c%.03f  %c%.03f ╶┐\n"
+           "	│  %c%.03f  %c%.03f  %c%.03f  %c%.03f  │\n"
+           "	│  %c%.03f  %c%.03f  %c%.03f  %c%.03f  │\n"
+           "	└╴ %c%.03f  %c%.03f  %c%.03f  %c%.03f ╶┘\n\n",
+           m->m00 >= 0 ? ' ' : '-', m->m00 >= 0 ? m->m00 : -m->m00,
+           m->m01 >= 0 ? ' ' : '-', m->m01 >= 0 ? m->m01 : -m->m01,
+           m->m02 >= 0 ? ' ' : '-', m->m02 >= 0 ? m->m02 : -m->m02,
+           m->m03 >= 0 ? ' ' : '-', m->m03 >= 0 ? m->m03 : -m->m03,
+           m->m10 >= 0 ? ' ' : '-', m->m10 >= 0 ? m->m10 : -m->m10,
+           m->m11 >= 0 ? ' ' : '-', m->m11 >= 0 ? m->m11 : -m->m11,
+           m->m12 >= 0 ? ' ' : '-', m->m12 >= 0 ? m->m12 : -m->m12,
+           m->m13 >= 0 ? ' ' : '-', m->m13 >= 0 ? m->m13 : -m->m13,
+           m->m20 >= 0 ? ' ' : '-', m->m20 >= 0 ? m->m20 : -m->m20,
+           m->m21 >= 0 ? ' ' : '-', m->m21 >= 0 ? m->m21 : -m->m21,
+           m->m22 >= 0 ? ' ' : '-', m->m22 >= 0 ? m->m22 : -m->m22,
+           m->m23 >= 0 ? ' ' : '-', m->m23 >= 0 ? m->m23 : -m->m23,
+           m->m30 >= 0 ? ' ' : '-', m->m30 >= 0 ? m->m30 : -m->m30,
+           m->m31 >= 0 ? ' ' : '-', m->m31 >= 0 ? m->m31 : -m->m31,
+           m->m32 >= 0 ? ' ' : '-', m->m32 >= 0 ? m->m32 : -m->m32,
+           m->m33 >= 0 ? ' ' : '-', m->m33 >= 0 ? m->m33 : -m->m33);
 }
 void nodeFree(struct Node *node) {
     for (int i = 0; i < node->ChildCount; i++) {
