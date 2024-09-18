@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene);
+struct Mesh *processMesh(struct aiMesh *mesh);
 struct Node *processNode(struct aiNode *node, struct Node *parentNode);
 void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
                       int *index, int parentIndex);
@@ -48,7 +48,7 @@ Model *modelLoad(const char *_modelPath) {
     model->MeshCount = scene->mNumMeshes;
     model->Meshes = malloc(model->MeshCount * sizeof(struct Mesh *));
     for (int i = 0; i < scene->mNumMeshes; i++) {
-        model->Meshes[i] = processMesh(scene->mMeshes[i], scene);
+        model->Meshes[i] = processMesh(scene->mMeshes[i]);
     }
 
     model->MaterialCount = scene->mNumMaterials;
@@ -186,7 +186,7 @@ void _modelFreeMaterials(void *_model) {
     }
 }
 
-struct Mesh *processMesh(struct aiMesh *mesh, const struct aiScene *scene) {
+struct Mesh *processMesh(struct aiMesh *mesh) {
     struct Vertex *vertices =
         malloc(mesh->mNumVertices * sizeof(struct Vertex));
     uint32_t *indices = malloc(mesh->mNumFaces * 3 * sizeof(uint32_t));
