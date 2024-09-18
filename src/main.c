@@ -45,7 +45,8 @@ int main(void) {
 
     vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
     vec3s lightColor = GLMS_VEC3_ONE;
-    uint32_t lightShader = shaderCreate("light_vert.glsl", "light_frag.glsl");
+    uint32_t lightShader =
+        shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
     Model *light = modelLoad("light.glb");
     light->Materials[0] =
         materialCreate(lightShader, 1,
@@ -53,20 +54,19 @@ int main(void) {
                                               (void *)&lightColor));
     light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
 
-    uint32_t shader =
-        shaderCreate("vertex_shader.glsl", "fragment_shader.glsl");
-    Model *model = modelLoad("BrainStem.glb");
-    model->Materials[0] =
-        materialCreate(shader, 2,
+    uint32_t skinningShader =
+        shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
+    Model *skinningModel = modelLoad("BrainStem.glb");
+    skinningModel->Materials[0] =
+        materialCreate(skinningShader, 2,
                        materialPropertyCreate("light_position", MATTYPE_VEC3,
                                               (void *)&lightPos),
                        materialPropertyCreate("light_color", MATTYPE_VEC3,
                                               (void *)&lightColor));
-    modelSetDefaultMaterial(model, model->Materials[0]);
-
-    model->WorldFromModel = glms_rotate_x(
+    modelSetDefaultMaterial(skinningModel, skinningModel->Materials[0]);
+    skinningModel->WorldFromModel = glms_rotate_x(
         glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)), glm_rad(180));
-    Armature *armature = armatureCreate(model);
+    Armature *armature = armatureCreate(skinningModel);
 
     glEnable(GL_CULL_FACE);
 
@@ -81,8 +81,8 @@ int main(void) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
-        for (int i = 0; i < model->AnimationCount; i++) {
-            animationStep(model->Animations[i], deltaTime);
+        for (int i = 0; i < skinningModel->AnimationCount; i++) {
+            animationStep(skinningModel->Animations[i], deltaTime);
         }
 
         inputUpdate();
@@ -121,16 +121,16 @@ int main(void) {
         modelSetNodeWorldMatrices(light);
         modelRender(light);
 
-        modelSetNodeWorldMatrices(model);
+        modelSetNodeWorldMatrices(skinningModel);
         armatureApplyTransformations(armature);
-        modelRender(model);
+        modelRender(skinningModel);
 
         windowDraw(window);
     }
 
-    materialFree(model->Materials[0]);
+    materialFree(skinningModel->Materials[0]);
     materialFree(light->Materials[0]);
-    modelFree(model);
+    modelFree(skinningModel);
     modelFree(light);
     armatureFree(armature);
     shaderFreeCache();
