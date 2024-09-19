@@ -5,5 +5,6 @@
 
 /// just some variables that can be manipulated to affect rendering
 extern mat4s ViewFromWorldMatrix, ProjectionFromViewMatrix;
+extern vec3s CameraPosition;
 
 #endif // !RENDERING_H

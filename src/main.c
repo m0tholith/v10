@@ -134,6 +134,8 @@ int main(void) {
         lightPos.x = sinf(currentTime * M_PI) * 1.3f + -2.7f;
         lightPos.y = sinf(currentTime * M_PI * 0.8f) * 0.7f + 0.7f;
         lightPos.z = sinf(currentTime * M_PI * 1.3f) * 1.8f + -1.2f;
+        cameraPreRender(&camera);
+
         lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;

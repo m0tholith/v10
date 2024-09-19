@@ -21,5 +21,6 @@ void cameraSetPosition(Camera *camera, vec3s position);
 void cameraLookAt(Camera *camera, vec3s target);
 void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles);
 void cameraSetQuaternion(Camera *camera, versors quaternion);
+void cameraPreRender(Camera *camera);
 
 #endif // !CAMERA_H

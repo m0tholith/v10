@@ -48,3 +48,6 @@ void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles) {
 void cameraSetQuaternion(Camera *camera, versors quaternion) {
     camera->Quaternion = quaternion;
 }
+void cameraPreRender(Camera *camera) {
+    CameraPosition = camera->Position;
+}
