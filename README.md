@@ -28,7 +28,9 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
 ## goals
 - [X] model loading
 - [X] basic lighting
-- [ ] skinning `<------ WE ARE HERE`
+- [X] skinning
+- [ ] material importing `<------ WE ARE HERE`
+- [ ] post processing
 - [ ] physics engine
 - [ ] sound engine
 - [ ] bindings for some other language (maybe lua)
