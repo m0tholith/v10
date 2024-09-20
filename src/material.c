@@ -45,6 +45,7 @@ Material *materialCreate(uint32_t shader, int propertyCount, ...) {
 
 void applyProperty(MaterialProperty *property, uint32_t shader) {
     glUseProgram(shader);
+    int intValue;
     float floatValue;
     vec2s vec2;
     vec3s vec3;
@@ -55,6 +56,8 @@ void applyProperty(MaterialProperty *property, uint32_t shader) {
     MaterialTextureData textureData;
     switch (property->Type) {
     case MATTYPE_INT:
+        intValue = *(int *)property->Data;
+        glUniform1i(glGetUniformLocation(shader, property->Name), intValue);
         break;
     case MATTYPE_FLOAT:
         floatValue = *(float *)property->Data;
