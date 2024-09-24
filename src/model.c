@@ -61,6 +61,7 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
             Material *material = materialCreate(0, 0);
 
             struct aiColor4D *color = malloc(sizeof(struct aiColor4D));
+            float *num = malloc(sizeof(float));
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, color) ==
                 AI_SUCCESS) {
                 vec3s *ambient = malloc(sizeof(vec3s));
@@ -94,8 +95,18 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                                                            MATTYPE_VEC3,
                                                            (void *)specular));
             }
+            if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS, num) ==
+                AI_SUCCESS) {
+                float *shininess = malloc(sizeof(float));
+                *shininess = *num;
+                materialAddProperty(
+                    material,
+                    materialPropertyCreate("_material.shininess", MATTYPE_FLOAT,
+                                           (void *)shininess));
+            }
             model->Materials[i] = material;
             free(color);
+            free(num);
         }
     }
 
