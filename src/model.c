@@ -67,9 +67,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 diffuse->r = color->r;
                 diffuse->g = color->g;
                 diffuse->b = color->b;
-                materialAddProperty(
-                    material, materialPropertyCreate("_diffuse", MATTYPE_VEC3,
-                                                     (void *)diffuse));
+                materialAddProperty(material,
+                                    materialPropertyCreate("_material.diffuse",
+                                                           MATTYPE_VEC3,
+                                                           (void *)diffuse));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, color) ==
                 AI_SUCCESS) {
@@ -77,9 +78,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 ambient->r = color->r;
                 ambient->g = color->g;
                 ambient->b = color->b;
-                materialAddProperty(
-                    material, materialPropertyCreate("_ambient", MATTYPE_VEC3,
-                                                     (void *)ambient));
+                materialAddProperty(material,
+                                    materialPropertyCreate("_material.ambient",
+                                                           MATTYPE_VEC3,
+                                                           (void *)ambient));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_EMISSIVE, color) ==
                 AI_SUCCESS) {
@@ -87,9 +89,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 emissive->r = color->r;
                 emissive->g = color->g;
                 emissive->b = color->b;
-                materialAddProperty(
-                    material, materialPropertyCreate("_emissive", MATTYPE_VEC3,
-                                                     (void *)emissive));
+                materialAddProperty(material,
+                                    materialPropertyCreate("_material.emissive",
+                                                           MATTYPE_VEC3,
+                                                           (void *)emissive));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, color) ==
                 AI_SUCCESS) {
@@ -97,9 +100,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 specular->r = color->r;
                 specular->g = color->g;
                 specular->b = color->b;
-                materialAddProperty(
-                    material, materialPropertyCreate("_specular", MATTYPE_VEC3,
-                                                     (void *)specular));
+                materialAddProperty(material,
+                                    materialPropertyCreate("_material.specular",
+                                                           MATTYPE_VEC3,
+                                                           (void *)specular));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_REFLECTIVE, color) ==
                 AI_SUCCESS) {
@@ -107,9 +111,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 reflective->r = color->r;
                 reflective->g = color->g;
                 reflective->b = color->b;
-                materialAddProperty(material, materialPropertyCreate(
-                                                  "_reflective", MATTYPE_VEC3,
-                                                  (void *)reflective));
+                materialAddProperty(
+                    material,
+                    materialPropertyCreate("_material.reflective", MATTYPE_VEC3,
+                                           (void *)reflective));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_TRANSPARENT, color) ==
                 AI_SUCCESS) {
@@ -117,9 +122,10 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                 transparent->r = color->r;
                 transparent->g = color->g;
                 transparent->b = color->b;
-                materialAddProperty(material, materialPropertyCreate(
-                                                  "_transparent", MATTYPE_VEC3,
-                                                  (void *)transparent));
+                materialAddProperty(
+                    material,
+                    materialPropertyCreate("_material.transparent",
+                                           MATTYPE_VEC3, (void *)transparent));
             }
             model->Materials[i] = material;
             free(color);

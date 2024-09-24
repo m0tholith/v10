@@ -153,7 +153,7 @@ int main(void) {
         Material *material = skinningModel->Materials[i];
         for (int j = 0; j < material->PropertyCount; j++) {
             MaterialProperty *property = material->Properties[j];
-            if (strncmp(property->Name, "_", 1) == 0) {
+            if (strncmp(property->Name, "_material", 9) == 0) {
                 materialPropertyDelete(property);
             }
         }
