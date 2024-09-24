@@ -44,15 +44,22 @@ int main(void) {
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
     vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
-    vec3s lightColor = GLMS_VEC3_ONE;
+    vec3s lightAmbient = (vec3s){{0.2f, 0.2f, 0.2f}};
+    vec3s lightDiffuse = (vec3s){{0.5f, 0.5f, 0.5f}};
+    vec3s lightSpecular = (vec3s){{1.0f, 1.0f, 1.0f}};
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
     Model *light = modelLoad("light.glb", 0);
     MaterialProperty *matPropertyLightPos = materialPropertyCreate(
-        "light_position", MATTYPE_VEC3, (void *)&lightPos);
-    MaterialProperty *matPropertyLightColor = materialPropertyCreate(
-        "light_color", MATTYPE_VEC3, (void *)&lightColor);
-    light->Materials[0] = materialCreate(lightShader, 1, matPropertyLightColor);
+        "light.position", MATTYPE_VEC3, (void *)&lightPos);
+    MaterialProperty *matPropertyLightAmbient = materialPropertyCreate(
+        "light.ambient", MATTYPE_VEC3, (void *)&lightAmbient);
+    MaterialProperty *matPropertyLightDiffuse = materialPropertyCreate(
+        "light.diffuse", MATTYPE_VEC3, (void *)&lightDiffuse);
+    MaterialProperty *matPropertyLightSpecular = materialPropertyCreate(
+        "light.specular", MATTYPE_VEC3, (void *)&lightSpecular);
+    light->Materials[0] =
+        materialCreate(lightShader, 1, matPropertyLightDiffuse);
     light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
 
     uint32_t skinningShader =
@@ -62,7 +69,13 @@ int main(void) {
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
         materialAddProperty(skinningModel->Materials[i], matPropertyLightPos);
-        materialAddProperty(skinningModel->Materials[i], matPropertyLightColor);
+
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyLightAmbient);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyLightDiffuse);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyLightSpecular);
     }
     skinningModel->WorldFromModel = glms_translate(
         glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
@@ -75,7 +88,7 @@ int main(void) {
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     Model *homeModel = modelLoad("home.glb", 0);
     homeModel->Materials[0] = materialCreate(homeShader, 2, matPropertyLightPos,
-                                             matPropertyLightColor);
+                                             matPropertyLightDiffuse);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     glEnable(GL_CULL_FACE);
@@ -132,9 +145,12 @@ int main(void) {
         lightPos.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
         lightPos.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
         lightPos.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
-        lightColor.x = (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightColor.y = (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightColor.z = (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightDiffuse.x =
+            (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightDiffuse.y =
+            (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightDiffuse.z =
+            (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
         modelSetNodeWorldMatrices(light);
         modelRender(light);
@@ -160,7 +176,9 @@ int main(void) {
         materialFree(material);
     }
     materialPropertyFree(matPropertyLightPos);
-    materialPropertyFree(matPropertyLightColor);
+    materialPropertyFree(matPropertyLightAmbient);
+    materialPropertyFree(matPropertyLightDiffuse);
+    materialPropertyFree(matPropertyLightSpecular);
     materialFree(homeModel->Materials[0]);
     materialFree(light->Materials[0]);
     modelFree(skinningModel);
