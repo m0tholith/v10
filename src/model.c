@@ -61,17 +61,6 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
             Material *material = materialCreate(0, 0);
 
             struct aiColor4D *color = malloc(sizeof(struct aiColor4D));
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, color) ==
-                AI_SUCCESS) {
-                vec3s *diffuse = malloc(sizeof(vec3s));
-                diffuse->r = color->r;
-                diffuse->g = color->g;
-                diffuse->b = color->b;
-                materialAddProperty(material,
-                                    materialPropertyCreate("_material.diffuse",
-                                                           MATTYPE_VEC3,
-                                                           (void *)diffuse));
-            }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, color) ==
                 AI_SUCCESS) {
                 vec3s *ambient = malloc(sizeof(vec3s));
@@ -83,16 +72,16 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                                                            MATTYPE_VEC3,
                                                            (void *)ambient));
             }
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_EMISSIVE, color) ==
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, color) ==
                 AI_SUCCESS) {
-                vec3s *emissive = malloc(sizeof(vec3s));
-                emissive->r = color->r;
-                emissive->g = color->g;
-                emissive->b = color->b;
+                vec3s *diffuse = malloc(sizeof(vec3s));
+                diffuse->r = color->r;
+                diffuse->g = color->g;
+                diffuse->b = color->b;
                 materialAddProperty(material,
-                                    materialPropertyCreate("_material.emissive",
+                                    materialPropertyCreate("_material.diffuse",
                                                            MATTYPE_VEC3,
-                                                           (void *)emissive));
+                                                           (void *)diffuse));
             }
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, color) ==
                 AI_SUCCESS) {
@@ -104,28 +93,6 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                                     materialPropertyCreate("_material.specular",
                                                            MATTYPE_VEC3,
                                                            (void *)specular));
-            }
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_REFLECTIVE, color) ==
-                AI_SUCCESS) {
-                vec3s *reflective = malloc(sizeof(vec3s));
-                reflective->r = color->r;
-                reflective->g = color->g;
-                reflective->b = color->b;
-                materialAddProperty(
-                    material,
-                    materialPropertyCreate("_material.reflective", MATTYPE_VEC3,
-                                           (void *)reflective));
-            }
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_TRANSPARENT, color) ==
-                AI_SUCCESS) {
-                vec3s *transparent = malloc(sizeof(vec3s));
-                transparent->r = color->r;
-                transparent->g = color->g;
-                transparent->b = color->b;
-                materialAddProperty(
-                    material,
-                    materialPropertyCreate("_material.transparent",
-                                           MATTYPE_VEC3, (void *)transparent));
             }
             model->Materials[i] = material;
             free(color);
