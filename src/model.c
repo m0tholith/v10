@@ -104,6 +104,15 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                     materialPropertyCreate("_material.shininess", MATTYPE_FLOAT,
                                            (void *)shininess));
             }
+            if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS_STRENGTH, num) ==
+                AI_SUCCESS) {
+                float *specular_strength = malloc(sizeof(float));
+                *specular_strength = *num;
+                materialAddProperty(material, materialPropertyCreate(
+                                                  "_material.specular_strength",
+                                                  MATTYPE_FLOAT,
+                                                  (void *)specular_strength));
+            }
             model->Materials[i] = material;
             free(color);
             free(num);
