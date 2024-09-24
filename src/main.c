@@ -11,7 +11,6 @@
 #include "error.h"
 #include "material.h"
 #include "model.h"
-#include "model_presets.h"
 #include "shader.h"
 
 #include <math.h>
