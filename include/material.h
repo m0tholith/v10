@@ -35,7 +35,12 @@ typedef struct {
 /// @param void *`data`: pointer to data
 MaterialProperty *materialPropertyCreate(const char *name,
                                          enum MaterialType type, void *data);
+/// frees property and its name
 void materialPropertyFree(MaterialProperty *property);
+/// frees property and its name, along with its data
+///
+/// use this e.x. for freeing properties imported by model (_diffuse, etc.)
+void materialPropertyDelete(MaterialProperty *property);
 /// returns material texture property data. free with `materialTextureDataFree`
 MaterialTextureData *materialTextureDataCreate(Texture *texture, int index);
 void materialTextureDataFree(MaterialTextureData *data);

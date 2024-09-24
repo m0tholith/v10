@@ -24,6 +24,11 @@ void materialPropertyFree(MaterialProperty *property) {
     free(property->Name);
     free(property);
 }
+void materialPropertyDelete(MaterialProperty *property) {
+    free(property->Data);
+    free(property->Name);
+    free(property);
+}
 MaterialTextureData *materialTextureDataCreate(Texture *texture, int index) {
     MaterialTextureData *data = malloc(sizeof(MaterialTextureData));
     data->Texture = texture;

@@ -154,8 +154,7 @@ int main(void) {
         for (int j = 0; j < material->PropertyCount; j++) {
             MaterialProperty *property = material->Properties[j];
             if (strncmp(property->Name, "_", 1) == 0) {
-                free(property->Data);
-                materialPropertyFree(property);
+                materialPropertyDelete(property);
             }
         }
         materialFree(material);
