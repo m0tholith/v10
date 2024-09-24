@@ -132,6 +132,13 @@ void materialChangeProperty(Material *material, const char *propertyName,
             "\"%s\"\n",
             propertyName);
 }
+void materialAddProperty(Material *material, MaterialProperty *property) {
+    material->PropertyCount++;
+    material->Properties =
+        realloc(material->Properties,
+                material->PropertyCount * sizeof(MaterialProperty));
+    material->Properties[material->PropertyCount - 1] = property;
+}
 void materialFree(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++) {
         free(material->Properties[i]->Name);

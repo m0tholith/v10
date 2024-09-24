@@ -55,6 +55,7 @@ void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
 void materialChangeProperty(Material *material, const char *propertyName,
                             void *newData);
+void materialAddProperty(Material *material, MaterialProperty *property);
 void materialFree(Material *material);
 
 #endif // !MATERIAL_H
