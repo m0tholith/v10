@@ -1,5 +1,6 @@
 #include "model.h"
 
+#include "assimp/material.h"
 #include "assimp/matrix4x4.h"
 #include "assimp/mesh.h"
 #include "material.h"
@@ -22,7 +23,7 @@ struct Node *processNode(struct aiNode *node, struct Node *parentNode);
 void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
                       int *index, int parentIndex);
 
-Model *modelLoad(const char *_modelPath) {
+Model *modelLoad(const char *_modelPath, unsigned int options) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
     strcpy(modelFile, MODELS_PATH);
     strcat(modelFile, _modelPath);
@@ -53,6 +54,77 @@ Model *modelLoad(const char *_modelPath) {
 
     model->MaterialCount = scene->mNumMaterials;
     model->Materials = malloc(model->MaterialCount * sizeof(Material *));
+
+    if (options & MODELOPTS_IMPORT_MATERIALS) {
+        for (int i = 0; i < model->MaterialCount; i++) {
+            struct aiMaterial *aiMat = scene->mMaterials[i];
+            Material *material = materialCreate(0, 0);
+
+            struct aiColor4D *color = malloc(sizeof(struct aiColor4D));
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, color) ==
+                AI_SUCCESS) {
+                vec3s *diffuse = malloc(sizeof(vec3s));
+                diffuse->r = color->r;
+                diffuse->g = color->g;
+                diffuse->b = color->b;
+                materialAddProperty(
+                    material, materialPropertyCreate("_diffuse", MATTYPE_VEC3,
+                                                     (void *)diffuse));
+            }
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, color) ==
+                AI_SUCCESS) {
+                vec3s *ambient = malloc(sizeof(vec3s));
+                ambient->r = color->r;
+                ambient->g = color->g;
+                ambient->b = color->b;
+                materialAddProperty(
+                    material, materialPropertyCreate("_ambient", MATTYPE_VEC3,
+                                                     (void *)ambient));
+            }
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_EMISSIVE, color) ==
+                AI_SUCCESS) {
+                vec3s *emissive = malloc(sizeof(vec3s));
+                emissive->r = color->r;
+                emissive->g = color->g;
+                emissive->b = color->b;
+                materialAddProperty(
+                    material, materialPropertyCreate("_emissive", MATTYPE_VEC3,
+                                                     (void *)emissive));
+            }
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, color) ==
+                AI_SUCCESS) {
+                vec3s *specular = malloc(sizeof(vec3s));
+                specular->r = color->r;
+                specular->g = color->g;
+                specular->b = color->b;
+                materialAddProperty(
+                    material, materialPropertyCreate("_specular", MATTYPE_VEC3,
+                                                     (void *)specular));
+            }
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_REFLECTIVE, color) ==
+                AI_SUCCESS) {
+                vec3s *reflective = malloc(sizeof(vec3s));
+                reflective->r = color->r;
+                reflective->g = color->g;
+                reflective->b = color->b;
+                materialAddProperty(material, materialPropertyCreate(
+                                                  "_reflective", MATTYPE_VEC3,
+                                                  (void *)reflective));
+            }
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_TRANSPARENT, color) ==
+                AI_SUCCESS) {
+                vec3s *transparent = malloc(sizeof(vec3s));
+                transparent->r = color->r;
+                transparent->g = color->g;
+                transparent->b = color->b;
+                materialAddProperty(material, materialPropertyCreate(
+                                                  "_transparent", MATTYPE_VEC3,
+                                                  (void *)transparent));
+            }
+            model->Materials[i] = material;
+            free(color);
+        }
+    }
 
     model->TextureCount = scene->mNumTextures;
     model->Textures = malloc(model->TextureCount * sizeof(Texture *));

@@ -20,7 +20,10 @@ MaterialProperty *materialPropertyCreate(const char *name,
     property->Data = data;
     return property;
 }
-void materialPropertyFree(MaterialProperty *property) { free(property); }
+void materialPropertyFree(MaterialProperty *property) {
+    free(property->Name);
+    free(property);
+}
 MaterialTextureData *materialTextureDataCreate(Texture *texture, int index) {
     MaterialTextureData *data = malloc(sizeof(MaterialTextureData));
     data->Texture = texture;
@@ -140,10 +143,6 @@ void materialAddProperty(Material *material, MaterialProperty *property) {
     material->Properties[material->PropertyCount - 1] = property;
 }
 void materialFree(Material *material) {
-    for (int i = 0; i < material->PropertyCount; i++) {
-        free(material->Properties[i]->Name);
-        free(material->Properties[i]);
-    }
     free(material->Properties);
     free(material);
 }

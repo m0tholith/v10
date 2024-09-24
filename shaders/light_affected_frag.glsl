@@ -8,6 +8,7 @@ in vec3 vPos;
 out vec4 FragColor;
 
 uniform vec3 _cameraWorldPosition;
+uniform vec3 _diffuse;
 
 uniform vec3 light_position;
 uniform vec3 light_color;
@@ -28,5 +29,8 @@ void main()
     float spec = pow(max(dot(vNormal, halfwayDir), 0.0f), pow(2, shininess));
     vec3 specular = specular_strength * spec * light_color;
 
-    FragColor = vec4((diffuse + ambient_color + specular) * vColor, 1.0f);
+    if (_diffuse != vec3(0))
+        FragColor = vec4((diffuse + ambient_color + specular) * vColor * _diffuse, 1.0f);
+    else
+        FragColor = vec4((diffuse + ambient_color + specular) * vColor, 1.0f);
 }

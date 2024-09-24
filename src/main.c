@@ -16,6 +16,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MOVE_SPEED 10.0f
 #define EVENT_COUNT 2
@@ -46,23 +47,23 @@ int main(void) {
     vec3s lightColor = GLMS_VEC3_ONE;
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
-    Model *light = modelLoad("light.glb");
-    light->Materials[0] =
-        materialCreate(lightShader, 1,
-                       materialPropertyCreate("light_color", MATTYPE_VEC3,
-                                              (void *)&lightColor));
+    Model *light = modelLoad("light.glb", 0);
+    MaterialProperty *matPropertyLightPos = materialPropertyCreate(
+        "light_position", MATTYPE_VEC3, (void *)&lightPos);
+    MaterialProperty *matPropertyLightColor = materialPropertyCreate(
+        "light_color", MATTYPE_VEC3, (void *)&lightColor);
+    light->Materials[0] = materialCreate(lightShader, 1, matPropertyLightColor);
     light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
 
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
-    Model *skinningModel = modelLoad("BrainStem.glb");
-    skinningModel->Materials[0] =
-        materialCreate(skinningShader, 2,
-                       materialPropertyCreate("light_position", MATTYPE_VEC3,
-                                              (void *)&lightPos),
-                       materialPropertyCreate("light_color", MATTYPE_VEC3,
-                                              (void *)&lightColor));
-    modelSetDefaultMaterial(skinningModel, skinningModel->Materials[0]);
+    Model *skinningModel =
+        modelLoad("BrainStem.glb", MODELOPTS_IMPORT_MATERIALS);
+    for (int i = 0; i < skinningModel->MaterialCount; i++) {
+        skinningModel->Materials[i]->Shader = skinningShader;
+        materialAddProperty(skinningModel->Materials[i], matPropertyLightPos);
+        materialAddProperty(skinningModel->Materials[i], matPropertyLightColor);
+    }
     skinningModel->WorldFromModel = glms_translate(
         glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
                                  glm_rad(180)),
@@ -72,13 +73,9 @@ int main(void) {
 
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
-    Model *homeModel = modelLoad("home.glb");
-    homeModel->Materials[0] =
-        materialCreate(homeShader, 2,
-                       materialPropertyCreate("light_position", MATTYPE_VEC3,
-                                              (void *)&lightPos),
-                       materialPropertyCreate("light_color", MATTYPE_VEC3,
-                                              (void *)&lightColor));
+    Model *homeModel = modelLoad("home.glb", 0);
+    homeModel->Materials[0] = materialCreate(homeShader, 2, matPropertyLightPos,
+                                             matPropertyLightColor);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     glEnable(GL_CULL_FACE);
@@ -152,8 +149,20 @@ int main(void) {
         windowDraw(window);
     }
 
+    for (int i = 0; i < skinningModel->MaterialCount; i++) {
+        Material *material = skinningModel->Materials[i];
+        for (int j = 0; j < material->PropertyCount; j++) {
+            MaterialProperty *property = material->Properties[j];
+            if (strncmp(property->Name, "_", 1) == 0) {
+                free(property->Data);
+                materialPropertyFree(property);
+            }
+        }
+        materialFree(material);
+    }
+    materialPropertyFree(matPropertyLightPos);
+    materialPropertyFree(matPropertyLightColor);
     materialFree(homeModel->Materials[0]);
-    materialFree(skinningModel->Materials[0]);
     materialFree(light->Materials[0]);
     modelFree(skinningModel);
     modelFree(light);

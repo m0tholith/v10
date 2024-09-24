@@ -39,8 +39,13 @@ typedef struct {
     void (*OnDelete)(void *model);
 } Model;
 
+enum ModelLoadOptions {
+    MODELOPTS_IMPORT_MATERIALS = 1,
+};
+
 /// manages rendering a 3d file. free with `modelFree`
-Model *modelLoad(const char *modelFilename);
+/// @param enum ModelLoadOptions `options`: use MODELOPTS_* options here
+Model *modelLoad(const char *modelFilename, unsigned int options);
 /// @param Material *...: materials to set, needs to be `model->MaterialCount`
 /// number of them
 void modelSetMaterials(Model *model, int materialCount, ...);
