@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 set(BUILD_DEBUG ON)
+set(ENABLE_ERRORCHECKING ON)
 
 set(SRC_FILES
     src/main.c
@@ -18,14 +19,17 @@ set(SRC_FILES
     src/material.c
     src/texture.c
     src/stb_image.c
-    src/camera.c
-)
+    src/camera.c)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(BUILD_DEBUG)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-    add_compile_options("-g")
-    add_compile_options("-Wall")
-    add_compile_options("-Werror")
+  add_compile_options("-g")
+  add_compile_options("-Wall")
+  add_compile_options("-Werror")
+  add_compile_options("-D BUILD_DEBUG")
+endif()
+if(ENABLE_ERRORCHECKING)
+  add_compile_options("-D ENABLE_ERRORCHECKING")
 endif()
 
 project(game)

@@ -8,7 +8,9 @@
 #include "rendering.h"
 
 #include "animation.h"
+#ifdef ENABLE_ERRORCHECKING
 #include "error.h"
+#endif
 #include "material.h"
 #include "model.h"
 #include "shader.h"
@@ -36,7 +38,9 @@ int main(void) {
     InputEvent *events = getInputEventArray();
     inputSetEvents(events, 2);
     inputInit(window);
+#ifdef ENABLE_ERRORCHECKING
     errorInit();
+#endif
 
     Camera camera =
         cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
