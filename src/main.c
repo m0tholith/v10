@@ -47,6 +47,9 @@ int main(void) {
     vec3s lightAmbient = (vec3s){{0.2f, 0.2f, 0.2f}};
     vec3s lightDiffuse = (vec3s){{0.5f, 0.5f, 0.5f}};
     vec3s lightSpecular = (vec3s){{1.0f, 1.0f, 1.0f}};
+    float lightIntensity = 1;
+    float lightDistance = 10;
+    float lightDecay = 1.5f;
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
     Model *light = modelLoad("light.glb", 0);
@@ -58,6 +61,12 @@ int main(void) {
         "light.diffuse", MATTYPE_VEC3, (void *)&lightDiffuse);
     MaterialProperty *matPropertyLightSpecular = materialPropertyCreate(
         "light.specular", MATTYPE_VEC3, (void *)&lightSpecular);
+    MaterialProperty *matPropertyLightIntensity = materialPropertyCreate(
+        "light.intensity", MATTYPE_FLOAT, (void *)&lightIntensity);
+    MaterialProperty *matPropertyLightDistance = materialPropertyCreate(
+        "light.distance", MATTYPE_FLOAT, (void *)&lightDistance);
+    MaterialProperty *matPropertyLightDecay = materialPropertyCreate(
+        "light.decay", MATTYPE_FLOAT, (void *)&lightDecay);
     light->Materials[0] =
         materialCreate(lightShader, 1, matPropertyLightDiffuse);
     light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
@@ -76,6 +85,11 @@ int main(void) {
                             matPropertyLightDiffuse);
         materialAddProperty(skinningModel->Materials[i],
                             matPropertyLightSpecular);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyLightIntensity);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyLightDistance);
+        materialAddProperty(skinningModel->Materials[i], matPropertyLightDecay);
     }
     skinningModel->WorldFromModel = glms_translate(
         glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
@@ -87,8 +101,11 @@ int main(void) {
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     Model *homeModel = modelLoad("home.glb", 0);
-    homeModel->Materials[0] = materialCreate(homeShader, 2, matPropertyLightPos,
-                                             matPropertyLightDiffuse);
+    homeModel->Materials[0] =
+        materialCreate(homeShader, 6, matPropertyLightPos,
+                       matPropertyLightAmbient, matPropertyLightDiffuse,
+                       matPropertyLightSpecular, matPropertyLightIntensity,
+                       matPropertyLightDistance, matPropertyLightDecay);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     glEnable(GL_CULL_FACE);
@@ -179,6 +196,9 @@ int main(void) {
     materialPropertyFree(matPropertyLightAmbient);
     materialPropertyFree(matPropertyLightDiffuse);
     materialPropertyFree(matPropertyLightSpecular);
+    materialPropertyFree(matPropertyLightIntensity);
+    materialPropertyFree(matPropertyLightDistance);
+    materialPropertyFree(matPropertyLightDecay);
     materialFree(homeModel->Materials[0]);
     materialFree(light->Materials[0]);
     modelFree(skinningModel);
