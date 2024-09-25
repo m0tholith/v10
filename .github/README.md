@@ -1,5 +1,6 @@
 # v10
-![engine](./.github/engine.gif)
+
+https://github.com/user-attachments/assets/332aae46-85f4-4ef9-bcb2-15f34ef7c5d5
 
 an opengl game engine/framework
 ## cloning and building
@@ -27,10 +28,17 @@ nix develop
 if you use `nix-direnv` then you can call `direnv allow` to automatically enter a devshell when entering the project directory
 ## goals
 - [X] model loading
-- [X] basic lighting
+- [X] lighting
+    - [X] point light
+    - [ ] directional light `<------ WE ARE HERE`
+    - [ ] spot light
+    - [ ] dedicated lighting system
 - [X] skinning
-- [ ] material importing `<------ WE ARE HERE`
+- [X] material importing
 - [ ] post processing
+    - [ ] multi-aliasing
+    - [ ] bloom
+    - [ ] post processing pipeline
 - [ ] physics engine
 - [ ] sound engine
 - [ ] bindings for some other language (maybe lua)
