@@ -234,9 +234,6 @@ void _modelDelete(void *_model) {
         meshFree(model->Meshes[i]);
     }
     free(model->Meshes);
-    for (int i = 0; i < model->TextureCount; i++) {
-        textureFree(model->Textures[i]);
-    }
     free(model->Textures);
     for (int i = 0; i < model->AnimationCount; i++) {
         animationFree(model->Animations[i]);

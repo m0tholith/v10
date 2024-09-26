@@ -21,5 +21,6 @@ typedef struct {
 Texture *textureCreate(const char *texturePath, enum TEXTURETYPE type,
                        bool optional);
 void textureFree(Texture *texture);
+void textureFreeCache();
 
 #endif // !TEXTURE_H

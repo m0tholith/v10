@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *readFile(const char *fileName);
-uint64_t hash(char *str);
+char *readShaderFile(const char *fileName);
+uint64_t shaderPathHash(char *str);
 
 struct shaderCacheEntry {
     uint32_t key;
@@ -24,22 +24,22 @@ void shaderCacheRemove(struct shaderCache *cache, int index);
 int shaderCacheSearch(struct shaderCache *cache, uint32_t key);
 void shaderCacheFree(struct shaderCache *cache);
 
-struct shaderCache *_cache;
+struct shaderCache *_shaderCache;
 
 uint32_t shaderCreate(const char *_vertexShaderPath,
                       const char *_fragmentShaderPath) {
-    if (_cache == NULL)
-        _cache = shaderCacheCreate();
+    if (_shaderCache == NULL)
+        _shaderCache = shaderCacheCreate();
 
     char *hashSource =
         malloc(strlen(_vertexShaderPath) + strlen(_fragmentShaderPath) + 1);
     strcpy(hashSource, _vertexShaderPath);
     strcat(hashSource, _fragmentShaderPath);
-    uint64_t hashSourceHash = hash(hashSource);
-    int shaderCacheIndex = shaderCacheSearch(_cache, hashSourceHash);
+    uint64_t hashSourceHash = shaderPathHash(hashSource);
+    int shaderCacheIndex = shaderCacheSearch(_shaderCache, hashSourceHash);
     if (shaderCacheIndex != -1) {
         free(hashSource);
-        return _cache->array[shaderCacheIndex].value;
+        return _shaderCache->array[shaderCacheIndex].value;
     }
 
     char *vertexShaderPath =
@@ -51,7 +51,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     strcpy(fragmentShaderPath, SHADERS_PATH);
     strcat(fragmentShaderPath, _fragmentShaderPath);
 
-    char *vertexShaderContents = readFile(vertexShaderPath);
+    char *vertexShaderContents = readShaderFile(vertexShaderPath);
     const char *vertexShaderSource = vertexShaderContents;
     uint32_t vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -66,7 +66,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
         exit(EXIT_FAILURE);
     }
 
-    char *fragmentShaderContents = readFile(fragmentShaderPath);
+    char *fragmentShaderContents = readShaderFile(fragmentShaderPath);
     const char *fragmentShaderSource = fragmentShaderContents;
     uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -98,22 +98,23 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     free(vertexShaderPath);
     free(fragmentShaderPath);
 
-    shaderCacheAppend(_cache, hashSourceHash, shaderProgram);
+    shaderCacheAppend(_shaderCache, hashSourceHash, shaderProgram);
     free(hashSource);
 
     return shaderProgram;
 }
 void shaderFree(uint32_t shader) {
-    int index = shaderCacheSearch(_cache, shader);
+    int index = shaderCacheSearch(_shaderCache, shader);
     if (index != -1) {
-        shaderCacheRemove(_cache, index);
+        shaderCacheRemove(_shaderCache, index);
         glDeleteProgram(shader);
     }
 }
-void shaderFreeCache() { shaderCacheFree(_cache); }
+void shaderFreeCache() { shaderCacheFree(_shaderCache); }
 
 void shaderCacheFitSize(struct shaderCache *cache) {
-    struct shaderCacheEntry *temp = realloc(cache->array, cache->size);
+    struct shaderCacheEntry *temp =
+        realloc(cache->array, cache->size * sizeof(struct shaderCacheEntry));
     if (temp != NULL)
         cache->array = temp;
     else {
@@ -136,9 +137,10 @@ void shaderCacheAppend(struct shaderCache *cache, uint32_t key,
         shaderCacheFitSize(cache);
     }
     cache->array[cache->used++] =
-        (struct shaderCacheEntry){.key = key, .value = value};
+        (struct shaderCacheEntry){.key = key & 0xFFFFFFFF, .value = value};
 }
 void shaderCacheRemove(struct shaderCache *cache, int index) {
+    shaderFree(cache->array[index].value);
     for (int i = index + 1; i < cache->used; i++) {
         cache[i - 1] = cache[i];
     }
@@ -159,7 +161,7 @@ void shaderCacheFree(struct shaderCache *cache) {
     free(cache);
 }
 
-char *readFile(const char *fileName) {
+char *readShaderFile(const char *fileName) {
     FILE *file = fopen(fileName, "rb");
     if (file == NULL) {
         printf("file %s could not be read", fileName);
@@ -179,7 +181,7 @@ char *readFile(const char *fileName) {
     string[fsize] = 0;
     return string;
 }
-uint64_t hash(char *str) {
+uint64_t shaderPathHash(char *str) {
     uint64_t hash = 5381;
     int c;
 
