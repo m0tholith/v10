@@ -4,12 +4,9 @@ in vec3 vColor;
 
 out vec4 FragColor;
 
-struct Light {
-    vec3 diffuse;
-};
-uniform Light light;
+uniform vec3 diffuse;
 
 void main()
 {
-    FragColor = vec4(light.diffuse, 1.0f);
+    FragColor = vec4(diffuse, 1.0f);
 }

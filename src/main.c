@@ -1,6 +1,7 @@
 #include "armature.h"
 #include "cglm/struct/affine-pre.h"
 #include "cglm/struct/affine.h"
+#include "cglm/struct/vec3.h"
 #include "window.h"
 
 #include "camera.h"
@@ -47,33 +48,65 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    vec3s lightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
-    vec3s lightAmbient = (vec3s){{0.2f, 0.2f, 0.2f}};
-    vec3s lightDiffuse = (vec3s){{0.5f, 0.5f, 0.5f}};
-    vec3s lightSpecular = (vec3s){{1.0f, 1.0f, 1.0f}};
-    float lightIntensity = 1;
-    float lightDistance = 10;
-    float lightDecay = 1.5f;
+    vec3s pointLightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
+    vec3s pointLightAmbient = (vec3s){{0.1f, 0.1f, 0.1f}};
+    vec3s pointLightDiffuse = (vec3s){{0.2f, 0.2f, 0.2f}};
+    vec3s pointLightSpecular = (vec3s){{1.0f, 1.0f, 1.0f}};
+    float pointLightIntensity = 1;
+    float pointLightDistance = 10;
+    float pointLightDecay = 1.5f;
+    MaterialProperty *matPropertyPointLightPos = materialPropertyCreate(
+        "pointLight.position", MATTYPE_VEC3, (void *)&pointLightPos);
+    MaterialProperty *matPropertyPointLightAmbient = materialPropertyCreate(
+        "pointLight.ambient", MATTYPE_VEC3, (void *)&pointLightAmbient);
+    MaterialProperty *matPropertyPointLightDiffuse = materialPropertyCreate(
+        "pointLight.diffuse", MATTYPE_VEC3, (void *)&pointLightDiffuse);
+    MaterialProperty *matPropertyPointLightSpecular = materialPropertyCreate(
+        "pointLight.specular", MATTYPE_VEC3, (void *)&pointLightSpecular);
+    MaterialProperty *matPropertyPointLightIntensity = materialPropertyCreate(
+        "pointLight.intensity", MATTYPE_FLOAT, (void *)&pointLightIntensity);
+    MaterialProperty *matPropertyPointLightDistance = materialPropertyCreate(
+        "pointLight.distance", MATTYPE_FLOAT, (void *)&pointLightDistance);
+    MaterialProperty *matPropertyPointLightDecay = materialPropertyCreate(
+        "pointLight.decay", MATTYPE_FLOAT, (void *)&pointLightDecay);
+    vec3s directionalLightDir = glms_vec3_normalize((vec3s){{3, 4, -12}});
+    vec3s directionalLightAmbient = (vec3s){{0, 0, 0}};
+    vec3s directionalLightDiffuse = (vec3s){{0.7f, 0.7f, 0.7f}};
+    vec3s directionalLightSpecular = (vec3s){{0.7f, 0.7f, 0.7f}};
+    MaterialProperty *matPropertyDirectionalLightDir =
+        materialPropertyCreate("directionalLight.direction", MATTYPE_VEC3,
+                               (void *)&directionalLightDir);
+    MaterialProperty *matPropertyDirectionalLightAmbient =
+        materialPropertyCreate("directionalLight.ambient", MATTYPE_VEC3,
+                               (void *)&directionalLightAmbient);
+    MaterialProperty *matPropertyDirectionalLightDiffuse =
+        materialPropertyCreate("directionalLight.diffuse", MATTYPE_VEC3,
+                               (void *)&directionalLightDiffuse);
+    MaterialProperty *matPropertyDirectionalLightSpecular =
+        materialPropertyCreate("directionalLight.specular", MATTYPE_VEC3,
+                               (void *)&directionalLightSpecular);
+
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
-    Model *light = modelLoad("light.glb", 0);
-    MaterialProperty *matPropertyLightPos = materialPropertyCreate(
-        "light.position", MATTYPE_VEC3, (void *)&lightPos);
-    MaterialProperty *matPropertyLightAmbient = materialPropertyCreate(
-        "light.ambient", MATTYPE_VEC3, (void *)&lightAmbient);
-    MaterialProperty *matPropertyLightDiffuse = materialPropertyCreate(
-        "light.diffuse", MATTYPE_VEC3, (void *)&lightDiffuse);
-    MaterialProperty *matPropertyLightSpecular = materialPropertyCreate(
-        "light.specular", MATTYPE_VEC3, (void *)&lightSpecular);
-    MaterialProperty *matPropertyLightIntensity = materialPropertyCreate(
-        "light.intensity", MATTYPE_FLOAT, (void *)&lightIntensity);
-    MaterialProperty *matPropertyLightDistance = materialPropertyCreate(
-        "light.distance", MATTYPE_FLOAT, (void *)&lightDistance);
-    MaterialProperty *matPropertyLightDecay = materialPropertyCreate(
-        "light.decay", MATTYPE_FLOAT, (void *)&lightDecay);
-    light->Materials[0] =
-        materialCreate(lightShader, 1, matPropertyLightDiffuse);
-    light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
+    Model *pointLight = modelLoad("light.glb", 0);
+    pointLight->Materials[0] =
+        materialCreate(lightShader, 1,
+                       materialPropertyCreate("diffuse", MATTYPE_VEC3,
+                                              (void *)&pointLightDiffuse));
+    pointLight->WorldFromModel =
+        glms_translate(GLMS_MAT4_IDENTITY, pointLightPos);
+
+    Model *directionalLight = modelLoad("arrow.glb", 0);
+    directionalLight->Materials[0] = materialCreate(
+        lightShader, 1,
+        materialPropertyCreate("diffuse", MATTYPE_VEC3,
+                               (void *)&directionalLightDiffuse));
+    directionalLight->WorldFromModel =
+        glms_rotate_z(glms_rotate_y(glms_rotate_x(GLMS_MAT4_IDENTITY,
+                                                  atan2(directionalLightDir.y,
+                                                        directionalLightDir.x)),
+                                    asin(directionalLightDir.z)),
+                      0);
 
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
@@ -81,19 +114,29 @@ int main(void) {
         modelLoad("BrainStem.glb", MODELOPTS_IMPORT_MATERIALS);
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
-        materialAddProperty(skinningModel->Materials[i], matPropertyLightPos);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightPos);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightAmbient);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightDiffuse);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightSpecular);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightIntensity);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightDistance);
+        materialAddProperty(skinningModel->Materials[i],
+                            matPropertyPointLightDecay);
 
         materialAddProperty(skinningModel->Materials[i],
-                            matPropertyLightAmbient);
+                            matPropertyDirectionalLightDir);
         materialAddProperty(skinningModel->Materials[i],
-                            matPropertyLightDiffuse);
+                            matPropertyDirectionalLightAmbient);
         materialAddProperty(skinningModel->Materials[i],
-                            matPropertyLightSpecular);
+                            matPropertyDirectionalLightDiffuse);
         materialAddProperty(skinningModel->Materials[i],
-                            matPropertyLightIntensity);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyLightDistance);
-        materialAddProperty(skinningModel->Materials[i], matPropertyLightDecay);
+                            matPropertyDirectionalLightSpecular);
     }
     skinningModel->WorldFromModel = glms_translate(
         glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
@@ -105,11 +148,13 @@ int main(void) {
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     Model *homeModel = modelLoad("home.glb", 0);
-    homeModel->Materials[0] =
-        materialCreate(homeShader, 6, matPropertyLightPos,
-                       matPropertyLightAmbient, matPropertyLightDiffuse,
-                       matPropertyLightSpecular, matPropertyLightIntensity,
-                       matPropertyLightDistance, matPropertyLightDecay);
+    homeModel->Materials[0] = materialCreate(
+        homeShader, 10, matPropertyPointLightPos, matPropertyPointLightAmbient,
+        matPropertyPointLightDiffuse, matPropertyPointLightSpecular,
+        matPropertyPointLightIntensity, matPropertyPointLightDistance,
+        matPropertyPointLightDecay, matPropertyDirectionalLightDir,
+        matPropertyDirectionalLightAmbient, matPropertyDirectionalLightDiffuse,
+        matPropertyDirectionalLightSpecular);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     glEnable(GL_CULL_FACE);
@@ -163,18 +208,21 @@ int main(void) {
 
         cameraPreRender(&camera);
 
-        lightPos.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
-        lightPos.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
-        lightPos.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
-        lightDiffuse.x =
+        pointLightPos.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
+        pointLightPos.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
+        pointLightPos.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
+        pointLightDiffuse.x =
             (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightDiffuse.y =
+        pointLightDiffuse.y =
             (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        lightDiffuse.z =
+        pointLightDiffuse.z =
             (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        light->WorldFromModel = glms_translate(GLMS_MAT4_IDENTITY, lightPos);
-        modelSetNodeWorldMatrices(light);
-        modelRender(light);
+        pointLight->WorldFromModel =
+            glms_translate(GLMS_MAT4_IDENTITY, pointLightPos);
+        modelSetNodeWorldMatrices(pointLight);
+        modelRender(pointLight);
+        modelSetNodeWorldMatrices(directionalLight);
+        modelRender(directionalLight);
 
         modelSetNodeWorldMatrices(skinningModel);
         armatureApplyTransformations(armature);
@@ -196,17 +244,25 @@ int main(void) {
         }
         materialFree(material);
     }
-    materialPropertyFree(matPropertyLightPos);
-    materialPropertyFree(matPropertyLightAmbient);
-    materialPropertyFree(matPropertyLightDiffuse);
-    materialPropertyFree(matPropertyLightSpecular);
-    materialPropertyFree(matPropertyLightIntensity);
-    materialPropertyFree(matPropertyLightDistance);
-    materialPropertyFree(matPropertyLightDecay);
+    materialPropertyFree(matPropertyPointLightPos);
+    materialPropertyFree(matPropertyPointLightAmbient);
+    materialPropertyFree(matPropertyPointLightDiffuse);
+    materialPropertyFree(matPropertyPointLightSpecular);
+    materialPropertyFree(matPropertyPointLightIntensity);
+    materialPropertyFree(matPropertyPointLightDistance);
+    materialPropertyFree(matPropertyPointLightDecay);
+    materialPropertyFree(matPropertyDirectionalLightDir);
+    materialPropertyFree(matPropertyDirectionalLightAmbient);
+    materialPropertyFree(matPropertyDirectionalLightDiffuse);
+    materialPropertyFree(matPropertyDirectionalLightSpecular);
     materialFree(homeModel->Materials[0]);
-    materialFree(light->Materials[0]);
+    materialPropertyFree(pointLight->Materials[0]->Properties[0]);
+    materialFree(pointLight->Materials[0]);
+    materialPropertyFree(directionalLight->Materials[0]->Properties[0]);
+    materialFree(directionalLight->Materials[0]);
     modelFree(skinningModel);
-    modelFree(light);
+    modelFree(pointLight);
+    modelFree(directionalLight);
     modelFree(homeModel);
     armatureFree(armature);
     shaderFreeCache();
