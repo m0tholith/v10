@@ -2,6 +2,7 @@
 #include "cglm/struct/affine-pre.h"
 #include "cglm/struct/affine.h"
 #include "cglm/struct/vec3.h"
+#include "texture.h"
 #include "window.h"
 
 #include "camera.h"
@@ -157,6 +158,32 @@ int main(void) {
         matPropertyDirectionalLightSpecular);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
+    const int TexturedBoxCount = 7;
+    Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
+    uint32_t texturedShader = shaderCreate("light_affected_vert.glsl",
+                                           "light_affected_tex_frag.glsl");
+    for (int i = 0; i < TexturedBoxCount; i++) {
+        texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
+        texturedBoxes[i]->Materials[0] = materialCreate(
+            texturedShader, 11,
+            materialPropertyCreate("_diffuseTex", MATTYPE_TEXTURE2D,
+                                   (void *)materialTextureDataCreate(
+                                       texturedBoxes[i]->Textures[0], 0)),
+            matPropertyPointLightPos, matPropertyPointLightAmbient,
+            matPropertyPointLightDiffuse, matPropertyPointLightSpecular,
+            matPropertyPointLightIntensity, matPropertyPointLightDistance,
+            matPropertyPointLightDecay, matPropertyDirectionalLightDir,
+            matPropertyDirectionalLightAmbient,
+            matPropertyDirectionalLightDiffuse,
+            matPropertyDirectionalLightSpecular);
+        modelSetDefaultMaterial(texturedBoxes[i],
+                                texturedBoxes[i]->Materials[0]);
+        texturedBoxes[i]->WorldFromModel = glms_translate(
+            glms_rotate_y(GLMS_MAT4_IDENTITY, glm_rad(23)),
+            (vec3s){{-1.7f + (float)i / ((TexturedBoxCount - 1) * 2), -4.0f + i,
+                     -4.4f}});
+    }
+
     glEnable(GL_CULL_FACE);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
@@ -231,6 +258,11 @@ int main(void) {
         modelSetNodeWorldMatrices(homeModel);
         modelRender(homeModel);
 
+        for (int i = 0; i < TexturedBoxCount; i++) {
+            modelSetNodeWorldMatrices(texturedBoxes[i]);
+            modelRender(texturedBoxes[i]);
+        }
+
         windowDraw(window);
     }
 
@@ -264,7 +296,14 @@ int main(void) {
     modelFree(pointLight);
     modelFree(directionalLight);
     modelFree(homeModel);
+    for (int i = 0; i < TexturedBoxCount; i++) {
+        materialPropertyFree(texturedBoxes[i]->Materials[0]->Properties[0]);
+        materialFree(texturedBoxes[i]->Materials[0]);
+        modelFree(texturedBoxes[i]);
+    }
     armatureFree(armature);
+
+    textureFreeCache();
     shaderFreeCache();
 
     windowClose();
