@@ -28,13 +28,18 @@ nix develop
 if you use `nix-direnv` then you can call `direnv allow` to automatically enter a devshell when entering the project directory
 ## goals
 - [X] model loading
+- [X] shader cache
+- [X] texture cache
+- [X] input system
 - [X] lighting
     - [X] point light
-    - [ ] directional light `<------ WE ARE HERE`
-    - [ ] spot light
+    - [X] directional light
+    - [ ] spot light `<------ WE ARE HERE`
     - [ ] dedicated lighting system
 - [X] skinning
 - [X] material importing
+    - [X] color importing (diffuse, ambient, etc.)
+    - [ ] texture importing
 - [ ] post processing
     - [ ] multi-aliasing
     - [ ] bloom
