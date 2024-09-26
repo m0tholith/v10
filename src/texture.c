@@ -41,6 +41,7 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     uint64_t hashSourceHash = texturePathHash(hashSource);
     int textureCacheIndex = textureCacheSearch(_textureCache, hashSourceHash);
     if (textureCacheIndex != -1) {
+        free(textureFile);
         free(hashSource);
         return _textureCache->array[textureCacheIndex].value;
     }

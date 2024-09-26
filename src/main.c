@@ -33,6 +33,7 @@ vec2s mouseSensitivity;
 
 // just to make the main function more easily accessible
 InputEvent *getInputEventArray();
+void freeInputEventArray(InputEvent *events);
 
 int main(void) {
     window = windowCreate();
@@ -297,10 +298,13 @@ int main(void) {
     modelFree(directionalLight);
     modelFree(homeModel);
     for (int i = 0; i < TexturedBoxCount; i++) {
+        materialTextureDataFree(
+            texturedBoxes[i]->Materials[0]->Properties[0]->Data);
         materialPropertyFree(texturedBoxes[i]->Materials[0]->Properties[0]);
         materialFree(texturedBoxes[i]->Materials[0]);
         modelFree(texturedBoxes[i]);
     }
+    free(texturedBoxes);
     armatureFree(armature);
 
     textureFreeCache();
@@ -308,7 +312,7 @@ int main(void) {
 
     windowClose();
 
-    free(events);
+    freeInputEventArray(events);
     return 0;
 }
 
@@ -353,4 +357,10 @@ InputEvent *getInputEventArray() {
     };
 
     return events;
+}
+void freeInputEventArray(InputEvent *events) {
+    for (int i = 0; i < EVENT_COUNT; i++) {
+        free(events[i].Keys);
+    }
+    free(events);
 }
