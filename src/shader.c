@@ -9,13 +9,16 @@
 char *readFile(const char *fileName);
 uint64_t hash(char *str);
 
+struct shaderCacheEntry {
+    uint32_t key;
+    uint32_t value;
+};
 struct shaderCache {
     size_t used;
     size_t size;
-    uint64_t *array;
+    struct shaderCacheEntry *array;
 };
 struct shaderCache *shaderCacheCreate();
-uint32_t shaderCacheValue(struct shaderCache *cache, int index);
 void shaderCacheAppend(struct shaderCache *cache, uint32_t key, uint32_t value);
 void shaderCacheRemove(struct shaderCache *cache, int index);
 int shaderCacheSearch(struct shaderCache *cache, uint32_t key);
@@ -36,7 +39,7 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     int shaderCacheIndex = shaderCacheSearch(_cache, hashSourceHash);
     if (shaderCacheIndex != -1) {
         free(hashSource);
-        return _cache->array[shaderCacheIndex] & 0xFFFF;
+        return _cache->array[shaderCacheIndex].value;
     }
 
     char *vertexShaderPath =
@@ -110,7 +113,7 @@ void shaderFree(uint32_t shader) {
 void shaderFreeCache() { shaderCacheFree(_cache); }
 
 void shaderCacheFitSize(struct shaderCache *cache) {
-    uint64_t *temp = realloc(cache->array, cache->size);
+    struct shaderCacheEntry *temp = realloc(cache->array, cache->size);
     if (temp != NULL)
         cache->array = temp;
     else {
@@ -126,16 +129,14 @@ struct shaderCache *shaderCacheCreate() {
     shaderCacheFitSize(cache);
     return cache;
 }
-uint32_t shaderCacheValue(struct shaderCache *cache, int index) {
-    return cache->array[index] & 0xFFFF;
-}
 void shaderCacheAppend(struct shaderCache *cache, uint32_t key,
                        uint32_t value) {
     if (cache->used > cache->size) {
         cache->size *= 2;
         shaderCacheFitSize(cache);
     }
-    cache->array[cache->used++] = ((uint64_t)key << 32) | value;
+    cache->array[cache->used++] =
+        (struct shaderCacheEntry){.key = key, .value = value};
 }
 void shaderCacheRemove(struct shaderCache *cache, int index) {
     for (int i = index + 1; i < cache->used; i++) {
@@ -145,14 +146,14 @@ void shaderCacheRemove(struct shaderCache *cache, int index) {
 }
 int shaderCacheSearch(struct shaderCache *cache, uint32_t key) {
     for (int i = 0; i < cache->used; i++) {
-        if ((cache->array[i] >> 32) == key)
+        if (key == cache->array[i].key)
             return i;
     }
     return -1;
 }
 void shaderCacheFree(struct shaderCache *cache) {
     for (int i = 0; i < cache->used; i++) {
-        shaderFree(shaderCacheValue(cache, i));
+        shaderFree(cache->array[i].value);
     }
     free(cache->array);
     free(cache);
