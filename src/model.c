@@ -1,12 +1,12 @@
 #include "model.h"
 
-#include "assimp/material.h"
-#include "assimp/matrix4x4.h"
-#include "assimp/mesh.h"
 #include "material.h"
 #include "mesh.h"
 #include "node.h"
 #include "texture.h"
+#include <assimp/material.h>
+#include <assimp/matrix4x4.h>
+#include <assimp/mesh.h>
 
 #include "glad/glad.h"
 #include <GL/gl.h>

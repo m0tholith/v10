@@ -1,5 +1,5 @@
 #include "input.h"
-#include "cglm/util.h"
+#include <cglm/util.h>
 
 #include <cglm/struct.h>
 #include <stdio.h>

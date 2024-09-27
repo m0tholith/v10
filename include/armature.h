@@ -1,8 +1,8 @@
 #ifndef ARMATURE_H
 #define ARMATURE_H
 
-#include "cglm/types-struct.h"
 #include "model.h"
+#include <cglm/types-struct.h>
 
 #define MAX_BONES 100
 

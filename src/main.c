@@ -1,9 +1,9 @@
 #include "armature.h"
-#include "cglm/struct/affine-pre.h"
-#include "cglm/struct/affine.h"
-#include "cglm/struct/vec3.h"
 #include "texture.h"
 #include "window.h"
+#include <cglm/struct/affine-pre.h>
+#include <cglm/struct/affine.h>
+#include <cglm/struct/vec3.h>
 
 #include "camera.h"
 #include "input.h"
