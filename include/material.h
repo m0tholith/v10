@@ -8,7 +8,7 @@
 /// `materialApplyProperties`.
 ///
 /// `MATTYPE_TEXTURE2D` is used with `MaterialTextureData` type
-enum MaterialType {
+enum MaterialPropertyType {
     MATTYPE_INT,
     MATTYPE_FLOAT,
     MATTYPE_VEC2,
@@ -21,7 +21,7 @@ enum MaterialType {
 };
 
 typedef struct {
-    enum MaterialType Type;
+    enum MaterialPropertyType Type;
     char *Name;
     void *Data;
 } MaterialProperty;
@@ -34,7 +34,8 @@ typedef struct {
 /// `materialPropertyFree`
 /// @param void *`data`: pointer to data
 MaterialProperty *materialPropertyCreate(const char *name,
-                                         enum MaterialType type, void *data);
+                                         enum MaterialPropertyType type,
+                                         void *data);
 /// frees property and its name
 void materialPropertyFree(MaterialProperty *property);
 /// frees property and its name, along with its data

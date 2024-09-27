@@ -12,7 +12,8 @@
 
 // `data` should be a pointer to a value defined in `MaterialType`
 MaterialProperty *materialPropertyCreate(const char *name,
-                                         enum MaterialType type, void *data) {
+                                         enum MaterialPropertyType type,
+                                         void *data) {
     MaterialProperty *property = malloc(sizeof(MaterialProperty));
     property->Name = malloc(strlen(name) * sizeof(char) + 1);
     strcpy(property->Name, name);
