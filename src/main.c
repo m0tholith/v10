@@ -71,9 +71,10 @@ int main(void) {
         "pointLight.distance", MATTYPE_FLOAT, (void *)&pointLightDistance);
     MaterialProperty *matPropertyPointLightDecay = materialPropertyCreate(
         "pointLight.decay", MATTYPE_FLOAT, (void *)&pointLightDecay);
-    vec3s directionalLightDir = glms_vec3_normalize((vec3s){{3, 4, -12}});
+    vec3s directionalLightDir =
+        glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}}));
     vec3s directionalLightAmbient = (vec3s){{0, 0, 0}};
-    vec3s directionalLightDiffuse = (vec3s){{0.7f, 0.7f, 0.7f}};
+    vec3s directionalLightDiffuse = (vec3s){{0.694f, 0.5f, 0.05f}};
     vec3s directionalLightSpecular = (vec3s){{0.7f, 0.7f, 0.7f}};
     MaterialProperty *matPropertyDirectionalLightDir =
         materialPropertyCreate("directionalLight.direction", MATTYPE_VEC3,
@@ -103,13 +104,11 @@ int main(void) {
         lightShader, 1,
         materialPropertyCreate("diffuse", MATTYPE_VEC3,
                                (void *)&directionalLightDiffuse));
+    vec3s startAxis = (vec3s){{1, 0, 0}};
+    float angle = acos(glms_vec3_dot(startAxis, directionalLightDir));
+    vec3s axis = glms_vec3_cross(startAxis, directionalLightDir);
     directionalLight->WorldFromModel =
-        glms_rotate_z(glms_rotate_y(glms_rotate_x(GLMS_MAT4_IDENTITY,
-                                                  atan2(directionalLightDir.y,
-                                                        directionalLightDir.x)),
-                                    asin(directionalLightDir.z)),
-                      0);
-
+        glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
     Model *skinningModel =
@@ -249,6 +248,12 @@ int main(void) {
             glms_translate(GLMS_MAT4_IDENTITY, pointLightPos);
         modelSetNodeWorldMatrices(pointLight);
         modelRender(pointLight);
+
+        vec3s startAxis = (vec3s){{1, 0, 0}};
+        float angle = acos(glms_vec3_dot(startAxis, directionalLightDir));
+        vec3s axis = glms_vec3_cross(startAxis, directionalLightDir);
+        directionalLight->WorldFromModel =
+            glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
         modelSetNodeWorldMatrices(directionalLight);
         modelRender(directionalLight);
 
