@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 layout(location = 0) in vec3 vertPos;
 layout(location = 1) in vec3 vertNormal;
@@ -12,7 +12,10 @@ out vec2 vTexCoord;
 out vec3 vNormal;
 out vec3 vPos;
 
-uniform mat4 _projectionFromModel;
+layout(std140, binding = 0) uniform WorldData {
+    mat4 _projectionFromWorld;
+    vec3 _cameraWorldPosition;
+};
 uniform mat4 _worldFromModel;
 uniform mat3 _worldNormalFromModel;
 
@@ -29,6 +32,7 @@ vec4 vertex_warp(vec4 pos) {
 }
 
 void main() {
+    mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
     vec4 position = vec4(0.0f);
     vec3 normal = vec3(0.0f);
     for (int i = 0; i < 4; i++) {

@@ -2,10 +2,17 @@
 
 #include "rendering.h"
 #include "window.h"
+#include <cglm/struct/affine-mat.h>
+#include <cglm/struct/quat.h>
+#include <cglm/struct/vec3-ext.h>
+#include <cglm/struct/vec4.h>
 
 #define X_AXIS ((vec3s){{1.0f, 0.0f, 0.0f}})
 #define Y_AXIS ((vec3s){{0.0f, 1.0f, 0.0f}})
 #define Z_AXIS ((vec3s){{0.0f, 0.0f, 1.0f}})
+
+uint32_t matricesUBO = 0;
+bool createdMatricesUBO = false;
 
 Camera cameraCreate(vec3s position, versors quaternion) {
     Camera camera = (Camera){
@@ -48,4 +55,36 @@ void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles) {
 void cameraSetQuaternion(Camera *camera, versors quaternion) {
     camera->Quaternion = quaternion;
 }
-void cameraPreRender(Camera *camera) { CameraPosition = camera->Position; }
+vec3s camPosPrev = GLMS_VEC3_ZERO;
+versors camRotPrev = GLMS_QUAT_IDENTITY;
+void cameraPreRender(Camera *camera) {
+    if (glms_vec3_eqv(camera->Position, camPosPrev) &&
+        glms_vec4_eqv(
+            (vec4s){{camera->Quaternion.x, camera->Quaternion.y,
+                     camera->Quaternion.z, camera->Quaternion.w}},
+            (vec4s){{camRotPrev.x, camRotPrev.y, camRotPrev.z, camRotPrev.w}}))
+        return;
+
+    CameraPosition = camPosPrev = camera->Position;
+    camRotPrev = camera->Quaternion;
+
+    if (!createdMatricesUBO) {
+        createdMatricesUBO = true;
+
+        glGenBuffers(1, &matricesUBO);
+        glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+
+        // mat4 _projectionFromWorld -> 64 => 0
+        // vec3 _cameraWorldPosition -> 16 => 64
+        glBufferData(GL_UNIFORM_BUFFER, 64 + 16, NULL, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, matricesUBO);
+    } else
+        glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
+
+    mat4s projectionFromWorld =
+        glms_mul(ProjectionFromViewMatrix, ViewFromWorldMatrix);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, &projectionFromWorld);
+    glBufferSubData(GL_UNIFORM_BUFFER, 64, 16, CameraPosition.raw);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}

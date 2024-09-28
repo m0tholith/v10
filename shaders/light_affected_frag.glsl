@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 in vec3 vColor;
 in vec2 vTexCoord;
@@ -7,7 +7,10 @@ in vec3 vPos;
 
 out vec4 FragColor;
 
-uniform vec3 _cameraWorldPosition;
+layout(std140, binding = 0) uniform WorldData {
+    mat4 _projectionFromWorld;
+    vec3 _cameraWorldPosition;
+};
 struct material {
     vec3 ambient;
     vec3 diffuse;

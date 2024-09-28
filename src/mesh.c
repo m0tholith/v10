@@ -78,13 +78,6 @@ void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
     glms_mat3_transpose(worldNormalFromModel);
     glUniformMatrix3fv(glGetUniformLocation(shader, "_worldNormalFromModel"), 1,
                        GL_FALSE, worldNormalFromModel.raw[0]);
-    mat4s projectionFromModel =
-        glms_mat4_mul(ProjectionFromViewMatrix,
-                      glms_mat4_mul(ViewFromWorldMatrix, worldFromModel));
-    glUniformMatrix4fv(glGetUniformLocation(shader, "_projectionFromModel"), 1,
-                       GL_FALSE, projectionFromModel.raw[0]);
-    glUniform3fv(glGetUniformLocation(shader, "_cameraWorldPosition"), 1,
-                 CameraPosition.raw);
 
     // render triangles
     glBindVertexArray(mesh->VAO);
