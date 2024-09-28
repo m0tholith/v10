@@ -15,7 +15,6 @@ layout(std140, binding = 0) uniform WorldData {
     vec3 _cameraWorldPosition;
 };
 uniform mat4 _worldFromModel;
-uniform mat3 _worldNormalFromModel;
 
 const float strength = 5;
 vec4 vertex_warp(vec4 pos) {
@@ -26,6 +25,8 @@ vec4 vertex_warp(vec4 pos) {
 }
 
 void main() {
+    mat3 _worldNormalFromModel = transpose(inverse(mat3(_worldFromModel)));
+
     vColor = vertColor;
     vTexCoord = vertTexCoord;
     vNormal = normalize(_worldNormalFromModel * vertNormal);

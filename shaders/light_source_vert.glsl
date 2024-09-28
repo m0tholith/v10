@@ -12,7 +12,6 @@ layout(std140, binding = 0) uniform WorldData {
     vec3 _cameraWorldPosition;
 };
 uniform mat4 _worldFromModel;
-uniform mat3 _worldNormalFromModel;
 
 void main() {
     vColor = vertColor;

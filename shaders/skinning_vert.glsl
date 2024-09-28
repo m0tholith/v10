@@ -17,7 +17,6 @@ layout(std140, binding = 0) uniform WorldData {
     vec3 _cameraWorldPosition;
 };
 uniform mat4 _worldFromModel;
-uniform mat3 _worldNormalFromModel;
 
 #define MAX_BONES 100
 
@@ -33,6 +32,7 @@ vec4 vertex_warp(vec4 pos) {
 
 void main() {
     mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
+    mat3 _worldNormalFromModel = transpose(inverse(mat3(_worldFromModel)));
     vec4 position = vec4(0.0f);
     vec3 normal = vec3(0.0f);
     for (int i = 0; i < 4; i++) {
