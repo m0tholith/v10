@@ -26,6 +26,7 @@
           assimp
 
           # debugging
+          valgrind
           renderdoc
           gdb
         ];
