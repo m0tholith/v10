@@ -35,7 +35,7 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [X] point light
     - [X] directional light
     - [ ] spot light `<------ WE ARE HERE`
-    - [ ] dedicated lighting system
+    - [X] dedicated lighting system
 - [X] skinning
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
