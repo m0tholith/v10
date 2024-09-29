@@ -7,7 +7,6 @@
 
 #include "camera.h"
 #include "input.h"
-#include "rendering.h"
 
 #include "animation.h"
 #ifdef ENABLE_ERRORCHECKING
@@ -18,12 +17,31 @@
 #include "shader.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MOVE_SPEED 10.0f
 #define EVENT_COUNT 2
+
+struct DirectionalLight {
+    vec4s direction; // 16, 0, 16
+    vec4s ambient;   // 16, 16, 32
+    vec4s diffuse;   // 16, 32, 48
+    vec4s specular;  // 16, 48, 64
+};
+struct PointLight {
+    vec4s position; // 16, 64, 80
+    vec4s ambient;  // 16, 80, 96
+    vec4s diffuse;  // 16, 96, 112
+    vec4s specular; // 16, 112, 128
+
+    // 16, 128, 144
+    float intensity;
+    float distance;
+    float decay;
+    float padding;
+};
+uint32_t lightsUBO;
 
 GLFWwindow *window;
 
@@ -45,69 +63,62 @@ int main(void) {
     errorInit();
 #endif
 
-    Camera camera =
-        cameraCreate((vec3s){{0.0f, 1.0f, 1.0f}}, GLMS_QUAT_IDENTITY);
+    Camera camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    vec3s pointLightPos = (vec3s){{-2.2f, 1.2f, -0.6f}};
-    vec3s pointLightAmbient = (vec3s){{0.1f, 0.1f, 0.1f}};
-    vec3s pointLightDiffuse = (vec3s){{0.2f, 0.2f, 0.2f}};
-    vec3s pointLightSpecular = (vec3s){{1.0f, 1.0f, 1.0f}};
-    float pointLightIntensity = 1;
-    float pointLightDistance = 10;
-    float pointLightDecay = 1.5f;
-    MaterialProperty *matPropertyPointLightPos = materialPropertyCreate(
-        "pointLight.position", MATTYPE_VEC3, (void *)&pointLightPos);
-    MaterialProperty *matPropertyPointLightAmbient = materialPropertyCreate(
-        "pointLight.ambient", MATTYPE_VEC3, (void *)&pointLightAmbient);
-    MaterialProperty *matPropertyPointLightDiffuse = materialPropertyCreate(
-        "pointLight.diffuse", MATTYPE_VEC3, (void *)&pointLightDiffuse);
-    MaterialProperty *matPropertyPointLightSpecular = materialPropertyCreate(
-        "pointLight.specular", MATTYPE_VEC3, (void *)&pointLightSpecular);
-    MaterialProperty *matPropertyPointLightIntensity = materialPropertyCreate(
-        "pointLight.intensity", MATTYPE_FLOAT, (void *)&pointLightIntensity);
-    MaterialProperty *matPropertyPointLightDistance = materialPropertyCreate(
-        "pointLight.distance", MATTYPE_FLOAT, (void *)&pointLightDistance);
-    MaterialProperty *matPropertyPointLightDecay = materialPropertyCreate(
-        "pointLight.decay", MATTYPE_FLOAT, (void *)&pointLightDecay);
-    vec3s directionalLightDir =
-        glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}}));
-    vec3s directionalLightAmbient = (vec3s){{0, 0, 0}};
-    vec3s directionalLightDiffuse = (vec3s){{0.694f, 0.5f, 0.05f}};
-    vec3s directionalLightSpecular = (vec3s){{0.7f, 0.7f, 0.7f}};
-    MaterialProperty *matPropertyDirectionalLightDir =
-        materialPropertyCreate("directionalLight.direction", MATTYPE_VEC3,
-                               (void *)&directionalLightDir);
-    MaterialProperty *matPropertyDirectionalLightAmbient =
-        materialPropertyCreate("directionalLight.ambient", MATTYPE_VEC3,
-                               (void *)&directionalLightAmbient);
-    MaterialProperty *matPropertyDirectionalLightDiffuse =
-        materialPropertyCreate("directionalLight.diffuse", MATTYPE_VEC3,
-                               (void *)&directionalLightDiffuse);
-    MaterialProperty *matPropertyDirectionalLightSpecular =
-        materialPropertyCreate("directionalLight.specular", MATTYPE_VEC3,
-                               (void *)&directionalLightSpecular);
+    // set up light ubo
+    glGenBuffers(1, &lightsUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 64 * 1 + 76 * 1, NULL, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightsUBO);
+
+    struct DirectionalLight *directionalLight =
+        malloc(sizeof(struct DirectionalLight));
+    *directionalLight = (struct DirectionalLight){
+        .direction =
+            glms_vec4_normalize(glms_vec4_negate((vec4s){{-3, -4, 7}})),
+        .ambient = (vec4s){{0, 0, 0}},
+        .diffuse = (vec4s){{0.694f, 0.5f, 0.05f}},
+        .specular = (vec4s){{0.7f, 0.7f, 0.7f}},
+    };
+    struct PointLight *pointLight = malloc(sizeof(struct PointLight));
+    *pointLight = (struct PointLight){
+        .position = (vec4s){{-2.2f, 1.2f, -0.6f}},
+        .ambient = (vec4s){{0.1f, 0.1f, 0.1f}},
+        .diffuse = (vec4s){{0.2f, 0.2f, 0.2f}},
+        .specular = (vec4s){{1.0f, 1.0f, 1.0f}},
+        .intensity = 1,
+        .distance = 10,
+        .decay = 1.5f,
+    };
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, directionalLight);
+    glBufferSubData(GL_UNIFORM_BUFFER, 64, 76, pointLight);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
-    Model *pointLight = modelLoad("light.glb", 0);
-    pointLight->Materials[0] =
+    Model *pointLightModel = modelLoad("light.glb", 0);
+    pointLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
-                                              (void *)&pointLightDiffuse));
-    pointLight->WorldFromModel =
-        glms_translate(GLMS_MAT4_IDENTITY, pointLightPos);
+                                              (void *)&pointLight->diffuse));
+    pointLightModel->WorldFromModel =
+        glms_translate(GLMS_MAT4_IDENTITY, glms_vec3(pointLight->position));
 
-    Model *directionalLight = modelLoad("arrow.glb", 0);
-    directionalLight->Materials[0] = materialCreate(
+    Model *directionalLightModel = modelLoad("arrow.glb", 0);
+    directionalLightModel->Materials[0] = materialCreate(
         lightShader, 1,
         materialPropertyCreate("diffuse", MATTYPE_VEC3,
-                               (void *)&directionalLightDiffuse));
+                               (void *)&directionalLight->diffuse));
     vec3s startAxis = (vec3s){{1, 0, 0}};
-    float angle = acos(glms_vec3_dot(startAxis, directionalLightDir));
-    vec3s axis = glms_vec3_cross(startAxis, directionalLightDir);
-    directionalLight->WorldFromModel =
+    float angle =
+        acos(glms_vec3_dot(startAxis, glms_vec3(directionalLight->direction)));
+    vec3s axis =
+        glms_vec3_cross(startAxis, glms_vec3(directionalLight->direction));
+    directionalLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
@@ -115,29 +126,6 @@ int main(void) {
         modelLoad("BrainStem.glb", MODELOPTS_IMPORT_MATERIALS);
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightPos);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightAmbient);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightDiffuse);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightSpecular);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightIntensity);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightDistance);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyPointLightDecay);
-
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyDirectionalLightDir);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyDirectionalLightAmbient);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyDirectionalLightDiffuse);
-        materialAddProperty(skinningModel->Materials[i],
-                            matPropertyDirectionalLightSpecular);
     }
     skinningModel->WorldFromModel = glms_translate(
         glms_scale(glms_rotate_x(glms_rotate_z(GLMS_MAT4_IDENTITY, glm_rad(90)),
@@ -149,13 +137,7 @@ int main(void) {
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     Model *homeModel = modelLoad("home.glb", 0);
-    homeModel->Materials[0] = materialCreate(
-        homeShader, 10, matPropertyPointLightPos, matPropertyPointLightAmbient,
-        matPropertyPointLightDiffuse, matPropertyPointLightSpecular,
-        matPropertyPointLightIntensity, matPropertyPointLightDistance,
-        matPropertyPointLightDecay, matPropertyDirectionalLightDir,
-        matPropertyDirectionalLightAmbient, matPropertyDirectionalLightDiffuse,
-        matPropertyDirectionalLightSpecular);
+    homeModel->Materials[0] = materialCreate(homeShader, 0);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     const int TexturedBoxCount = 7;
@@ -165,17 +147,10 @@ int main(void) {
     for (int i = 0; i < TexturedBoxCount; i++) {
         texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
         texturedBoxes[i]->Materials[0] = materialCreate(
-            texturedShader, 11,
+            texturedShader, 1,
             materialPropertyCreate("_diffuseTex", MATTYPE_TEXTURE2D,
                                    (void *)materialTextureDataCreate(
-                                       texturedBoxes[i]->Textures[0], 0)),
-            matPropertyPointLightPos, matPropertyPointLightAmbient,
-            matPropertyPointLightDiffuse, matPropertyPointLightSpecular,
-            matPropertyPointLightIntensity, matPropertyPointLightDistance,
-            matPropertyPointLightDecay, matPropertyDirectionalLightDir,
-            matPropertyDirectionalLightAmbient,
-            matPropertyDirectionalLightDiffuse,
-            matPropertyDirectionalLightSpecular);
+                                       texturedBoxes[i]->Textures[0], 0)));
         modelSetDefaultMaterial(texturedBoxes[i],
                                 texturedBoxes[i]->Materials[0]);
         texturedBoxes[i]->WorldFromModel = glms_translate(
@@ -235,27 +210,34 @@ int main(void) {
 
         cameraPreRender(&camera);
 
-        pointLightPos.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
-        pointLightPos.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
-        pointLightPos.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
-        pointLightDiffuse.x =
+        glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, directionalLight);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, 76, pointLight);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        pointLight->position.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
+        pointLight->position.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
+        pointLight->position.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
+        pointLight->diffuse.x =
             (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        pointLightDiffuse.y =
+        pointLight->diffuse.y =
             (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        pointLightDiffuse.z =
+        pointLight->diffuse.z =
             (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        pointLight->WorldFromModel =
-            glms_translate(GLMS_MAT4_IDENTITY, pointLightPos);
-        modelSetNodeWorldMatrices(pointLight);
-        modelRender(pointLight);
+        pointLightModel->WorldFromModel =
+            glms_translate(GLMS_MAT4_IDENTITY, glms_vec3(pointLight->position));
+        modelSetNodeWorldMatrices(pointLightModel);
+        modelRender(pointLightModel);
 
         vec3s startAxis = (vec3s){{1, 0, 0}};
-        float angle = acos(glms_vec3_dot(startAxis, directionalLightDir));
-        vec3s axis = glms_vec3_cross(startAxis, directionalLightDir);
-        directionalLight->WorldFromModel =
+        float angle = acos(
+            glms_vec3_dot(startAxis, glms_vec3(directionalLight->direction)));
+        vec3s axis =
+            glms_vec3_cross(startAxis, glms_vec3(directionalLight->direction));
+        directionalLightModel->WorldFromModel =
             glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
-        modelSetNodeWorldMatrices(directionalLight);
-        modelRender(directionalLight);
+        modelSetNodeWorldMatrices(directionalLightModel);
+        modelRender(directionalLightModel);
 
         modelSetNodeWorldMatrices(skinningModel);
         armatureApplyTransformations(armature);
@@ -282,25 +264,14 @@ int main(void) {
         }
         materialFree(material);
     }
-    materialPropertyFree(matPropertyPointLightPos);
-    materialPropertyFree(matPropertyPointLightAmbient);
-    materialPropertyFree(matPropertyPointLightDiffuse);
-    materialPropertyFree(matPropertyPointLightSpecular);
-    materialPropertyFree(matPropertyPointLightIntensity);
-    materialPropertyFree(matPropertyPointLightDistance);
-    materialPropertyFree(matPropertyPointLightDecay);
-    materialPropertyFree(matPropertyDirectionalLightDir);
-    materialPropertyFree(matPropertyDirectionalLightAmbient);
-    materialPropertyFree(matPropertyDirectionalLightDiffuse);
-    materialPropertyFree(matPropertyDirectionalLightSpecular);
     materialFree(homeModel->Materials[0]);
-    materialPropertyFree(pointLight->Materials[0]->Properties[0]);
-    materialFree(pointLight->Materials[0]);
-    materialPropertyFree(directionalLight->Materials[0]->Properties[0]);
-    materialFree(directionalLight->Materials[0]);
+    materialPropertyFree(pointLightModel->Materials[0]->Properties[0]);
+    materialFree(pointLightModel->Materials[0]);
+    materialPropertyFree(directionalLightModel->Materials[0]->Properties[0]);
+    materialFree(directionalLightModel->Materials[0]);
     modelFree(skinningModel);
-    modelFree(pointLight);
-    modelFree(directionalLight);
+    modelFree(pointLightModel);
+    modelFree(directionalLightModel);
     modelFree(homeModel);
     for (int i = 0; i < TexturedBoxCount; i++) {
         materialTextureDataFree(
@@ -311,6 +282,10 @@ int main(void) {
     }
     free(texturedBoxes);
     armatureFree(armature);
+
+    glDeleteBuffers(1, &lightsUBO);
+    free(directionalLight);
+    free(pointLight);
 
     textureFreeCache();
     shaderFreeCache();

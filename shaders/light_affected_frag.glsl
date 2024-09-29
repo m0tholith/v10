@@ -21,25 +21,27 @@ struct material {
 uniform material _material = material(vec3(0.1f), vec3(1), vec3(1), 0, 0.1f);
 
 struct DirectionalLight {
-    vec3 direction;
+    vec4 direction;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
 };
 struct PointLight {
-    vec3 position;
+    vec4 position;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
 
     float intensity;
     float distance;
     float decay;
 };
-uniform PointLight pointLight;
-uniform DirectionalLight directionalLight;
+layout(std140, binding = 1) uniform Lights {
+    DirectionalLight directionalLight;
+    PointLight pointLight;
+};
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
@@ -74,19 +76,19 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular)
 }
 vec3 calc_point_light(PointLight light)
 {
-    vec3 lightDir = normalize(light.position - vPos);
-    vec3 ambient = light.ambient * _material.ambient;
-    vec3 diffuse = diffuse(lightDir, light.diffuse);
-    vec3 specular = specular(lightDir, light.specular);
+    vec3 lightDir = normalize(light.position.xyz - vPos);
+    vec3 ambient = light.ambient.xyz * _material.ambient;
+    vec3 diffuse = diffuse(lightDir, light.diffuse.xyz);
+    vec3 specular = specular(lightDir, light.specular.xyz);
 
     vec3 resultColor = diffuse + ambient + specular;
 
-    return resultColor * attenuation(light.position, light.distance, light.intensity, light.decay);
+    return resultColor * attenuation(light.position.xyz, light.distance, light.intensity, light.decay);
 }
 vec3 calc_directional_light(DirectionalLight light) {
-    vec3 ambient = light.ambient * _material.ambient;
-    vec3 diffuse = diffuse(light.direction, light.diffuse);
-    vec3 specular = specular(light.direction, light.specular);
+    vec3 ambient = light.ambient.xyz * _material.ambient;
+    vec3 diffuse = diffuse(light.direction.xyz, light.diffuse.xyz);
+    vec3 specular = specular(light.direction.xyz, light.specular.xyz);
 
     vec3 resultColor = diffuse + ambient + specular;
 
