@@ -80,6 +80,7 @@ void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
     glBindVertexArray(0);
 }
 void meshFree(struct Mesh *mesh) {
+    glDeleteBuffers(3, &mesh->VAO);
     free(mesh->Vertices);
     free(mesh->Indices);
     free(mesh);
