@@ -16,6 +16,7 @@ set(SRC_FILES
     src/node.c
     src/animation.c
     src/shader.c
+    src/light.c
     src/material.c
     src/texture.c
     src/stb_image.c

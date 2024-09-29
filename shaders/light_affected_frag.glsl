@@ -21,22 +21,25 @@ struct material {
 uniform material _material = material(vec3(0.1f), vec3(1), vec3(1), 0, 0.1f);
 
 struct DirectionalLight {
-    vec4 direction;
-
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
+
+    vec3 direction;
+    float _padding;
 };
 struct PointLight {
-    vec4 position;
-
-    vec4 ambient;
-    vec4 diffuse;
-    vec4 specular;
-
+    vec3 position;
     float intensity;
+
+    vec3 ambient;
     float distance;
+
+    vec3 diffuse;
     float decay;
+
+    vec3 specular;
+    float _padding;
 };
 layout(std140, binding = 1) uniform Lights {
     DirectionalLight directionalLight;

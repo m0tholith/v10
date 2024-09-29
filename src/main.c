@@ -1,17 +1,17 @@
-#include "armature.h"
-#include "texture.h"
 #include "window.h"
 #include <cglm/struct/affine-pre.h>
 #include <cglm/struct/affine.h>
 #include <cglm/struct/vec3.h>
 
+#include "animation.h"
+#include "armature.h"
 #include "camera.h"
 #include "input.h"
-
-#include "animation.h"
+#include "texture.h"
 #ifdef ENABLE_ERRORCHECKING
 #include "error.h"
 #endif
+#include "light.h"
 #include "material.h"
 #include "model.h"
 #include "shader.h"
@@ -22,26 +22,6 @@
 
 #define MOVE_SPEED 10.0f
 #define EVENT_COUNT 2
-
-struct DirectionalLight {
-    vec4s direction; // 16, 0, 16
-    vec4s ambient;   // 16, 16, 32
-    vec4s diffuse;   // 16, 32, 48
-    vec4s specular;  // 16, 48, 64
-};
-struct PointLight {
-    vec4s position; // 16, 64, 80
-    vec4s ambient;  // 16, 80, 96
-    vec4s diffuse;  // 16, 96, 112
-    vec4s specular; // 16, 112, 128
-
-    // 16, 128, 144
-    float intensity;
-    float distance;
-    float decay;
-    float padding;
-};
-uint32_t lightsUBO;
 
 GLFWwindow *window;
 
@@ -67,36 +47,15 @@ int main(void) {
     cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
     cameraLookAt(&camera, GLMS_VEC3_ZERO);
 
-    // set up light ubo
-    glGenBuffers(1, &lightsUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
-    glBufferData(GL_UNIFORM_BUFFER, 64 * 1 + 76 * 1, NULL, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightsUBO);
-
-    struct DirectionalLight *directionalLight =
-        malloc(sizeof(struct DirectionalLight));
-    *directionalLight = (struct DirectionalLight){
-        .direction =
-            glms_vec4_normalize(glms_vec4_negate((vec4s){{-3, -4, 7}})),
-        .ambient = (vec4s){{0, 0, 0}},
-        .diffuse = (vec4s){{0.694f, 0.5f, 0.05f}},
-        .specular = (vec4s){{0.7f, 0.7f, 0.7f}},
-    };
-    struct PointLight *pointLight = malloc(sizeof(struct PointLight));
-    *pointLight = (struct PointLight){
-        .position = (vec4s){{-2.2f, 1.2f, -0.6f}},
-        .ambient = (vec4s){{0.1f, 0.1f, 0.1f}},
-        .diffuse = (vec4s){{0.2f, 0.2f, 0.2f}},
-        .specular = (vec4s){{1.0f, 1.0f, 1.0f}},
-        .intensity = 1,
-        .distance = 10,
-        .decay = 1.5f,
-    };
-
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, directionalLight);
-    glBufferSubData(GL_UNIFORM_BUFFER, 64, 76, pointLight);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    DirectionalLight *dirLight = directionalLightCreate(
+        glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}})),
+        (vec3s){{0.0f, 0.0f, 0.0f}}, (vec3s){{0.694f, 0.5f, 0.05f}},
+        (vec3s){{0.7f, 0.7f, 0.7f}});
+    PointLight *pointLight = pointLightCreate(
+        (vec3s){{-2.2f, 1.2f, -0.6f}}, (vec3s){{0.1f, 0.1f, 0.1f}},
+        (vec3s){{0.2f, 0.2f, 0.2f}}, (vec3s){{1.0f, 1.0f, 1.0f}}, 1.0f, 10.0f,
+        1.5f);
+    LightScene *lightScene = lightSceneCreate(dirLight, pointLight);
 
     uint32_t lightShader =
         shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
@@ -104,20 +63,18 @@ int main(void) {
     pointLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
-                                              (void *)&pointLight->diffuse));
+                                              (void *)&pointLight->Diffuse));
     pointLightModel->WorldFromModel =
-        glms_translate(GLMS_MAT4_IDENTITY, glms_vec3(pointLight->position));
+        glms_translate(GLMS_MAT4_IDENTITY, pointLight->Position);
 
     Model *directionalLightModel = modelLoad("arrow.glb", 0);
-    directionalLightModel->Materials[0] = materialCreate(
-        lightShader, 1,
-        materialPropertyCreate("diffuse", MATTYPE_VEC3,
-                               (void *)&directionalLight->diffuse));
+    directionalLightModel->Materials[0] =
+        materialCreate(lightShader, 1,
+                       materialPropertyCreate("diffuse", MATTYPE_VEC3,
+                                              (void *)&dirLight->Diffuse));
     vec3s startAxis = (vec3s){{1, 0, 0}};
-    float angle =
-        acos(glms_vec3_dot(startAxis, glms_vec3(directionalLight->direction)));
-    vec3s axis =
-        glms_vec3_cross(startAxis, glms_vec3(directionalLight->direction));
+    float angle = acos(glms_vec3_dot(startAxis, dirLight->Direction));
+    vec3s axis = glms_vec3_cross(startAxis, dirLight->Direction);
     directionalLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
     uint32_t skinningShader =
@@ -208,32 +165,26 @@ int main(void) {
 
         lastTime = currentTime;
 
+        pointLight->Position.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
+        pointLight->Position.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
+        pointLight->Position.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
+        pointLight->Diffuse.x =
+            (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        pointLight->Diffuse.y =
+            (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        pointLight->Diffuse.z =
+            (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        lightScenePrerender(lightScene);
         cameraPreRender(&camera);
 
-        glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, directionalLight);
-        glBufferSubData(GL_UNIFORM_BUFFER, 64, 76, pointLight);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        pointLight->position.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
-        pointLight->position.y = sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
-        pointLight->position.z = sinf(currentTime * M_PI * 1.3f) * 2.8f + -1.2f;
-        pointLight->diffuse.x =
-            (sinf(currentTime * M_PI / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        pointLight->diffuse.y =
-            (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
-        pointLight->diffuse.z =
-            (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         pointLightModel->WorldFromModel =
-            glms_translate(GLMS_MAT4_IDENTITY, glms_vec3(pointLight->position));
+            glms_translate(GLMS_MAT4_IDENTITY, pointLight->Position);
         modelSetNodeWorldMatrices(pointLightModel);
         modelRender(pointLightModel);
 
         vec3s startAxis = (vec3s){{1, 0, 0}};
-        float angle = acos(
-            glms_vec3_dot(startAxis, glms_vec3(directionalLight->direction)));
-        vec3s axis =
-            glms_vec3_cross(startAxis, glms_vec3(directionalLight->direction));
+        float angle = acos(glms_vec3_dot(startAxis, dirLight->Direction));
+        vec3s axis = glms_vec3_cross(startAxis, dirLight->Direction);
         directionalLightModel->WorldFromModel =
             glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
         modelSetNodeWorldMatrices(directionalLightModel);
@@ -283,9 +234,9 @@ int main(void) {
     free(texturedBoxes);
     armatureFree(armature);
 
-    glDeleteBuffers(1, &lightsUBO);
-    free(directionalLight);
-    free(pointLight);
+    pointLightFree(pointLight);
+    directionalLightFree(dirLight);
+    lightSceneFree(lightScene);
 
     textureFreeCache();
     shaderFreeCache();
