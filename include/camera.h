@@ -7,9 +7,10 @@ typedef struct {
     vec3s Position;
     versors Quaternion;
     mat4s ViewFromWorldMatrix;
+    uint32_t MatricesUBO;
 } Camera;
 
-Camera cameraCreate(vec3s position, versors quaternion);
+Camera *cameraCreate(vec3s position, versors quaternion);
 void cameraSetProjectionMatrixPersp(Camera *camera, float fov, float nearPlane,
                                     float farPlane);
 /// @param float x: the width of the viewport in world units
@@ -22,5 +23,6 @@ void cameraLookAt(Camera *camera, vec3s target);
 void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles);
 void cameraSetQuaternion(Camera *camera, versors quaternion);
 void cameraPreRender(Camera *camera);
+void cameraFree(Camera *camera);
 
 #endif // !CAMERA_H

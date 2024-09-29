@@ -11,15 +11,22 @@
 #define Y_AXIS ((vec3s){{0.0f, 1.0f, 0.0f}})
 #define Z_AXIS ((vec3s){{0.0f, 0.0f, 1.0f}})
 
-uint32_t matricesUBO = 0;
-bool createdMatricesUBO = false;
-
-Camera cameraCreate(vec3s position, versors quaternion) {
-    Camera camera = (Camera){
+Camera *cameraCreate(vec3s position, versors quaternion) {
+    Camera *camera = malloc(sizeof(Camera));
+    *camera = (Camera){
         .Position = position,
         .Quaternion = quaternion,
     };
-    cameraCalculateViewMatrix(&camera);
+
+    glGenBuffers(1, &camera->MatricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
+    // mat4 _projectionFromWorld -> 64 => 0
+    // vec3 _cameraWorldPosition -> 16 => 64
+    glBufferData(GL_UNIFORM_BUFFER, 64 + 16, NULL, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera->MatricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    cameraCalculateViewMatrix(camera);
     return camera;
 }
 void cameraSetProjectionMatrixPersp(Camera *camera, float fov, float nearPlane,
@@ -68,23 +75,15 @@ void cameraPreRender(Camera *camera) {
     CameraPosition = camPosPrev = camera->Position;
     camRotPrev = camera->Quaternion;
 
-    if (!createdMatricesUBO) {
-        createdMatricesUBO = true;
-
-        glGenBuffers(1, &matricesUBO);
-        glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-
-        // mat4 _projectionFromWorld -> 64 => 0
-        // vec3 _cameraWorldPosition -> 16 => 64
-        glBufferData(GL_UNIFORM_BUFFER, 64 + 16, NULL, GL_DYNAMIC_DRAW);
-        glBindBufferBase(GL_UNIFORM_BUFFER, 0, matricesUBO);
-    } else
-        glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
-
+    glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
     mat4s projectionFromWorld =
         glms_mul(ProjectionFromViewMatrix, ViewFromWorldMatrix);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, &projectionFromWorld);
     glBufferSubData(GL_UNIFORM_BUFFER, 64, 16, CameraPosition.raw);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+void cameraFree(Camera *camera) {
+    glDeleteBuffers(1, &camera->MatricesUBO);
+    free(camera);
 }

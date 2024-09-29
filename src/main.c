@@ -43,9 +43,9 @@ int main(void) {
     errorInit();
 #endif
 
-    Camera camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
-    cameraSetProjectionMatrixPersp(&camera, 60, 0.1f, 100.0f);
-    cameraLookAt(&camera, GLMS_VEC3_ZERO);
+    Camera *camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
+    cameraSetProjectionMatrixPersp(camera, 60, 0.1f, 100.0f);
+    cameraLookAt(camera, GLMS_VEC3_ZERO);
 
     DirectionalLight *dirLight = directionalLightCreate(
         glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}})),
@@ -144,7 +144,7 @@ int main(void) {
             eulerAngles,
             (vec3s){{-mouseDelta.y * mouseSensitivity.x * deltaTime,
                      -mouseDelta.x * mouseSensitivity.y * deltaTime, 0}});
-        cameraSetEulerAngles(&camera, eulerAngles);
+        cameraSetEulerAngles(camera, eulerAngles);
 
         movementInput = (vec3s){{
             glm_clamp(movementEvent->State & (1 << 0), -1, 1) -
@@ -155,13 +155,13 @@ int main(void) {
                 glm_clamp(movementEvent->State & (1 << 5), -1, 1),
         }};
         positionDelta = (vec3s){{movementInput.x, 0, -movementInput.z}};
-        positionDelta = glms_quat_rotatev(camera.Quaternion, positionDelta);
+        positionDelta = glms_quat_rotatev(camera->Quaternion, positionDelta);
         positionDelta =
             glms_vec3_add(positionDelta, (vec3s){{0, movementInput.y, 0}});
-        camera.Position = glms_vec3_add(
-            camera.Position,
+        camera->Position = glms_vec3_add(
+            camera->Position,
             glms_vec3_scale(positionDelta, MOVE_SPEED * deltaTime));
-        cameraCalculateViewMatrix(&camera);
+        cameraCalculateViewMatrix(camera);
 
         lastTime = currentTime;
 
@@ -175,7 +175,7 @@ int main(void) {
         pointLight->Diffuse.z =
             (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         lightScenePrerender(lightScene);
-        cameraPreRender(&camera);
+        cameraPreRender(camera);
 
         pointLightModel->WorldFromModel =
             glms_translate(GLMS_MAT4_IDENTITY, pointLight->Position);
@@ -242,6 +242,8 @@ int main(void) {
     shaderFreeCache();
 
     windowClose();
+
+    cameraFree(camera);
 
     freeInputEventArray(events);
     return 0;
