@@ -58,8 +58,8 @@ struct SpotLight {
     float outerCutoff;
 };
 const int DirLightsMax = 1;
-const int PointLightsMax = 2;
-const int SpotLightsMax = 2;
+const int PointLightsMax = 8;
+const int SpotLightsMax = 8;
 layout(std140, binding = 1) uniform Lights {
     DirectionalLight[DirLightsMax] directionalLights;
     PointLight[PointLightsMax] pointLights;
