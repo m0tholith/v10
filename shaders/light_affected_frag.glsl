@@ -41,20 +41,51 @@ struct PointLight {
     vec3 specular;
     float _padding;
 };
+struct SpotLight {
+    vec3 position;
+    float intensity;
+
+    vec3 ambient;
+    float distance;
+
+    vec3 diffuse;
+    float decay;
+
+    vec3 specular;
+    float innerCutoff;
+
+    vec3 direction;
+    float outerCutoff;
+};
+const int DirLightsMax = 1;
+const int PointLightsMax = 2;
+const int SpotLightsMax = 2;
 layout(std140, binding = 1) uniform Lights {
-    DirectionalLight directionalLight;
-    PointLight pointLight;
+    DirectionalLight[DirLightsMax] directionalLights;
+    PointLight[PointLightsMax] pointLights;
+    SpotLight[SpotLightsMax] spotLights;
 };
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
 vec3 specular(vec3 lightDir, vec3 lightSpecular);
+vec3 calc_spot_light(SpotLight light);
 vec3 calc_point_light(PointLight light);
 vec3 calc_directional_light(DirectionalLight light);
 
 void main()
 {
-    FragColor = vec4(calc_point_light(pointLight) + calc_directional_light(directionalLight), 1.0f);
+    vec3 totalColor = vec3(0);
+    for (int i = 0; i < DirLightsMax; i++) {
+        totalColor += calc_directional_light(directionalLights[i]);
+    }
+    for (int i = 0; i < PointLightsMax; i++) {
+        totalColor += calc_point_light(pointLights[i]);
+    }
+    for (int i = 0; i < SpotLightsMax; i++) {
+        totalColor += calc_spot_light(spotLights[i]);
+    }
+    FragColor = vec4(totalColor, 1.0f);
 }
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay)
@@ -76,6 +107,32 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular)
     float spec = pow(max(dot(vNormal, halfwayDir), 0.0f), pow(2, _material.shininess));
     vec3 specular = lightSpecular * spec * _material.specular * _material.specular_strength;
     return specular;
+}
+float ease(float x) {
+    return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
+}
+vec3 calc_spot_light(SpotLight light) {
+    vec3 lightDir = normalize(light.position.xyz - vPos);
+    vec3 ambient = light.ambient.xyz * _material.ambient;
+    float att = attenuation(light.position.xyz, light.distance, light.intensity, light.decay);
+
+    float angle = dot(lightDir, light.direction);
+    if (angle < light.outerCutoff)
+        return ambient * att;
+
+    vec3 diffuse = diffuse(lightDir, light.diffuse.xyz);
+    vec3 specular = specular(lightDir, light.specular.xyz);
+
+    vec3 resultColor = diffuse + specular;
+
+    float t;
+    if (light.innerCutoff == light.outerCutoff || angle > light.innerCutoff)
+        t = 1;
+    else
+        t = (angle - light.outerCutoff) / (light.innerCutoff - light.outerCutoff);
+    t = ease(t);
+
+    return (ambient + resultColor * t) * att;
 }
 vec3 calc_point_light(PointLight light)
 {

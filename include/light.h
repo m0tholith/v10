@@ -4,7 +4,6 @@
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
-#define DIRLIGHT_SIZE 64
 typedef struct {
     vec4s Ambient;
     vec4s Diffuse;
@@ -13,11 +12,9 @@ typedef struct {
     vec3s Direction;
     float __padding; // to complete a 16 byte block in uniform buffer
 } DirectionalLight;
-DirectionalLight *directionalLightCreate(vec3s direction, vec3s ambient,
-                                         vec3s diffuse, vec3s specular);
-void directionalLightFree(DirectionalLight *directionalLight);
+DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
+                                        vec3s diffuse, vec3s specular);
 
-#define POINTLIGHT_SIZE 64
 typedef struct {
     vec3s Position;
     float Intensity;
@@ -31,19 +28,45 @@ typedef struct {
     vec3s Specular;
     float __padding; // to complete a 16 byte block in uniform buffer
 } PointLight;
-PointLight *pointLightCreate(vec3s position, vec3s ambient, vec3s diffuse,
-                             vec3s specular, float intensity, float distance,
-                             float decay);
-void pointLightFree(PointLight *pointLight);
+PointLight pointLightCreate(vec3s position, vec3s ambient, vec3s diffuse,
+                            vec3s specular, float intensity, float distance,
+                            float decay);
 
 typedef struct {
-    DirectionalLight *DirectionalLight;
-    PointLight *PointLight;
+    vec3s Position;
+    float Intensity;
+
+    vec3s Ambient;
+    float Distance;
+
+    vec3s Diffuse;
+    float Decay;
+
+    vec3s Specular;
+    float InnerCutoff;
+
+    vec3s Direction;
+    float OuterCutoff;
+} SpotLight;
+SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s ambient,
+                          vec3s diffuse, vec3s specular, float intensity,
+                          float distance, float decay, float innerCutoffDeg,
+                          float outerCutoffDeg);
+void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
+                        float outerCutoffDeg);
+
+#define DIRLIGHTS_MAX 1
+#define POINTLIGHTS_MAX 2
+#define SPOTLIGHTS_MAX 2
+typedef struct {
+    DirectionalLight *DirectionalLights;
+    PointLight *PointLights;
+    SpotLight *SpotLights;
 
     uint32_t UBO;
 } LightScene;
-LightScene *lightSceneCreate(DirectionalLight *directionalLight,
-                             PointLight *pointLight);
+LightScene *lightSceneCreate(DirectionalLight *directionalLights,
+                             PointLight *pointLights, SpotLight *spotLights);
 void lightScenePrerender(LightScene *lightScene);
 void lightSceneFree(LightScene *lightScene);
 
