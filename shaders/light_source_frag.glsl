@@ -8,5 +8,5 @@ uniform vec3 diffuse;
 
 void main()
 {
-    FragColor = vec4(diffuse, 1.0f);
+    FragColor = vec4(diffuse * vColor, 1.0f);
 }

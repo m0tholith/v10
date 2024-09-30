@@ -93,6 +93,18 @@ int main(void) {
     vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
     directionalLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
+
+    Model *spotLightModel = modelLoad("flashlight.glb", 0);
+    spotLightModel->Materials[0] =
+        materialCreate(lightShader, 1,
+                       materialPropertyCreate("diffuse", MATTYPE_VEC3,
+                                              (void *)&spotLights[0].Diffuse));
+    angle = acos(glms_vec3_dot(startAxis, spotLights[0].Direction));
+    axis = glms_vec3_cross(startAxis, spotLights[0].Direction);
+    spotLightModel->WorldFromModel =
+        glms_rotate(glms_translate(GLMS_MAT4_IDENTITY, spotLights[0].Position),
+                    angle, axis);
+
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
     Model *skinningModel =
@@ -207,6 +219,9 @@ int main(void) {
             glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
         modelSetNodeWorldMatrices(directionalLightModel);
         modelRender(directionalLightModel);
+
+        modelSetNodeWorldMatrices(spotLightModel);
+        modelRender(spotLightModel);
 
         modelSetNodeWorldMatrices(skinningModel);
         armatureApplyTransformations(armature);
