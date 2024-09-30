@@ -30,6 +30,7 @@ PointLight *pointLightCreate(vec3s position, vec3s ambient, vec3s diffuse,
         .Ambient = ambient,
         .Distance = distance,
         .Diffuse = diffuse,
+        .Decay = decay,
         .Specular = specular,
     };
     return pointLight;
