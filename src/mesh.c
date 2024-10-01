@@ -1,11 +1,11 @@
 #include "mesh.h"
 
-#include "rendering.h"
-
 #include "glad/glad.h"
 #include <cglm/struct/mat3.h>
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
+
+uint64_t shaderOverride;
 
 struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount) {
@@ -68,8 +68,12 @@ void meshSendData(struct Mesh *mesh) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->IndexCount * sizeof(uint32_t),
                  mesh->Indices, GL_STATIC_DRAW);
 }
+void meshOverrideShaders(uint32_t shader) { shaderOverride = shader; }
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
-    glUseProgram(shader);
+    if (shaderOverride >= 0)
+        glUseProgram(shader);
+    else
+        glUseProgram(shaderOverride);
 
     glUniformMatrix4fv(glGetUniformLocation(shader, "_worldFromModel"), 1,
                        GL_FALSE, worldFromModel.raw[0]);

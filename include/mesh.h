@@ -30,6 +30,10 @@ struct Mesh {
 struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount);
 void meshSendData(struct Mesh *mesh);
+/// overrides all meshes' draw calls to use specific shader
+///
+/// set to -1 to remove override
+void meshOverrideShaders(uint32_t shader);
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader);
 void meshFree(struct Mesh *mesh);
 
