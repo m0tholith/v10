@@ -67,6 +67,8 @@ layout(std140, binding = 1) uniform Lights {
     SpotLight[SpotLightsMax] spotLights;
 };
 
+vec3 _diffuse;
+
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
 vec3 specular(vec3 lightDir, vec3 lightSpecular);
@@ -76,6 +78,7 @@ vec3 calc_directional_light(DirectionalLight light);
 
 void main()
 {
+    _diffuse = vec3(texture(_material.diffuse_tex, vTexCoord));
     vec3 totalColor = vec3(0);
     for (int i = 0; i < DirLightsMax; i++) {
         totalColor += calc_directional_light(directionalLights[i]);
@@ -98,7 +101,7 @@ float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, floa
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse)
 {
     float diffuseValue = max(dot((vNormal), lightDir), 0.0f);
-    vec3 diffuse = lightDiffuse * diffuseValue * _material.diffuse * vColor;
+    vec3 diffuse = lightDiffuse * diffuseValue * _material.diffuse * _diffuse * vColor;
     return diffuse;
 }
 vec3 specular(vec3 lightDir, vec3 lightSpecular)

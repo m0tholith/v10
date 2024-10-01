@@ -121,14 +121,14 @@ int main(void) {
 
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
-    Model *homeModel = modelLoad("home.glb", 0);
+    Model *homeModel = modelLoad("home.glb", MODELOPTS_IMPORT_MATERIALS);
     homeModel->Materials[0] = materialCreate(homeShader, 0);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
     uint32_t texturedShader = shaderCreate("light_affected_vert.glsl",
-                                           "light_affected_tex_frag.glsl");
+                                           "light_affected_frag.glsl");
     for (int i = 0; i < TexturedBoxCount; i++) {
         texturedBoxes[i] = modelLoad("BoxTextured.glb", MODELOPTS_IMPORT_MATERIALS);
         for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
