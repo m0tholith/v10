@@ -36,11 +36,11 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [X] directional light
     - [X] spot light
     - [X] dedicated lighting system
-    - [ ] shadows
+    - [ ] shadows `<------ WE ARE HERE`
 - [X] skinning
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
-    - [ ] texture importing `<------ WE ARE HERE`
+    - [X] texture importing
 - [ ] post processing
     - [ ] multi-aliasing
     - [ ] bloom
