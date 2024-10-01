@@ -107,8 +107,7 @@ int main(void) {
 
     uint32_t skinningShader =
         shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
-    Model *skinningModel =
-        modelLoad("BrainStem.glb", MODELOPTS_IMPORT_MATERIALS);
+    Model *skinningModel = modelLoad("BrainStem.glb", 0);
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
     }
@@ -121,7 +120,7 @@ int main(void) {
 
     uint32_t homeShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
-    Model *homeModel = modelLoad("home.glb", MODELOPTS_IMPORT_MATERIALS);
+    Model *homeModel = modelLoad("home.glb", 0);
     homeModel->Materials[0] = materialCreate(homeShader, 0);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
@@ -130,8 +129,7 @@ int main(void) {
     uint32_t texturedShader =
         shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     for (int i = 0; i < TexturedBoxCount; i++) {
-        texturedBoxes[i] =
-            modelLoad("BoxTextured.glb", MODELOPTS_IMPORT_MATERIALS);
+        texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
         for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
             texturedBoxes[i]->Materials[j]->Shader = texturedShader;
         }

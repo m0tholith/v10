@@ -62,7 +62,7 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                                            TEXTURETYPE_RGB, true);
     }
 
-    if (options & MODELOPTS_IMPORT_MATERIALS) {
+    if (!(options & MODELOPTS_DONT_IMPORT_MATERIALS)) {
         for (int i = 0; i < model->MaterialCount; i++) {
             struct aiMaterial *aiMat = scene->mMaterials[i];
             Material *material = materialCreate(0, 0);

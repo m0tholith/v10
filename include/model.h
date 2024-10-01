@@ -40,7 +40,7 @@ typedef struct {
 } Model;
 
 enum ModelLoadOptions {
-    MODELOPTS_IMPORT_MATERIALS = 1,
+    MODELOPTS_DONT_IMPORT_MATERIALS = 1,
 };
 
 /// manages rendering a 3d file. free with `modelFree`
