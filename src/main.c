@@ -74,7 +74,7 @@ int main(void) {
         lightSceneCreate(dirLights, pointLights, spotLights);
 
     uint32_t lightShader =
-        shaderCreate("light_source_vert.glsl", "light_source_frag.glsl");
+        shaderCreate("light_source.vert", "light_source.frag");
     Model *pointLightModel = modelLoad("light.glb", 0);
     pointLightModel->Materials[0] =
         materialCreate(lightShader, 1,
@@ -106,7 +106,7 @@ int main(void) {
                     angle, axis);
 
     uint32_t skinningShader =
-        shaderCreate("skinning_vert.glsl", "light_affected_frag.glsl");
+        shaderCreate("skinning.vert", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
@@ -119,7 +119,7 @@ int main(void) {
     Armature *armature = armatureCreate(skinningModel);
 
     uint32_t homeShader =
-        shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
+        shaderCreate("light_affected.vert", "light_affected.frag");
     Model *homeModel = modelLoad("home.glb", 0);
     homeModel->Materials[0] = materialCreate(homeShader, 0);
     modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
@@ -127,7 +127,7 @@ int main(void) {
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
     uint32_t texturedShader =
-        shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
+        shaderCreate("light_affected.vert", "light_affected.frag");
     for (int i = 0; i < TexturedBoxCount; i++) {
         texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
         for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
