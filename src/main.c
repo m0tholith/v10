@@ -127,10 +127,11 @@ int main(void) {
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
-    uint32_t texturedShader = shaderCreate("light_affected_vert.glsl",
-                                           "light_affected_frag.glsl");
+    uint32_t texturedShader =
+        shaderCreate("light_affected_vert.glsl", "light_affected_frag.glsl");
     for (int i = 0; i < TexturedBoxCount; i++) {
-        texturedBoxes[i] = modelLoad("BoxTextured.glb", MODELOPTS_IMPORT_MATERIALS);
+        texturedBoxes[i] =
+            modelLoad("BoxTextured.glb", MODELOPTS_IMPORT_MATERIALS);
         for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
             texturedBoxes[i]->Materials[j]->Shader = texturedShader;
         }
