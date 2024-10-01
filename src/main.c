@@ -130,14 +130,10 @@ int main(void) {
     uint32_t texturedShader = shaderCreate("light_affected_vert.glsl",
                                            "light_affected_tex_frag.glsl");
     for (int i = 0; i < TexturedBoxCount; i++) {
-        texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
-        texturedBoxes[i]->Materials[0] = materialCreate(
-            texturedShader, 1,
-            materialPropertyCreate("_diffuseTex", MATTYPE_TEXTURE2D,
-                                   (void *)materialTextureDataCreate(
-                                       texturedBoxes[i]->Textures[0], 0)));
-        modelSetDefaultMaterial(texturedBoxes[i],
-                                texturedBoxes[i]->Materials[0]);
+        texturedBoxes[i] = modelLoad("BoxTextured.glb", MODELOPTS_IMPORT_MATERIALS);
+        for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
+            texturedBoxes[i]->Materials[j]->Shader = texturedShader;
+        }
         texturedBoxes[i]->WorldFromModel = glms_translate(
             glms_rotate_y(GLMS_MAT4_IDENTITY, glm_rad(23)),
             (vec3s){{-1.7f + (float)i / ((TexturedBoxCount - 1) * 2), -4.0f + i,
@@ -242,7 +238,7 @@ int main(void) {
         Material *material = skinningModel->Materials[i];
         for (int j = 0; j < material->PropertyCount; j++) {
             MaterialProperty *property = material->Properties[j];
-            if (strncmp(property->Name, "_material", 9) == 0) {
+            if (strncmp(property->Name, "_material.", 9) == 0) {
                 materialPropertyDelete(property);
             }
         }
@@ -258,9 +254,6 @@ int main(void) {
     modelFree(directionalLightModel);
     modelFree(homeModel);
     for (int i = 0; i < TexturedBoxCount; i++) {
-        materialTextureDataFree(
-            texturedBoxes[i]->Materials[0]->Properties[0]->Data);
-        materialPropertyFree(texturedBoxes[i]->Materials[0]->Properties[0]);
         materialFree(texturedBoxes[i]->Materials[0]);
         modelFree(texturedBoxes[i]);
     }

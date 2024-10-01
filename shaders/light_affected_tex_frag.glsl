@@ -17,8 +17,9 @@ struct material {
     vec3 specular;
     float shininess;
     float specular_strength;
+    sampler2D diffuse_tex;
 };
-uniform material _material = material(vec3(0.1f), vec3(1), vec3(1), 0, 0.1f);
+uniform material _material;
 
 struct DirectionalLight {
     vec4 ambient;
@@ -66,7 +67,6 @@ layout(std140, binding = 1) uniform Lights {
     SpotLight[SpotLightsMax] spotLights;
 };
 
-uniform sampler2D _diffuseTex;
 vec3 _diffuse;
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
@@ -78,7 +78,7 @@ vec3 calc_directional_light(DirectionalLight light);
 
 void main()
 {
-    _diffuse = vec3(texture(_diffuseTex, vTexCoord));
+    _diffuse = vec3(texture(_material.diffuse_tex, vTexCoord));
     vec3 totalColor = vec3(0);
     for (int i = 0; i < DirLightsMax; i++) {
         totalColor += calc_directional_light(directionalLights[i]);

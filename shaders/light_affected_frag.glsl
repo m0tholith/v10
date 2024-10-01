@@ -17,8 +17,9 @@ struct material {
     vec3 specular;
     float shininess;
     float specular_strength;
+    sampler2D diffuse_tex;
 };
-uniform material _material = material(vec3(0.1f), vec3(1), vec3(1), 0, 0.1f);
+uniform material _material;
 
 struct DirectionalLight {
     vec4 ambient;
