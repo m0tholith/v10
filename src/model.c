@@ -149,7 +149,7 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                         "_material.diffuse_tex", MATTYPE_TEXTURE2D,
                         (void *)materialTextureDataCreate(texture, 0)));
             } else {
-                texture = textureCreate("default.jpg", TEXTURETYPE_RGB, 0);
+                texture = textureCreate(TEXTURE_DEFAULT, TEXTURETYPE_RGB, 0);
                 materialAddProperty(
                     material,
                     materialPropertyCreate(

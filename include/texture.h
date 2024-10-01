@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define TEXTURES_PATH "textures/"
+#define TEXTURE_DEFAULT "default.jpg"
 
 /// defines the encoding of the image (used for transparency in shaders)
 enum TEXTURETYPE {
