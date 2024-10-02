@@ -69,20 +69,20 @@ void errorHandle(GLenum source, GLenum type, GLuint id, GLenum severity,
     }
     switch (severity) {
     case GL_DEBUG_SEVERITY_NOTIFICATION:
-        printf("GL notification from %s (type %s):\n	%s\n", sourceString,
-               typeString, message);
+        fprintf(stderr, "GL notification from %s (type %s):\n	%s\n",
+                sourceString, typeString, message);
         break;
     case GL_DEBUG_SEVERITY_LOW:
-        printf("GL low severity from %s (type %s):\n	%s\n", sourceString,
-               typeString, message);
+        fprintf(stderr, "GL low severity from %s (type %s):\n	%s\n",
+                sourceString, typeString, message);
         break;
     case GL_DEBUG_SEVERITY_MEDIUM:
-        printf("GL medium severity from %s (type %s):\n	%s\n", sourceString,
-               typeString, message);
+        fprintf(stderr, "GL medium severity from %s (type %s):\n	%s\n",
+                sourceString, typeString, message);
         break;
     case GL_DEBUG_SEVERITY_HIGH:
-        printf("GL high severity from %s (type %s):\n	%s\n", sourceString,
-               typeString, message);
+        fprintf(stderr, "GL high severity from %s (type %s):\n	%s\n",
+                sourceString, typeString, message);
         break;
     default:
         break;
