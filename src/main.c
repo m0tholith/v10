@@ -179,6 +179,16 @@ int main(void) {
                                 depthProperty);
         }
     }
+    mat4s lightProjectionFromViewMatrix =
+        glms_ortho(-10, 10, -10, 10, -100, 100);
+    mat4s lightViewFromWorldMatrix =
+        glms_lookat(dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
+    mat4s lightProjectionFromWorld =
+        glms_mul(lightProjectionFromViewMatrix, lightViewFromWorldMatrix);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, &lightProjectionFromWorld);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     //
 
     glEnable(GL_CULL_FACE);
@@ -245,19 +255,10 @@ int main(void) {
         cameraPreRender(camera);
 
         //
+        meshOverrideShaders(depthShader);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
-        mat4s lightProjectionFromViewMatrix = glms_ortho(-50, 50, -50, 50, -100, 100);
-        mat4s lightViewFromWorldMatrix = glms_lookat(
-            dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
-        mat4s projectionFromWorld =
-            glms_mul(lightProjectionFromViewMatrix, lightViewFromWorldMatrix);
-        glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, &projectionFromWorld);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        meshOverrideShaders(depthShader);
 
         ///
         pointLightModel->WorldFromModel =
@@ -288,11 +289,11 @@ int main(void) {
             modelRender(texturedBoxes[i]);
         }
         ///
-        meshOverrideShaders(-1);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         glActiveTexture(GL_TEXTURE10);
         glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+        meshOverrideShaders(-1);
         //
 
         pointLightModel->WorldFromModel =

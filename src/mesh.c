@@ -5,7 +5,7 @@
 #include <cglm/struct/mat4.h>
 #include <stdlib.h>
 
-uint64_t shaderOverride;
+int64_t shaderOverride;
 
 struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount) {
@@ -68,9 +68,9 @@ void meshSendData(struct Mesh *mesh) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->IndexCount * sizeof(uint32_t),
                  mesh->Indices, GL_STATIC_DRAW);
 }
-void meshOverrideShaders(uint32_t shader) { shaderOverride = shader; }
+void meshOverrideShaders(int64_t shader) { shaderOverride = shader; }
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
-    if (shaderOverride >= 0)
+    if (shaderOverride < 0)
         glUseProgram(shader);
     else
         glUseProgram(shaderOverride);

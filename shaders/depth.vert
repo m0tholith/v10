@@ -12,5 +12,5 @@ uniform mat4 _worldFromModel;
 
 void main()
 {
-    gl_Position = _projectionFromWorld * _worldFromModel * vec4(aPos, 1.0);
+    gl_Position = _lightSpaceProjectionFromWorld * _worldFromModel * vec4(aPos, 1.0);
 }

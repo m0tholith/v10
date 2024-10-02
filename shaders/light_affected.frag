@@ -76,7 +76,7 @@ vec3 _diffuse;
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
 vec3 specular(vec3 lightDir, vec3 lightSpecular);
-float shadow(vec4 lightSpacePos);
+float shadow(vec4 lightSpacePos, float bias);
 vec3 calc_spot_light(SpotLight light);
 vec3 calc_point_light(PointLight light);
 vec3 calc_directional_light(DirectionalLight light);
@@ -120,13 +120,13 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular)
 float ease(float x) {
     return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
 }
-float shadow(vec4 lightSpacePos) {
+float shadow(vec4 lightSpacePos, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5f + vec3(0.5f);
 
     float closestDepth = texture(shadowMap, projectionCoords.xy).r;
     float currentDepth = projectionCoords.z;
-    float shadow = currentDepth > closestDepth ? 1.0f : 0.0f;
+    float shadow = currentDepth - bias < closestDepth ? 1.0f : 0.0f;
 
     return shadow;
 }
@@ -171,5 +171,5 @@ vec3 calc_directional_light(DirectionalLight light) {
 
     vec3 resultColor = diffuse + specular;
 
-    return ambient + resultColor * shadow(vLightSpacePos);
+    return ambient + resultColor * shadow(vLightSpacePos, 0.005f);
 }
