@@ -262,7 +262,7 @@ int main(void) {
 
         lastTime = currentTime;
 
-        lightScenePrerender(lightScene);
+        lightScenePreRender(lightScene);
         cameraPreRender(camera);
 
         //

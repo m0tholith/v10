@@ -67,7 +67,7 @@ typedef struct {
 } LightScene;
 LightScene *lightSceneCreate(DirectionalLight *directionalLights,
                              PointLight *pointLights, SpotLight *spotLights);
-void lightScenePrerender(LightScene *lightScene);
+void lightScenePreRender(LightScene *lightScene);
 void lightSceneFree(LightScene *lightScene);
 
 #endif // !LIGHT_H

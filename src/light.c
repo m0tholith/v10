@@ -80,7 +80,7 @@ LightScene *lightSceneCreate(DirectionalLight *directionalLights,
 
     return lightScene;
 }
-void lightScenePrerender(LightScene *lightScene) {
+void lightScenePreRender(LightScene *lightScene) {
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0,
                     DIRLIGHTS_MAX * sizeof(DirectionalLight),
