@@ -166,19 +166,19 @@ int main(void) {
     uint32_t depthSkinningShader =
         shaderCreate("depth_skinning.vert", "depth.frag");
 
-    MaterialProperty *depthProperty = materialPropertyCreate(
+    MaterialProperty *shadowMapProperty = materialPropertyCreate(
         "shadowMap", MATTYPE_TEXTURE2D,
         materialTextureDataCreate((Texture *)&depthMapTexture, 10));
     for (int i = 0; i < homeModel->MaterialCount; i++) {
-        materialAddProperty(homeModel->Materials[i], depthProperty);
+        materialAddProperty(homeModel->Materials[i], shadowMapProperty);
     }
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
-        materialAddProperty(skinningModel->Materials[i], depthProperty);
+        materialAddProperty(skinningModel->Materials[i], shadowMapProperty);
     }
     for (int boxId = 0; boxId < TexturedBoxCount; boxId++) {
         for (int i = 0; i < texturedBoxes[boxId]->MaterialCount; i++) {
             materialAddProperty(texturedBoxes[boxId]->Materials[i],
-                                depthProperty);
+                                shadowMapProperty);
         }
     }
     mat4s lightProjectionFromViewMatrix =
