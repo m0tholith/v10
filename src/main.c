@@ -163,6 +163,8 @@ int main(void) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     uint32_t depthShader = shaderCreate("depth.vert", "depth.frag");
+    uint32_t depthSkinningShader =
+        shaderCreate("depth_skinning.vert", "depth.frag");
 
     MaterialProperty *depthProperty = materialPropertyCreate(
         "shadowMap", MATTYPE_TEXTURE2D,
@@ -277,9 +279,15 @@ int main(void) {
         modelSetNodeWorldMatrices(spotLightModel);
         modelRender(spotLightModel);
 
+        meshOverrideShaders(depthSkinningShader);
         modelSetNodeWorldMatrices(skinningModel);
         armatureApplyTransformations(armature);
+        glUseProgram(depthSkinningShader);
+        glUniformMatrix4fv(
+            glGetUniformLocation(depthSkinningShader, "_boneTransformations"),
+            MAX_BONES, GL_FALSE, (void *)&armature->BoneTransformations);
         modelRender(skinningModel);
+        meshOverrideShaders(depthShader);
 
         modelSetNodeWorldMatrices(homeModel);
         modelRender(homeModel);
