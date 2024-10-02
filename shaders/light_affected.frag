@@ -126,7 +126,9 @@ float shadow(vec4 lightSpacePos, float bias) {
 
     float closestDepth = texture(shadowMap, projectionCoords.xy).r;
     float currentDepth = projectionCoords.z;
-    float shadow = currentDepth - bias < closestDepth ? 1.0f : 0.0f;
+    float shadow = currentDepth - bias > closestDepth ? 0.0f : 1.0f;
+    if (projectionCoords.z > 1.0f)
+        shadow = 0.0f;
 
     return shadow;
 }
