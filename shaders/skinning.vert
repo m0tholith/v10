@@ -11,9 +11,11 @@ out vec3 vColor;
 out vec2 vTexCoord;
 out vec3 vNormal;
 out vec3 vPos;
+out vec4 vLightSpacePos;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
+    mat4 _lightSpaceProjectionFromWorld;
     vec3 _cameraWorldPosition;
 };
 uniform mat4 _worldFromModel;
@@ -46,6 +48,7 @@ void main() {
     vTexCoord = vertTexCoord;
     vNormal = normalize(_worldNormalFromModel * normal);
     vPos = vec3(_worldFromModel * position);
+    vLightSpacePos = _lightSpaceProjectionFromWorld * vec4(vPos, 1.0f);
 
     gl_Position = _projectionFromModel * position;
 }

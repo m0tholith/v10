@@ -21,8 +21,9 @@ Camera *cameraCreate(vec3s position, versors quaternion) {
     glGenBuffers(1, &camera->MatricesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
     // mat4 _projectionFromWorld -> 64 => 0
+    // mat4 _lightSpaceProjectionFromWorld -> 64 => 0
     // vec3 _cameraWorldPosition -> 16 => 64
-    glBufferData(GL_UNIFORM_BUFFER, 64 + 16, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 64 + 64 + 16, NULL, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, camera->MatricesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -79,7 +80,7 @@ void cameraPreRender(Camera *camera) {
     mat4s projectionFromWorld =
         glms_mul(ProjectionFromViewMatrix, ViewFromWorldMatrix);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, &projectionFromWorld);
-    glBufferSubData(GL_UNIFORM_BUFFER, 64, 16, CameraPosition.raw);
+    glBufferSubData(GL_UNIFORM_BUFFER, 64 * 2, 16, CameraPosition.raw);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

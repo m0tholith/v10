@@ -4,11 +4,13 @@ in vec3 vColor;
 in vec2 vTexCoord;
 in vec3 vNormal;
 in vec3 vPos;
+in vec4 vLightSpacePos;
 
 out vec4 FragColor;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
+    mat4 _lightSpaceProjectionFromWorld;
     vec3 _cameraWorldPosition;
 };
 struct material {
@@ -67,11 +69,14 @@ layout(std140, binding = 1) uniform Lights {
     SpotLight[SpotLightsMax] spotLights;
 };
 
+uniform sampler2D shadowMap;
+
 vec3 _diffuse;
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
 vec3 specular(vec3 lightDir, vec3 lightSpecular);
+float shadow(vec4 lightSpacePos);
 vec3 calc_spot_light(SpotLight light);
 vec3 calc_point_light(PointLight light);
 vec3 calc_directional_light(DirectionalLight light);
@@ -115,6 +120,16 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular)
 float ease(float x) {
     return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
 }
+float shadow(vec4 lightSpacePos) {
+    vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projectionCoords = projectionCoords * 0.5f + vec3(0.5f);
+
+    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
+    float currentDepth = projectionCoords.z;
+    float shadow = currentDepth > closestDepth ? 1.0f : 0.0f;
+
+    return shadow;
+}
 vec3 calc_spot_light(SpotLight light) {
     vec3 lightDir = normalize(light.position.xyz - vPos);
     vec3 ambient = light.ambient.xyz * _material.ambient;
@@ -154,7 +169,7 @@ vec3 calc_directional_light(DirectionalLight light) {
     vec3 diffuse = diffuse(light.direction.xyz, light.diffuse.xyz);
     vec3 specular = specular(light.direction.xyz, light.specular.xyz);
 
-    vec3 resultColor = diffuse + ambient + specular;
+    vec3 resultColor = diffuse + specular;
 
-    return resultColor;
+    return ambient + resultColor * shadow(vLightSpacePos);
 }

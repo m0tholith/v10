@@ -1,7 +1,4 @@
 #include "window.h"
-#include <cglm/struct/affine-pre.h>
-#include <cglm/struct/affine.h>
-#include <cglm/struct/vec3.h>
 
 #include "animation.h"
 #include "armature.h"
@@ -16,6 +13,9 @@
 #include "model.h"
 #include "shader.h"
 
+#include <cglm/struct/affine-pre.h>
+#include <cglm/struct/affine.h>
+#include <cglm/struct/vec3.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -105,6 +105,13 @@ int main(void) {
         glms_rotate(glms_translate(GLMS_MAT4_IDENTITY, spotLights[0].Position),
                     angle, axis);
 
+    uint32_t homeShader =
+        shaderCreate("light_affected.vert", "light_affected.frag");
+    Model *homeModel = modelLoad("home.glb", 0);
+    for (int i = 0; i < homeModel->MaterialCount; i++) {
+        homeModel->Materials[i]->Shader = homeShader;
+    }
+
     uint32_t skinningShader =
         shaderCreate("skinning.vert", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
@@ -117,12 +124,6 @@ int main(void) {
                    (vec3s){{1.5f, 1.5f, 1.5f}}),
         (vec3s){{-3.0f, 0.0f, -1.4f}});
     Armature *armature = armatureCreate(skinningModel);
-
-    uint32_t homeShader =
-        shaderCreate("light_affected.vert", "light_affected.frag");
-    Model *homeModel = modelLoad("home.glb", 0);
-    homeModel->Materials[0] = materialCreate(homeShader, 0);
-    modelSetDefaultMaterial(homeModel, homeModel->Materials[0]);
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
@@ -138,6 +139,47 @@ int main(void) {
             (vec3s){{-1.7f + (float)i / ((TexturedBoxCount - 1) * 2), -4.0f + i,
                      -4.4f}});
     }
+
+    //
+    uint32_t depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+
+    const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    uint32_t depthMapTexture;
+    glGenTextures(1, &depthMapTexture);
+    glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH,
+                 SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                           depthMapTexture, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    uint32_t depthShader = shaderCreate("depth.vert", "depth.frag");
+
+    MaterialProperty *depthProperty = materialPropertyCreate(
+        "shadowMap", MATTYPE_TEXTURE2D,
+        materialTextureDataCreate((Texture *)&depthMapTexture, 10));
+    for (int i = 0; i < homeModel->MaterialCount; i++) {
+        materialAddProperty(homeModel->Materials[i], depthProperty);
+    }
+    for (int i = 0; i < skinningModel->MaterialCount; i++) {
+        materialAddProperty(skinningModel->Materials[i], depthProperty);
+    }
+    for (int boxId = 0; boxId < TexturedBoxCount; boxId++) {
+        for (int i = 0; i < texturedBoxes[boxId]->MaterialCount; i++) {
+            materialAddProperty(texturedBoxes[boxId]->Materials[i],
+                                depthProperty);
+        }
+    }
+    //
 
     glEnable(GL_CULL_FACE);
 
@@ -202,6 +244,22 @@ int main(void) {
         lightScenePrerender(lightScene);
         cameraPreRender(camera);
 
+        //
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
+        mat4s lightProjectionFromViewMatrix = glms_ortho(-50, 50, -50, 50, -100, 100);
+        mat4s lightViewFromWorldMatrix = glms_lookat(
+            dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
+        mat4s projectionFromWorld =
+            glms_mul(lightProjectionFromViewMatrix, lightViewFromWorldMatrix);
+        glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, &projectionFromWorld);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        meshOverrideShaders(depthShader);
+
+        ///
         pointLightModel->WorldFromModel =
             glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
         modelSetNodeWorldMatrices(pointLightModel);
@@ -210,6 +268,41 @@ int main(void) {
         vec3s startAxis = (vec3s){{1, 0, 0}};
         float angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
         vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
+        directionalLightModel->WorldFromModel =
+            glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
+        modelSetNodeWorldMatrices(directionalLightModel);
+        modelRender(directionalLightModel);
+
+        modelSetNodeWorldMatrices(spotLightModel);
+        modelRender(spotLightModel);
+
+        modelSetNodeWorldMatrices(skinningModel);
+        armatureApplyTransformations(armature);
+        modelRender(skinningModel);
+
+        modelSetNodeWorldMatrices(homeModel);
+        modelRender(homeModel);
+
+        for (int i = 0; i < TexturedBoxCount; i++) {
+            modelSetNodeWorldMatrices(texturedBoxes[i]);
+            modelRender(texturedBoxes[i]);
+        }
+        ///
+        meshOverrideShaders(-1);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        glActiveTexture(GL_TEXTURE10);
+        glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+        //
+
+        pointLightModel->WorldFromModel =
+            glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
+        modelSetNodeWorldMatrices(pointLightModel);
+        modelRender(pointLightModel);
+
+        startAxis = (vec3s){{1, 0, 0}};
+        angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
+        axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
         directionalLightModel->WorldFromModel =
             glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
         modelSetNodeWorldMatrices(directionalLightModel);

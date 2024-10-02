@@ -47,6 +47,13 @@ Material *materialCreate(uint32_t shader, int propertyCount, ...) {
     va_start(properties, propertyCount);
     for (int i = 0; i < propertyCount; i++) {
         material->Properties[i] = va_arg(properties, MaterialProperty *);
+        if (material->Properties[i]->Type == MATTYPE_TEXTURE2D) {
+            MaterialTextureData *data =
+                (MaterialTextureData *)material->Properties[i]->Data;
+            glUniform1i(
+                glGetUniformLocation(shader, material->Properties[i]->Name),
+                data->Index);
+        }
     }
     va_end(properties);
     return material;
@@ -102,6 +109,8 @@ void applyProperty(MaterialProperty *property, uint32_t shader) {
         textureData = *(MaterialTextureData *)(property->Data);
         glActiveTexture(GL_TEXTURE0 + textureData.Index);
         glBindTexture(GL_TEXTURE_2D, textureData.Texture->id);
+        glUniform1i(glGetUniformLocation(shader, property->Name),
+                    textureData.Index);
         break;
     default:
         fprintf(stderr,
