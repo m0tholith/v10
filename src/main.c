@@ -240,8 +240,6 @@ int main(void) {
             glms_vec3_scale(positionDelta, MOVE_SPEED * deltaTime));
         cameraCalculateViewMatrix(camera);
 
-        lastTime = currentTime;
-
         pointLights[0].Position.x = sinf(currentTime * M_PI) * 2.3f + 0.7f;
         pointLights[0].Position.y =
             sinf(currentTime * M_PI * 0.8f) * 1.7f + 0.7f;
@@ -253,6 +251,17 @@ int main(void) {
             (sinf(currentTime * 0.7f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
         pointLights[0].Diffuse.z =
             (sinf(currentTime * 1.3f / 4) * 0.5 + 0.5) * 0.9f + 0.6f;
+        pointLightModel->WorldFromModel =
+            glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
+
+        vec3s startAxis = (vec3s){{1, 0, 0}};
+        float angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
+        vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
+        directionalLightModel->WorldFromModel =
+            glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
+
+        lastTime = currentTime;
+
         lightScenePrerender(lightScene);
         cameraPreRender(camera);
 
@@ -263,16 +272,9 @@ int main(void) {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         ///
-        pointLightModel->WorldFromModel =
-            glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
         modelSetNodeWorldMatrices(pointLightModel);
         modelRender(pointLightModel);
 
-        vec3s startAxis = (vec3s){{1, 0, 0}};
-        float angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
-        vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
-        directionalLightModel->WorldFromModel =
-            glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
         modelSetNodeWorldMatrices(directionalLightModel);
         modelRender(directionalLightModel);
 
@@ -304,31 +306,12 @@ int main(void) {
         meshOverrideShaders(-1);
         //
 
-        pointLightModel->WorldFromModel =
-            glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
-        modelSetNodeWorldMatrices(pointLightModel);
         modelRender(pointLightModel);
-
-        startAxis = (vec3s){{1, 0, 0}};
-        angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
-        axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
-        directionalLightModel->WorldFromModel =
-            glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
-        modelSetNodeWorldMatrices(directionalLightModel);
         modelRender(directionalLightModel);
-
-        modelSetNodeWorldMatrices(spotLightModel);
         modelRender(spotLightModel);
-
-        modelSetNodeWorldMatrices(skinningModel);
-        armatureApplyTransformations(armature);
         modelRender(skinningModel);
-
-        modelSetNodeWorldMatrices(homeModel);
         modelRender(homeModel);
-
         for (int i = 0; i < TexturedBoxCount; i++) {
-            modelSetNodeWorldMatrices(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
 
