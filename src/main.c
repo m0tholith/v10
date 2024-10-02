@@ -272,17 +272,17 @@ int main(void) {
         glClear(GL_DEPTH_BUFFER_BIT);
 
         ///
-        modelSetNodeWorldMatrices(pointLightModel);
+        modelPreRender(pointLightModel);
         modelRender(pointLightModel);
 
-        modelSetNodeWorldMatrices(directionalLightModel);
+        modelPreRender(directionalLightModel);
         modelRender(directionalLightModel);
 
-        modelSetNodeWorldMatrices(spotLightModel);
+        modelPreRender(spotLightModel);
         modelRender(spotLightModel);
 
         meshOverrideShaders(depthSkinningShader);
-        modelSetNodeWorldMatrices(skinningModel);
+        modelPreRender(skinningModel);
         armatureApplyTransformations(armature);
         glUseProgram(depthSkinningShader);
         glUniformMatrix4fv(
@@ -291,11 +291,11 @@ int main(void) {
         modelRender(skinningModel);
         meshOverrideShaders(depthShader);
 
-        modelSetNodeWorldMatrices(homeModel);
+        modelPreRender(homeModel);
         modelRender(homeModel);
 
         for (int i = 0; i < TexturedBoxCount; i++) {
-            modelSetNodeWorldMatrices(texturedBoxes[i]);
+            modelPreRender(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
         ///

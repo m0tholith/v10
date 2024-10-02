@@ -231,7 +231,7 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
         model->Materials[i] = material;
     }
 }
-void modelSetNodeWorldMatrices(Model *model) {
+void modelPreRender(Model *model) {
     for (int i = 0; i < model->NodeCount; i++) {
         struct NodeEntry *nodeEntry = &model->NodeEntries[i];
         mat4s worldFromParent;
