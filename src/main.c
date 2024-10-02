@@ -144,7 +144,10 @@ int main(void) {
     uint32_t depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
 
-    const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    int maxTextureSize;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    maxTextureSize /= 4;
+    const int SHADOW_WIDTH = maxTextureSize, SHADOW_HEIGHT = maxTextureSize;
     uint32_t depthMapTexture;
     glGenTextures(1, &depthMapTexture);
     glBindTexture(GL_TEXTURE_2D, depthMapTexture);
@@ -182,7 +185,7 @@ int main(void) {
         }
     }
     mat4s lightProjectionFromViewMatrix =
-        glms_ortho(-10, 10, -10, 10, -100, 100);
+        glms_ortho(-20, 20, -20, 20, -20, 20);
     mat4s lightViewFromWorldMatrix =
         glms_lookat(dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
     mat4s lightProjectionFromWorld =
@@ -270,6 +273,7 @@ int main(void) {
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
 
         ///
         modelPreRender(pointLightModel);
@@ -299,6 +303,7 @@ int main(void) {
             modelRender(texturedBoxes[i]);
         }
         ///
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         glActiveTexture(GL_TEXTURE10);

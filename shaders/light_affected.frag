@@ -171,5 +171,5 @@ vec3 calc_directional_light(DirectionalLight light) {
 
     vec3 resultColor = diffuse + specular;
 
-    return ambient + resultColor * shadow(vLightSpacePos, 0.005f);
+    return ambient + resultColor * shadow(vLightSpacePos, 0);
 }
