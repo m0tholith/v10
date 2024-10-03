@@ -43,6 +43,9 @@ int main(void) {
     errorInit();
 #endif
 
+    ShaderCache *shaderCache = shaderCacheCreate();
+    shaderSetCache(shaderCache);
+
     Camera *camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
     cameraSetProjectionMatrixPersp(camera, 60, 0.1f, 100.0f);
     cameraLookAt(camera, GLMS_VEC3_ZERO);
@@ -354,7 +357,7 @@ int main(void) {
     lightSceneFree(lightScene);
 
     textureFreeCache();
-    shaderFreeCache();
+    shaderCacheFree(shaderCache);
 
     windowClose();
 
