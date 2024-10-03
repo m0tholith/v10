@@ -1,6 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "shader.h"
 #include "texture.h"
 
 /// all types that can be defined as uniforms in shaders. if you want to add
@@ -47,7 +48,7 @@ MaterialTextureData *materialTextureDataCreate(Texture *texture, int index);
 void materialTextureDataFree(MaterialTextureData *data);
 
 typedef struct {
-    uint32_t Shader;
+    Shader *Shader;
 
     int PropertyCount;
     MaterialProperty **Properties;
@@ -56,7 +57,7 @@ typedef struct {
 /// returns material for use with models
 /// @param int `propertyCount`: the number of properties to allocate for
 /// @param MaterialProperty *...: x number of properties to set
-Material *materialCreate(uint32_t shader, int propertyCount, ...);
+Material *materialCreate(Shader *shader, int propertyCount, ...);
 void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
 void materialChangeProperty(Material *material, const char *propertyName,

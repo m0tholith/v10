@@ -11,7 +11,7 @@ uint64_t shaderPathHash(char *str);
 
 struct shaderCacheEntry {
     uint32_t key;
-    uint32_t value;
+    Shader *value;
 };
 struct shaderCache {
     size_t used;
@@ -19,15 +19,15 @@ struct shaderCache {
     struct shaderCacheEntry *array;
 };
 struct shaderCache *shaderCacheCreate();
-void shaderCacheAppend(struct shaderCache *cache, uint32_t key, uint32_t value);
+void shaderCacheAppend(struct shaderCache *cache, uint32_t key, Shader *value);
 void shaderCacheRemove(struct shaderCache *cache, int index);
 int shaderCacheSearch(struct shaderCache *cache, uint32_t key);
 void shaderCacheFree(struct shaderCache *cache);
 
 struct shaderCache *_shaderCache;
 
-uint32_t shaderCreate(const char *_vertexShaderPath,
-                      const char *_fragmentShaderPath) {
+Shader *shaderCreate(const char *_vertexShaderPath,
+                     const char *_fragmentShaderPath) {
     if (_shaderCache == NULL)
         _shaderCache = shaderCacheCreate();
 
@@ -98,17 +98,24 @@ uint32_t shaderCreate(const char *_vertexShaderPath,
     free(vertexShaderPath);
     free(fragmentShaderPath);
 
-    shaderCacheAppend(_shaderCache, hashSourceHash, shaderProgram);
+    Shader *shader = malloc(sizeof(Shader));
+    shader->ID = shaderProgram;
+    shader->VertPath = malloc(strlen(_vertexShaderPath) + 1);
+    strcpy(shader->VertPath, _vertexShaderPath);
+    shader->FragPath = malloc(strlen(_fragmentShaderPath) + 1);
+    strcpy(shader->FragPath, _fragmentShaderPath);
+    shader->_hash = hashSourceHash;
+
+    shaderCacheAppend(_shaderCache, hashSourceHash, shader);
     free(hashSource);
 
-    return shaderProgram;
+    return shader;
 }
-void shaderFree(uint32_t shader) {
-    int index = shaderCacheSearch(_shaderCache, shader);
-    if (index != -1) {
-        shaderCacheRemove(_shaderCache, index);
-        glDeleteProgram(shader);
-    }
+void shaderFree(Shader *shader) {
+    glDeleteProgram(shader->ID);
+    free(shader->FragPath);
+    free(shader->VertPath);
+    free(shader);
 }
 void shaderFreeCache() { shaderCacheFree(_shaderCache); }
 
@@ -130,9 +137,8 @@ struct shaderCache *shaderCacheCreate() {
     shaderCacheFitSize(cache);
     return cache;
 }
-void shaderCacheAppend(struct shaderCache *cache, uint32_t key,
-                       uint32_t value) {
-    if (cache->used > cache->size) {
+void shaderCacheAppend(struct shaderCache *cache, uint32_t key, Shader *value) {
+    if (cache->used >= cache->size) {
         cache->size *= 2;
         shaderCacheFitSize(cache);
     }
@@ -144,7 +150,7 @@ void shaderCacheRemove(struct shaderCache *cache, int index) {
     for (int i = index + 1; i < cache->used; i++) {
         cache[i - 1] = cache[i];
     }
-    cache->size--;
+    cache->used--;
 }
 int shaderCacheSearch(struct shaderCache *cache, uint32_t key) {
     for (int i = 0; i < cache->used; i++) {
@@ -154,8 +160,8 @@ int shaderCacheSearch(struct shaderCache *cache, uint32_t key) {
     return -1;
 }
 void shaderCacheFree(struct shaderCache *cache) {
-    for (int i = 0; i < cache->used; i++) {
-        shaderFree(cache->array[i].value);
+    while (cache->used > 0) {
+        shaderCacheRemove(cache, cache->used - 1);
     }
     free(cache->array);
     free(cache);

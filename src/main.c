@@ -73,7 +73,7 @@ int main(void) {
     LightScene *lightScene =
         lightSceneCreate(dirLights, pointLights, spotLights);
 
-    uint32_t lightShader =
+    Shader *lightShader =
         shaderCreate("light_source.vert", "light_source.frag");
     Model *pointLightModel = modelLoad("light.glb", 0);
     pointLightModel->Materials[0] =
@@ -105,14 +105,14 @@ int main(void) {
         glms_rotate(glms_translate(GLMS_MAT4_IDENTITY, spotLights[0].Position),
                     angle, axis);
 
-    uint32_t homeShader =
+    Shader *homeShader =
         shaderCreate("light_affected.vert", "light_affected.frag");
     Model *homeModel = modelLoad("home.glb", 0);
     for (int i = 0; i < homeModel->MaterialCount; i++) {
         homeModel->Materials[i]->Shader = homeShader;
     }
 
-    uint32_t skinningShader =
+    Shader *skinningShader =
         shaderCreate("skinning.vert", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
@@ -127,7 +127,7 @@ int main(void) {
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
-    uint32_t texturedShader =
+    Shader *texturedShader =
         shaderCreate("light_affected.vert", "light_affected.frag");
     for (int i = 0; i < TexturedBoxCount; i++) {
         texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
@@ -165,8 +165,8 @@ int main(void) {
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    uint32_t depthShader = shaderCreate("depth.vert", "depth.frag");
-    uint32_t depthSkinningShader =
+    Shader *depthShader = shaderCreate("depth.vert", "depth.frag");
+    Shader *depthSkinningShader =
         shaderCreate("depth_skinning.vert", "depth.frag");
 
     MaterialProperty *shadowMapProperty = materialPropertyCreate(
@@ -268,7 +268,7 @@ int main(void) {
         cameraPreRender(camera);
 
         //
-        meshOverrideShaders(depthShader);
+        meshOverrideShaders(depthShader->ID);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -284,15 +284,16 @@ int main(void) {
         modelPreRender(spotLightModel);
         modelRender(spotLightModel);
 
-        meshOverrideShaders(depthSkinningShader);
+        meshOverrideShaders(depthSkinningShader->ID);
         modelPreRender(skinningModel);
         armatureApplyTransformations(armature);
-        glUseProgram(depthSkinningShader);
-        glUniformMatrix4fv(
-            glGetUniformLocation(depthSkinningShader, "_boneTransformations"),
-            MAX_BONES, GL_FALSE, (void *)&armature->BoneTransformations);
+        glUseProgram(depthSkinningShader->ID);
+        glUniformMatrix4fv(glGetUniformLocation(depthSkinningShader->ID,
+                                                "_boneTransformations"),
+                           MAX_BONES, GL_FALSE,
+                           (void *)&armature->BoneTransformations);
         modelRender(skinningModel);
-        meshOverrideShaders(depthShader);
+        meshOverrideShaders(depthShader->ID);
 
         modelPreRender(homeModel);
         modelRender(homeModel);

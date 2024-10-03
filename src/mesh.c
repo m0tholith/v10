@@ -68,14 +68,14 @@ void meshSendData(struct Mesh *mesh) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->IndexCount * sizeof(uint32_t),
                  mesh->Indices, GL_STATIC_DRAW);
 }
-void meshOverrideShaders(int64_t shader) { shaderOverride = shader; }
-void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader) {
+void meshOverrideShaders(int64_t shaderID) { shaderOverride = shaderID; }
+void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shaderID) {
     if (shaderOverride < 0)
-        glUseProgram(shader);
+        glUseProgram(shaderID);
     else
         glUseProgram(shaderOverride);
 
-    glUniformMatrix4fv(glGetUniformLocation(shader, "_worldFromModel"), 1,
+    glUniformMatrix4fv(glGetUniformLocation(shaderID, "_worldFromModel"), 1,
                        GL_FALSE, worldFromModel.raw[0]);
 
     // render triangles

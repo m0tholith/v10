@@ -33,10 +33,10 @@ void armatureApplyTransformations(Armature *armature) {
                           armature->OffsetMatrices[i]);
     }
     for (int i = 0; i < armature->Model->MaterialCount; i++) {
-        glUseProgram(armature->Model->Materials[i]->Shader);
+        glUseProgram(armature->Model->Materials[i]->Shader->ID);
 
         glUniformMatrix4fv(
-            glGetUniformLocation(armature->Model->Materials[i]->Shader,
+            glGetUniformLocation(armature->Model->Materials[i]->Shader->ID,
                                  "_boneTransformations"),
             MAX_BONES, GL_FALSE, (void *)&armature->BoneTransformations);
     }
