@@ -1,17 +1,18 @@
 #include "window.h"
 
+#ifdef ENABLE_ERRORCHECKING
+#include "error.h"
+#endif
 #include "animation.h"
 #include "armature.h"
 #include "camera.h"
 #include "input.h"
-#include "texture.h"
-#ifdef ENABLE_ERRORCHECKING
-#include "error.h"
-#endif
 #include "light.h"
 #include "material.h"
 #include "model.h"
+#include "render_texture.h"
 #include "shader.h"
+#include "texture.h"
 
 #include <cglm/struct/affine-pre.h>
 #include <cglm/struct/affine.h>
@@ -144,29 +145,12 @@ int main(void) {
     }
 
     //
-    uint32_t depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-
     int maxTextureSize;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
     maxTextureSize /= 4;
     const int SHADOW_WIDTH = maxTextureSize, SHADOW_HEIGHT = maxTextureSize;
-    uint32_t depthMapTexture;
-    glGenTextures(1, &depthMapTexture);
-    glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH,
-                 SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                           depthMapTexture, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    RenderTexture *dirLightRenderTex =
+        renderTextureCreate(SHADOW_WIDTH, SHADOW_HEIGHT, RENDERTEX_DEPTH);
 
     Shader *depthShader = shaderCreate("depth.vert", "depth.frag");
     Shader *depthSkinningShader =
@@ -257,9 +241,7 @@ int main(void) {
 
         //
         meshOverrideShaders(depthShader->ID);
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        renderTextureBind(dirLightRenderTex);
         glCullFace(GL_FRONT);
 
         ///
@@ -292,12 +274,12 @@ int main(void) {
         }
         ///
         glCullFace(GL_BACK);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderTextureUnbind(dirLightRenderTex);
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         for (int i = 0; i < shaderCache->Used; i++) {
             glUseProgram(shaderCache->Array[i].value->ID);
             glActiveTexture(GL_TEXTURE10);
-            glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+            glBindTexture(GL_TEXTURE_2D, dirLightRenderTex->Texture);
         }
         meshOverrideShaders(-1);
         //
@@ -346,6 +328,8 @@ int main(void) {
 
     textureFreeCache();
     shaderCacheFree(shaderCache);
+
+    renderTextureFree(dirLightRenderTex);
 
     windowClose();
 

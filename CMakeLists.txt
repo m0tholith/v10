@@ -15,6 +15,7 @@ set(SRC_FILES
     src/armature.c
     src/node.c
     src/animation.c
+    src/render_texture.c
     src/shader.c
     src/light.c
     src/material.c
