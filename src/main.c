@@ -61,17 +61,17 @@ int main(void) {
 
     PointLight *pointLights = malloc(POINTLIGHTS_MAX * sizeof(PointLight));
     memset(pointLights, 0, POINTLIGHTS_MAX * sizeof(PointLight));
-    pointLights[0] = pointLightCreate(
-        (vec3s){{-2.2f, 1.2f, -0.6f}}, (vec3s){{0.1f, 0.1f, 0.1f}},
-        (vec3s){{0.2f, 0.2f, 0.2f}}, (vec3s){{1.0f, 1.0f, 1.0f}}, 1.0f, 10.0f,
-        1.5f);
+    pointLights[0] =
+        pointLightCreate((vec3s){{-2.2f, 1.2f, -0.6f}}, (vec3s){{0, 0, 0}},
+                         (vec3s){{0.2f, 0.2f, 0.2f}},
+                         (vec3s){{1.0f, 1.0f, 1.0f}}, 1.0f, 10.0f, 1.5f);
 
     SpotLight *spotLights = malloc(SPOTLIGHTS_MAX * sizeof(SpotLight));
     memset(spotLights, 0, SPOTLIGHTS_MAX * sizeof(SpotLight));
     spotLights[0] = spotLightCreate(
         (vec3s){{5.2f, -3.2f, -5.6f}},
         glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, 2, 1}})),
-        (vec3s){{0.1f, 0.1f, 0.1f}}, (vec3s){{1.0f, 0.2f, 1.0f}},
+        (vec3s){{0, 0, 0}}, (vec3s){{1.0f, 0.2f, 1.0f}},
         (vec3s){{1.0f, 1.0f, 1.0f}}, 5.0f, 15.0f, 1.5f, 12.5f, 17.5f);
 
     LightScene *lightScene =
