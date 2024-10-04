@@ -1,10 +1,12 @@
 #version 420 core
 
-in vec3 vColor;
-in vec2 vTexCoord;
-in vec3 vNormal;
-in vec3 vPos;
-in vec4 vLightSpacePos;
+in VS_OUT {
+    vec3 Color;
+    vec2 TexCoord;
+    vec3 Normal;
+    vec3 Pos;
+    vec4 LightSpacePos;
+} fs_in;
 
 out vec4 FragColor;
 
@@ -83,7 +85,7 @@ vec3 calc_directional_light(DirectionalLight light);
 
 void main()
 {
-    _diffuse = vec3(texture(_material.diffuse_tex, vTexCoord));
+    _diffuse = vec3(texture(_material.diffuse_tex, fs_in.TexCoord));
     vec3 totalColor = vec3(0);
     for (int i = 0; i < DirLightsMax; i++) {
         totalColor += calc_directional_light(directionalLights[i]);
@@ -99,21 +101,21 @@ void main()
 
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity, float lightDecay)
 {
-    float distanceRatioSqr = pow(min(distance(lightPos, vPos) / lightDistance, 1), 2);
+    float distanceRatioSqr = pow(min(distance(lightPos, fs_in.Pos) / lightDistance, 1), 2);
     float att = lightIntensity * pow(1 - distanceRatioSqr, 2) / (1 + lightDecay * distanceRatioSqr);
     return att;
 }
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse)
 {
-    float diffuseValue = max(dot((vNormal), lightDir), 0.0f);
-    vec3 diffuse = lightDiffuse * diffuseValue * _material.diffuse * _diffuse * vColor;
+    float diffuseValue = max(dot((fs_in.Normal), lightDir), 0.0f);
+    vec3 diffuse = lightDiffuse * diffuseValue * _material.diffuse * _diffuse * fs_in.Color;
     return diffuse;
 }
 vec3 specular(vec3 lightDir, vec3 lightSpecular)
 {
-    vec3 viewDir = normalize(_cameraWorldPosition - vPos);
+    vec3 viewDir = normalize(_cameraWorldPosition - fs_in.Pos);
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(vNormal, halfwayDir), 0.0f), pow(2, _material.shininess));
+    float spec = pow(max(dot(fs_in.Normal, halfwayDir), 0.0f), pow(2, _material.shininess));
     vec3 specular = lightSpecular * spec * _material.specular * _material.specular_strength;
     return specular;
 }
@@ -133,7 +135,7 @@ float shadow(vec4 lightSpacePos, float bias) {
     return shadow;
 }
 vec3 calc_spot_light(SpotLight light) {
-    vec3 lightDir = normalize(light.position.xyz - vPos);
+    vec3 lightDir = normalize(light.position.xyz - fs_in.Pos);
     vec3 ambient = light.ambient.xyz * _material.ambient;
 
     float angle = dot(lightDir, light.direction);
@@ -156,7 +158,7 @@ vec3 calc_spot_light(SpotLight light) {
 }
 vec3 calc_point_light(PointLight light)
 {
-    vec3 lightDir = normalize(light.position.xyz - vPos);
+    vec3 lightDir = normalize(light.position.xyz - fs_in.Pos);
     vec3 ambient = light.ambient.xyz * _material.ambient;
     vec3 diffuse = diffuse(lightDir, light.diffuse.xyz);
     vec3 specular = specular(lightDir, light.specular.xyz);
@@ -172,5 +174,5 @@ vec3 calc_directional_light(DirectionalLight light) {
 
     vec3 resultColor = diffuse + specular;
 
-    return ambient + resultColor * shadow(vLightSpacePos, 0);
+    return ambient + resultColor * shadow(fs_in.LightSpacePos, 0);
 }

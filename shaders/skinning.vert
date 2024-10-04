@@ -7,11 +7,13 @@ layout(location = 3) in vec3 vertColor;
 layout(location = 4) in ivec4 vertBoneIDs;
 layout(location = 5) in vec4 vertBoneWeights;
 
-out vec3 vColor;
-out vec2 vTexCoord;
-out vec3 vNormal;
-out vec3 vPos;
-out vec4 vLightSpacePos;
+out VS_OUT {
+    vec3 Color;
+    vec2 TexCoord;
+    vec3 Normal;
+    vec3 Pos;
+    vec4 LightSpacePos;
+} vs_out;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
@@ -44,11 +46,11 @@ void main() {
         normal += (mat3(_boneTransformations[vertBoneIDs[i]]) * vertNormal) * vertBoneWeights[i];
     }
 
-    vColor = vertColor;
-    vTexCoord = vertTexCoord;
-    vNormal = normalize(_worldNormalFromModel * normal);
-    vPos = vec3(_worldFromModel * position);
-    vLightSpacePos = _lightSpaceProjectionFromWorld * vec4(vPos, 1.0f);
+    vs_out.Color = vertColor;
+    vs_out.TexCoord = vertTexCoord;
+    vs_out.Normal = normalize(_worldNormalFromModel * normal);
+    vs_out.Pos = vec3(_worldFromModel * position);
+    vs_out.LightSpacePos = _lightSpaceProjectionFromWorld * vec4(vs_out.Pos, 1.0f);
 
     gl_Position = _projectionFromModel * position;
 }

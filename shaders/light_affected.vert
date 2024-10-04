@@ -5,11 +5,13 @@ layout(location = 1) in vec3 vertNormal;
 layout(location = 2) in vec2 vertTexCoord;
 layout(location = 3) in vec3 vertColor;
 
-out vec3 vColor;
-out vec2 vTexCoord;
-out vec3 vNormal;
-out vec3 vPos;
-out vec4 vLightSpacePos;
+out VS_OUT {
+    vec3 Color;
+    vec2 TexCoord;
+    vec3 Normal;
+    vec3 Pos;
+    vec4 LightSpacePos;
+} vs_out;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
@@ -29,11 +31,11 @@ vec4 vertex_warp(vec4 pos) {
 void main() {
     mat3 _worldNormalFromModel = transpose(inverse(mat3(_worldFromModel)));
 
-    vColor = vertColor;
-    vTexCoord = vertTexCoord;
-    vNormal = normalize(_worldNormalFromModel * vertNormal);
-    vPos = vec3(_worldFromModel * vec4(vertPos, 1.0f));
-    vLightSpacePos = _lightSpaceProjectionFromWorld * vec4(vPos, 1.0f);
+    vs_out.Color = vertColor;
+    vs_out.TexCoord = vertTexCoord;
+    vs_out.Normal = normalize(_worldNormalFromModel * vertNormal);
+    vs_out.Pos = vec3(_worldFromModel * vec4(vertPos, 1.0f));
+    vs_out.LightSpacePos = _lightSpaceProjectionFromWorld * vec4(vs_out.Pos, 1.0f);
 
     mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
     gl_Position = _projectionFromModel * vec4(vertPos, 1.0f);

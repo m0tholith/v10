@@ -1,6 +1,6 @@
 #version 420 core
 
-layout(location = 0) in vec3 aPos;
+layout(location = 0) in vec3 vertPos;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
@@ -12,5 +12,5 @@ uniform mat4 _worldFromModel;
 
 void main()
 {
-    gl_Position = _lightSpaceProjectionFromWorld * _worldFromModel * vec4(aPos, 1.0);
+    gl_Position = _lightSpaceProjectionFromWorld * _worldFromModel * vec4(vertPos, 1.0);
 }
