@@ -172,21 +172,6 @@ int main(void) {
     Shader *depthSkinningShader =
         shaderCreate("depth_skinning.vert", "depth.frag");
 
-    MaterialProperty *shadowMapProperty = materialPropertyCreate(
-        "shadowMap", MATTYPE_TEXTURE2D,
-        materialTextureDataCreate((Texture *)&depthMapTexture, 10));
-    for (int i = 0; i < homeModel->MaterialCount; i++) {
-        materialAddProperty(homeModel->Materials[i], shadowMapProperty);
-    }
-    for (int i = 0; i < skinningModel->MaterialCount; i++) {
-        materialAddProperty(skinningModel->Materials[i], shadowMapProperty);
-    }
-    for (int boxId = 0; boxId < TexturedBoxCount; boxId++) {
-        for (int i = 0; i < texturedBoxes[boxId]->MaterialCount; i++) {
-            materialAddProperty(texturedBoxes[boxId]->Materials[i],
-                                shadowMapProperty);
-        }
-    }
     mat4s lightProjectionFromViewMatrix = glms_ortho(-20, 20, -20, 20, -20, 20);
     mat4s lightViewFromWorldMatrix =
         glms_lookat(dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
@@ -309,8 +294,11 @@ int main(void) {
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        glActiveTexture(GL_TEXTURE10);
-        glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+        for (int i = 0; i < shaderCache->Used; i++) {
+            glUseProgram(shaderCache->Array[i].value->ID);
+            glActiveTexture(GL_TEXTURE10);
+            glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+        }
         meshOverrideShaders(-1);
         //
 

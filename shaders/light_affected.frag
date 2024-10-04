@@ -69,7 +69,7 @@ layout(std140, binding = 1) uniform Lights {
     SpotLight[SpotLightsMax] spotLights;
 };
 
-uniform sampler2D shadowMap;
+layout(binding = 10) uniform sampler2D shadowMap;
 
 vec3 _diffuse;
 
