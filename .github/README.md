@@ -36,7 +36,10 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [X] directional light
     - [X] spot light
     - [X] dedicated lighting system
-    - [ ] shadows `<------ WE ARE HERE`
+    - [ ] shadows
+        - [ ] directional light shadows `<------ WE ARE HERE`
+        - [ ] point light shadows
+        - [ ] spot light shadows
 - [X] skinning
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
@@ -47,4 +50,4 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [ ] post processing pipeline
 - [ ] physics engine
 - [ ] sound engine
-- [ ] bindings for some other language (maybe lua)
+- [ ] particle system
