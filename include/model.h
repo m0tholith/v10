@@ -39,6 +39,7 @@ typedef struct {
     Shader *DepthShader;
 
     void (*OnDelete)(void *model);
+    void (*OnRender)(void *model);
 } Model;
 
 enum ModelLoadOptions {
@@ -53,12 +54,12 @@ Model *modelLoad(const char *modelFilename, unsigned int options);
 void modelSetMaterials(Model *model, int materialCount, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 /// useful for calculating bone transforms before rendering
-void modelPreRender(Model *model);
 void modelRender(Model *model);
 /// calls `model->OnDelete`
 void modelFree(Model *model);
 
 /// not to be used directly, but by presets and such
+void _modelPreRender(void *_model);
 void _modelDelete(void *_model);
 void _modelFreeMaterials(void *_model);
 

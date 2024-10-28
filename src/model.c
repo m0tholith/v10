@@ -214,6 +214,7 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
     model->DepthShader = shaderCreate("depth.vert", "depth.frag");
 
     model->OnDelete = &_modelDelete;
+    model->OnRender = &_modelPreRender;
 
     free(modelFile);
     aiReleaseImport(scene);
@@ -233,21 +234,8 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
         model->Materials[i] = material;
     }
 }
-void modelPreRender(Model *model) {
-    for (int i = 0; i < model->NodeCount; i++) {
-        struct NodeEntry *nodeEntry = &model->NodeEntries[i];
-        mat4s worldFromParent;
-        if (i == 0)
-            worldFromParent = model->WorldFromModel;
-        else
-            worldFromParent =
-                model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
-
-        nodeEntry->WorldFromLocal =
-            glms_mat4_mul(worldFromParent, nodeEntry->Node->ParentFromLocal);
-    }
-}
 void modelRender(Model *model) {
+    model->OnRender(model);
     for (int i = 0; i < model->NodeCount; i++) {
         struct NodeEntry *nodeEntry = &model->NodeEntries[i];
         mat4s worldFromParent;
@@ -262,6 +250,22 @@ void modelRender(Model *model) {
     }
 }
 void modelFree(Model *model) { (model->OnDelete)(model); }
+
+void _modelPreRender(void *_model) {
+    Model *model = (Model *)_model;
+    for (int i = 0; i < model->NodeCount; i++) {
+        struct NodeEntry *nodeEntry = &model->NodeEntries[i];
+        mat4s worldFromParent;
+        if (i == 0)
+            worldFromParent = model->WorldFromModel;
+        else
+            worldFromParent =
+                model->NodeEntries[nodeEntry->ParentIndex].WorldFromLocal;
+
+        nodeEntry->WorldFromLocal =
+            glms_mat4_mul(worldFromParent, nodeEntry->Node->ParentFromLocal);
+    }
+}
 void _modelDelete(void *_model) {
     Model *model = (Model *)_model;
     nodeFree(model->NodeEntries[0].Node);

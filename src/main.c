@@ -243,19 +243,15 @@ int main(void) {
 
         ///
         meshOverrideShaders(pointLightModel->DepthShader);
-        modelPreRender(pointLightModel);
         modelRender(pointLightModel);
 
         meshOverrideShaders(directionalLightModel->DepthShader);
-        modelPreRender(directionalLightModel);
         modelRender(directionalLightModel);
 
         meshOverrideShaders(spotLightModel->DepthShader);
-        modelPreRender(spotLightModel);
         modelRender(spotLightModel);
 
         meshOverrideShaders(skinningModel->DepthShader);
-        modelPreRender(skinningModel);
         armatureApplyTransformations(armature);
         glUseProgram(skinningModel->DepthShader->ID);
         glUniformMatrix4fv(glGetUniformLocation(skinningModel->DepthShader->ID,
@@ -265,12 +261,10 @@ int main(void) {
         modelRender(skinningModel);
 
         meshOverrideShaders(homeModel->DepthShader);
-        modelPreRender(homeModel);
         modelRender(homeModel);
 
         for (int i = 0; i < TexturedBoxCount; i++) {
             meshOverrideShaders(texturedBoxes[i]->DepthShader);
-            modelPreRender(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
         ///
