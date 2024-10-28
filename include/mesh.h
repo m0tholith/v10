@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "shader.h"
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
@@ -33,7 +34,7 @@ void meshSendData(struct Mesh *mesh);
 /// overrides all meshes' draw calls to use specific shader
 ///
 /// set to -1 to remove override
-void meshOverrideShaders(int64_t shader);
+void meshOverrideShaders(Shader *shader);
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader);
 void meshFree(struct Mesh *mesh);
 

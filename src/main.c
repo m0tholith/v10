@@ -242,19 +242,19 @@ int main(void) {
         glCullFace(GL_FRONT);
 
         ///
-        meshOverrideShaders(pointLightModel->DepthShader->ID);
+        meshOverrideShaders(pointLightModel->DepthShader);
         modelPreRender(pointLightModel);
         modelRender(pointLightModel);
 
-        meshOverrideShaders(directionalLightModel->DepthShader->ID);
+        meshOverrideShaders(directionalLightModel->DepthShader);
         modelPreRender(directionalLightModel);
         modelRender(directionalLightModel);
 
-        meshOverrideShaders(spotLightModel->DepthShader->ID);
+        meshOverrideShaders(spotLightModel->DepthShader);
         modelPreRender(spotLightModel);
         modelRender(spotLightModel);
 
-        meshOverrideShaders(skinningModel->DepthShader->ID);
+        meshOverrideShaders(skinningModel->DepthShader);
         modelPreRender(skinningModel);
         armatureApplyTransformations(armature);
         glUseProgram(skinningModel->DepthShader->ID);
@@ -264,12 +264,12 @@ int main(void) {
                            (void *)&armature->BoneTransformations);
         modelRender(skinningModel);
 
-        meshOverrideShaders(homeModel->DepthShader->ID);
+        meshOverrideShaders(homeModel->DepthShader);
         modelPreRender(homeModel);
         modelRender(homeModel);
 
         for (int i = 0; i < TexturedBoxCount; i++) {
-            meshOverrideShaders(texturedBoxes[i]->DepthShader->ID);
+            meshOverrideShaders(texturedBoxes[i]->DepthShader);
             modelPreRender(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
@@ -282,7 +282,7 @@ int main(void) {
             glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D, dirLightRenderTex->Texture);
         }
-        meshOverrideShaders(-1);
+        meshOverrideShaders(NULL);
         //
 
         modelRender(pointLightModel);
