@@ -211,6 +211,8 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                             model->NodeEntries[0].Node);
     }
 
+    model->DepthShader = shaderCreate("depth.vert", "depth.frag");
+
     model->OnDelete = &_modelDelete;
 
     free(modelFile);

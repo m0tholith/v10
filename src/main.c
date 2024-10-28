@@ -119,6 +119,8 @@ int main(void) {
     Shader *skinningShader =
         shaderCreate("skinning.vert", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
+    skinningModel->DepthShader =
+        shaderCreate("depth_skinning.vert", "depth.frag");
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
     }
@@ -151,10 +153,6 @@ int main(void) {
     const int SHADOW_WIDTH = maxTextureSize, SHADOW_HEIGHT = maxTextureSize;
     RenderTexture *dirLightRenderTex =
         renderTextureCreate(SHADOW_WIDTH, SHADOW_HEIGHT, RENDERTEX_DEPTH);
-
-    Shader *depthShader = shaderCreate("depth.vert", "depth.frag");
-    Shader *depthSkinningShader =
-        shaderCreate("depth_skinning.vert", "depth.frag");
 
     mat4s lightProjectionFromViewMatrix = glms_ortho(-20, 20, -20, 20, -20, 20);
     mat4s lightViewFromWorldMatrix =
@@ -240,35 +238,38 @@ int main(void) {
         cameraPreRender(camera);
 
         //
-        meshOverrideShaders(depthShader->ID);
         renderTextureBind(dirLightRenderTex);
         glCullFace(GL_FRONT);
 
         ///
+        meshOverrideShaders(pointLightModel->DepthShader->ID);
         modelPreRender(pointLightModel);
         modelRender(pointLightModel);
 
+        meshOverrideShaders(directionalLightModel->DepthShader->ID);
         modelPreRender(directionalLightModel);
         modelRender(directionalLightModel);
 
+        meshOverrideShaders(spotLightModel->DepthShader->ID);
         modelPreRender(spotLightModel);
         modelRender(spotLightModel);
 
-        meshOverrideShaders(depthSkinningShader->ID);
+        meshOverrideShaders(skinningModel->DepthShader->ID);
         modelPreRender(skinningModel);
         armatureApplyTransformations(armature);
-        glUseProgram(depthSkinningShader->ID);
-        glUniformMatrix4fv(glGetUniformLocation(depthSkinningShader->ID,
+        glUseProgram(skinningModel->DepthShader->ID);
+        glUniformMatrix4fv(glGetUniformLocation(skinningModel->DepthShader->ID,
                                                 "_boneTransformations"),
                            MAX_BONES, GL_FALSE,
                            (void *)&armature->BoneTransformations);
         modelRender(skinningModel);
-        meshOverrideShaders(depthShader->ID);
 
+        meshOverrideShaders(homeModel->DepthShader->ID);
         modelPreRender(homeModel);
         modelRender(homeModel);
 
         for (int i = 0; i < TexturedBoxCount; i++) {
+            meshOverrideShaders(texturedBoxes[i]->DepthShader->ID);
             modelPreRender(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
