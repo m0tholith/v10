@@ -38,7 +38,7 @@ int main(void) {
     window = windowCreate();
     windowSetSkybox(0.117f, 0.117f, 0.18f);
     InputEvent *events = getInputEventArray();
-    inputSetEvents(events, 2);
+    inputSetEvents(events, EVENT_COUNT);
     inputInit(window);
 #ifdef ENABLE_ERRORCHECKING
     errorInit();
