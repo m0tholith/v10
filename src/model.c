@@ -249,7 +249,7 @@ void modelRender(Model *model) {
                    model->Materials);
     }
 }
-void modelFree(Model *model) { (model->OnDelete)(model); }
+void modelFree(Model *model) { model->OnDelete(model); }
 
 void _modelPreRender(void *_model) {
     Model *model = (Model *)_model;
