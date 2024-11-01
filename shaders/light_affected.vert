@@ -10,12 +10,10 @@ out VS_OUT {
     vec2 TexCoord;
     vec3 Normal;
     vec3 Pos;
-    vec4 LightSpacePos;
 } vs_out;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
-    mat4 _lightSpaceProjectionFromWorld;
     vec3 _cameraWorldPosition;
 };
 uniform mat4 _worldFromModel;
@@ -35,7 +33,6 @@ void main() {
     vs_out.TexCoord = vertTexCoord;
     vs_out.Normal = normalize(_worldNormalFromModel * vertNormal);
     vs_out.Pos = vec3(_worldFromModel * vec4(vertPos, 1.0f));
-    vs_out.LightSpacePos = _lightSpaceProjectionFromWorld * vec4(vs_out.Pos, 1.0f);
 
     mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
     gl_Position = _projectionFromModel * vec4(vertPos, 1.0f);

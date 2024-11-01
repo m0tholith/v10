@@ -153,16 +153,6 @@ int main(void) {
     const int SHADOW_WIDTH = maxTextureSize, SHADOW_HEIGHT = maxTextureSize;
     RenderTexture *dirLightRenderTex =
         renderTextureCreate(SHADOW_WIDTH, SHADOW_HEIGHT, RENDERTEX_DEPTH);
-
-    mat4s lightProjectionFromViewMatrix = glms_ortho(-20, 20, -20, 20, -20, 20);
-    mat4s lightViewFromWorldMatrix =
-        glms_lookat(dirLights[0].Direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}});
-    mat4s lightProjectionFromWorld =
-        glms_mul(lightProjectionFromViewMatrix, lightViewFromWorldMatrix);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, camera->MatricesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, &lightProjectionFromWorld);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     //
 
     glEnable(GL_CULL_FACE);
@@ -242,16 +232,27 @@ int main(void) {
         glCullFace(GL_FRONT);
 
         ///
+#define sendLightMatrix(__model)                                               \
+    glUseProgram(__model->DepthShader->ID);                                    \
+    glUniformMatrix4fv(glGetUniformLocation(__model->DepthShader->ID,          \
+                                            "_lightSpaceProjectionFromWorld"), \
+                       1, GL_FALSE,                                            \
+                       (void *)&dirLights[0].ProjectionFromWorld);
+
         meshOverrideShaders(pointLightModel->DepthShader);
+        sendLightMatrix(pointLightModel);
         modelRender(pointLightModel);
 
         meshOverrideShaders(directionalLightModel->DepthShader);
+        sendLightMatrix(directionalLightModel);
         modelRender(directionalLightModel);
 
         meshOverrideShaders(spotLightModel->DepthShader);
+        sendLightMatrix(spotLightModel);
         modelRender(spotLightModel);
 
         meshOverrideShaders(skinningModel->DepthShader);
+        sendLightMatrix(skinningModel);
         armatureApplyTransformations(armature);
         glUseProgram(skinningModel->DepthShader->ID);
         glUniformMatrix4fv(glGetUniformLocation(skinningModel->DepthShader->ID,
@@ -261,10 +262,12 @@ int main(void) {
         modelRender(skinningModel);
 
         meshOverrideShaders(homeModel->DepthShader);
+        sendLightMatrix(homeModel);
         modelRender(homeModel);
 
         for (int i = 0; i < TexturedBoxCount; i++) {
             meshOverrideShaders(texturedBoxes[i]->DepthShader);
+            sendLightMatrix(texturedBoxes[i]);
             modelRender(texturedBoxes[i]);
         }
         ///

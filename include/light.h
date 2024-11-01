@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 typedef struct {
+    mat4s ProjectionFromWorld;
     vec4s Ambient;
     vec4s Diffuse;
     vec4s Specular;

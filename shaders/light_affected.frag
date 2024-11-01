@@ -5,14 +5,12 @@ in VS_OUT {
     vec2 TexCoord;
     vec3 Normal;
     vec3 Pos;
-    vec4 LightSpacePos;
 } fs_in;
 
 out vec4 FragColor;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
-    mat4 _lightSpaceProjectionFromWorld;
     vec3 _cameraWorldPosition;
 };
 struct material {
@@ -26,6 +24,7 @@ struct material {
 uniform material _material;
 
 struct DirectionalLight {
+    mat4 projectionFromWorld;
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
@@ -168,11 +167,13 @@ vec3 calc_point_light(PointLight light)
     return ambient + resultColor * attenuation(light.position.xyz, light.distance, light.intensity, light.decay);
 }
 vec3 calc_directional_light(DirectionalLight light) {
+    vec4 lightSpacePos = light.projectionFromWorld * vec4(fs_in.Pos, 1.0f);
+
     vec3 ambient = light.ambient.xyz * _material.ambient;
     vec3 diffuse = diffuse(light.direction.xyz, light.diffuse.xyz);
     vec3 specular = specular(light.direction.xyz, light.specular.xyz);
 
     vec3 resultColor = diffuse + specular;
 
-    return ambient + resultColor * shadow(fs_in.LightSpacePos, 0);
+    return ambient + resultColor * shadow(lightSpacePos, 0);
 }

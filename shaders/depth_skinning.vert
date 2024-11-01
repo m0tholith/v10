@@ -6,11 +6,11 @@ layout(location = 5) in vec4 vertBoneWeights;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
-    mat4 _lightSpaceProjectionFromWorld;
     vec3 _cameraWorldPosition;
 };
 
 uniform mat4 _worldFromModel;
+uniform mat4 _lightSpaceProjectionFromWorld;
 
 #define MAX_BONES 100
 uniform mat4 _boneTransformations[MAX_BONES];

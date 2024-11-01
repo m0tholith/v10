@@ -1,5 +1,7 @@
 #include "light.h"
 
+#include "cglm/struct/affine-mat.h"
+#include "cglm/struct/cam.h"
 #include "glad/glad.h"
 #include <GL/gl.h>
 #include <cglm/util.h>
@@ -10,6 +12,9 @@
 DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
                                         vec3s diffuse, vec3s specular) {
     DirectionalLight directionalLight = (DirectionalLight){
+        .ProjectionFromWorld = glms_mul(
+            glms_ortho(-20, 20, -20, 20, -20, 20),
+            glms_lookat(direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}})),
         .Ambient = (vec4s){{ambient.x, ambient.y, ambient.z, 0}},
         .Diffuse = (vec4s){{diffuse.x, diffuse.y, diffuse.z, 0}},
         .Specular = (vec4s){{specular.x, specular.y, specular.z, 0}},
