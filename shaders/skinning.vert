@@ -12,7 +12,8 @@ out VS_OUT {
     vec2 TexCoord;
     vec3 Normal;
     vec3 Pos;
-} vs_out;
+}
+vs_out;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
@@ -26,22 +27,27 @@ uniform mat4 _boneTransformations[MAX_BONES];
 
 const float strength = 5;
 vec4 vertex_warp(vec4 pos) {
-    pos.xy = (pos.xy + vec2(1.0)) * vec2(320.0 / strength, 240.0 / strength) * 0.5;
+    pos.xy =
+        (pos.xy + vec2(1.0)) * vec2(320.0 / strength, 240.0 / strength) * 0.5;
     pos.xy = round(pos.xy);
-    pos.xy = pos.xy * 2 / vec2(320.0 / strength, 240.0 / strength) - vec2(1.0, 1.0);
+    pos.xy =
+        pos.xy * 2 / vec2(320.0 / strength, 240.0 / strength) - vec2(1.0, 1.0);
     return pos;
 }
 
 void main() {
     mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
     mat3 _worldNormalFromModel = transpose(inverse(mat3(_worldFromModel)));
-    vec4 position = vec4(0.0f);
-    vec3 normal = vec3(0.0f);
+    vec4 position = vec4(0.0);
+    vec3 normal = vec3(0.0);
     for (int i = 0; i < 4; i++) {
         if (vertBoneIDs[i] == -1)
             break;
-        position += (_boneTransformations[vertBoneIDs[i]] * vec4(vertPos, 1.0f)) * vertBoneWeights[i];
-        normal += (mat3(_boneTransformations[vertBoneIDs[i]]) * vertNormal) * vertBoneWeights[i];
+        position +=
+            (_boneTransformations[vertBoneIDs[i]] * vec4(vertPos, 1.0)) *
+            vertBoneWeights[i];
+        normal += (mat3(_boneTransformations[vertBoneIDs[i]]) * vertNormal) *
+                  vertBoneWeights[i];
     }
 
     vs_out.Color = vertColor;

@@ -10,7 +10,7 @@ layout(std140, binding = 0) uniform WorldData {
 uniform mat4 _worldFromModel;
 uniform mat4 _lightSpaceProjectionFromWorld;
 
-void main()
-{
-    gl_Position = _lightSpaceProjectionFromWorld * _worldFromModel * vec4(vertPos, 1.0);
+void main() {
+    gl_Position =
+        _lightSpaceProjectionFromWorld * _worldFromModel * vec4(vertPos, 1.0);
 }

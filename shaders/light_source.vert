@@ -5,9 +5,8 @@ layout(location = 1) in vec3 vertNormal;
 layout(location = 2) in vec2 vertTexCoord;
 layout(location = 3) in vec3 vertColor;
 
-out VS_OUT {
-    vec3 Color;
-} vs_out;
+out VS_OUT { vec3 Color; }
+vs_out;
 
 layout(std140, binding = 0) uniform WorldData {
     mat4 _projectionFromWorld;
@@ -19,5 +18,5 @@ void main() {
     vs_out.Color = vertColor;
 
     mat4 _projectionFromModel = _projectionFromWorld * _worldFromModel;
-    gl_Position = _projectionFromModel * vec4(vertPos, 1.0f);
+    gl_Position = _projectionFromModel * vec4(vertPos, 1.0);
 }
