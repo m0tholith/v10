@@ -90,8 +90,6 @@ Shader *shaderCreate(const char *_vertexShaderPath,
         exit(EXIT_FAILURE);
     }
     glUseProgram(shaderProgram);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(vertexShader);
 
     free(vertexShaderContents);
     free(fragmentShaderContents);
@@ -99,11 +97,17 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     free(fragmentShaderPath);
 
     Shader *shader = malloc(sizeof(Shader));
+
     shader->ID = shaderProgram;
+
     shader->VertPath = malloc(strlen(_vertexShaderPath) + 1);
     strcpy(shader->VertPath, _vertexShaderPath);
+    shader->VertID = vertexShader;
+
     shader->FragPath = malloc(strlen(_fragmentShaderPath) + 1);
     strcpy(shader->FragPath, _fragmentShaderPath);
+    shader->FragID = fragmentShader;
+
     if (_shaderCache != NULL) {
         shader->_hash = hashSourceHash;
         shaderCacheAppend(_shaderCache, hashSourceHash, shader);
@@ -114,6 +118,8 @@ Shader *shaderCreate(const char *_vertexShaderPath,
 }
 void shaderFree(Shader *shader) {
     glDeleteProgram(shader->ID);
+    glDeleteShader(shader->VertID);
+    glDeleteShader(shader->FragID);
     free(shader->FragPath);
     free(shader->VertPath);
     free(shader);

@@ -8,8 +8,12 @@
 
 typedef struct {
     uint32_t ID;
+
     char *VertPath;
+    uint32_t VertID;
+
     char *FragPath;
+    uint32_t FragID;
 
     uint32_t _hash;
 } Shader;
