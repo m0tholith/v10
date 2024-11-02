@@ -24,7 +24,7 @@ struct material {
 };
 uniform material _material;
 
-struct DirectionalLight {
+struct DirLight {
     mat4 projectionFromWorld;
     vec4 ambient;
     vec4 diffuse;
@@ -65,7 +65,7 @@ const int DirLightsMax = 1;
 const int PointLightsMax = 8;
 const int SpotLightsMax = 8;
 layout(std140, binding = 1) uniform Lights {
-    DirectionalLight[DirLightsMax] directionalLights;
+    DirLight[DirLightsMax] dirLights;
     PointLight[PointLightsMax] pointLights;
     SpotLight[SpotLightsMax] spotLights;
 };
@@ -81,15 +81,15 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular);
 float shadow(vec4 lightSpacePos, float bias);
 vec3 calc_spot_light(SpotLight light);
 vec3 calc_point_light(PointLight light);
-vec3 calc_directional_light(DirectionalLight light);
+vec3 calc_dir_light(DirLight light);
 
 void main() {
     _diffuse = vec3(texture(_material.diffuse_tex, fs_in.TexCoord));
     vec3 totalColor = vec3(0);
     for (int i = 0; i < DirLightsMax; i++) {
-        if (directionalLights[i].enabled == 0)
+        if (dirLights[i].enabled == 0)
             break;
-        totalColor += calc_directional_light(directionalLights[i]);
+        totalColor += calc_dir_light(dirLights[i]);
     }
     for (int i = 0; i < PointLightsMax; i++) {
         if (pointLights[i].enabled == 0)
@@ -174,11 +174,10 @@ vec3 calc_point_light(PointLight light) {
 
     vec3 resultColor = diffuse + specular;
 
-    return resultColor * attenuation(light.position.xyz,
-                                               light.distance, light.intensity,
-                                               light.decay);
+    return resultColor * attenuation(light.position.xyz, light.distance,
+                                     light.intensity, light.decay);
 }
-vec3 calc_directional_light(DirectionalLight light) {
+vec3 calc_dir_light(DirLight light) {
     vec4 lightSpacePos = light.projectionFromWorld * vec4(fs_in.Pos, 1.0);
 
     vec3 ambient = light.ambient.xyz * _material.ambient;

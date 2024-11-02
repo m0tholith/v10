@@ -51,10 +51,9 @@ int main(void) {
     cameraSetProjectionMatrixPersp(camera, 60, 0.1f, 100.0f);
     cameraLookAt(camera, GLMS_VEC3_ZERO);
 
-    DirectionalLight *dirLights =
-        malloc(DIRLIGHTS_MAX * sizeof(DirectionalLight));
-    memset(dirLights, 0, DIRLIGHTS_MAX * sizeof(DirectionalLight));
-    dirLights[0] = directionalLightCreate(
+    DirLight *dirLights = malloc(DIRLIGHTS_MAX * sizeof(DirLight));
+    memset(dirLights, 0, DIRLIGHTS_MAX * sizeof(DirLight));
+    dirLights[0] = dirLightCreate(
         glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}})),
         (vec3s){{0.0f, 0.0f, 0.0f}}, (vec3s){{0.694f, 0.688f, 0.578f}},
         (vec3s){{0.7f, 0.7f, 0.7f}});
@@ -86,15 +85,15 @@ int main(void) {
     pointLightModel->WorldFromModel =
         glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
 
-    Model *directionalLightModel = modelLoad("arrow.glb", 0);
-    directionalLightModel->Materials[0] =
+    Model *dirLightModel = modelLoad("arrow.glb", 0);
+    dirLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
                                               (void *)&dirLights[0].Diffuse));
     vec3s startAxis = (vec3s){{1, 0, 0}};
     float angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
     vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
-    directionalLightModel->WorldFromModel =
+    dirLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
 
     Model *spotLightModel = modelLoad("flashlight.glb", 0);
@@ -218,7 +217,7 @@ int main(void) {
         vec3s startAxis = (vec3s){{1, 0, 0}};
         float angle = acos(glms_vec3_dot(startAxis, dirLights[0].Direction));
         vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
-        directionalLightModel->WorldFromModel =
+        dirLightModel->WorldFromModel =
             glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
 
         lastTime = currentTime;
@@ -242,9 +241,9 @@ int main(void) {
         sendLightMatrix(pointLightModel);
         modelRender(pointLightModel);
 
-        meshOverrideShaders(directionalLightModel->DepthShader);
-        sendLightMatrix(directionalLightModel);
-        modelRender(directionalLightModel);
+        meshOverrideShaders(dirLightModel->DepthShader);
+        sendLightMatrix(dirLightModel);
+        modelRender(dirLightModel);
 
         meshOverrideShaders(spotLightModel->DepthShader);
         sendLightMatrix(spotLightModel);
@@ -282,7 +281,7 @@ int main(void) {
         //
 
         modelRender(pointLightModel);
-        modelRender(directionalLightModel);
+        modelRender(dirLightModel);
         modelRender(spotLightModel);
         modelRender(skinningModel);
         modelRender(homeModel);
@@ -306,11 +305,11 @@ int main(void) {
     materialFree(homeModel->Materials[0]);
     materialPropertyFree(pointLightModel->Materials[0]->Properties[0]);
     materialFree(pointLightModel->Materials[0]);
-    materialPropertyFree(directionalLightModel->Materials[0]->Properties[0]);
-    materialFree(directionalLightModel->Materials[0]);
+    materialPropertyFree(dirLightModel->Materials[0]->Properties[0]);
+    materialFree(dirLightModel->Materials[0]);
     modelFree(skinningModel);
     modelFree(pointLightModel);
-    modelFree(directionalLightModel);
+    modelFree(dirLightModel);
     modelFree(homeModel);
     for (int i = 0; i < TexturedBoxCount; i++) {
         materialFree(texturedBoxes[i]->Materials[0]);

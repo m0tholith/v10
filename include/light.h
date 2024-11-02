@@ -12,9 +12,9 @@ typedef struct {
 
     vec3s Direction;
     int _enabled;
-} DirectionalLight;
-DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
-                                        vec3s diffuse, vec3s specular);
+} DirLight; // short for directional light
+DirLight dirLightCreate(vec3s direction, vec3s ambient, vec3s diffuse,
+                        vec3s specular);
 
 typedef struct {
     vec3s Position;
@@ -58,14 +58,14 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
 #define POINTLIGHTS_MAX 8
 #define SPOTLIGHTS_MAX 8
 typedef struct {
-    DirectionalLight *DirectionalLights;
+    DirLight *DirLights;
     PointLight *PointLights;
     SpotLight *SpotLights;
 
     uint32_t UBO;
 } LightScene;
-LightScene *lightSceneCreate(DirectionalLight *directionalLights,
-                             PointLight *pointLights, SpotLight *spotLights);
+LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
+                             SpotLight *spotLights);
 void lightScenePreRender(LightScene *lightScene);
 void lightSceneFree(LightScene *lightScene);
 

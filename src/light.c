@@ -9,9 +9,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
-                                        vec3s diffuse, vec3s specular) {
-    DirectionalLight directionalLight = (DirectionalLight){
+DirLight dirLightCreate(vec3s direction, vec3s ambient, vec3s diffuse,
+                        vec3s specular) {
+    DirLight dirLight = (DirLight){
         .ProjectionFromWorld = glms_mul(
             glms_ortho(-20, 20, -20, 20, -20, 20),
             glms_lookat(direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}})),
@@ -21,7 +21,7 @@ DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
         .Direction = direction,
         ._enabled = true,
     };
-    return directionalLight;
+    return dirLight;
 }
 
 PointLight pointLightCreate(vec3s position, vec3s diffuse, vec3s specular,
@@ -62,17 +62,17 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
     spotLight->OuterCutoff = cosf(glm_rad(outerCutoffDeg));
 }
 
-LightScene *lightSceneCreate(DirectionalLight *directionalLights,
-                             PointLight *pointLights, SpotLight *spotLights) {
+LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
+                             SpotLight *spotLights) {
     LightScene *lightScene = malloc(sizeof(LightScene));
-    lightScene->DirectionalLights = directionalLights;
+    lightScene->DirLights = dirLights;
     lightScene->PointLights = pointLights;
     lightScene->SpotLights = spotLights;
 
     glGenBuffers(1, &lightScene->UBO);
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);
     glBufferData(GL_UNIFORM_BUFFER,
-                 DIRLIGHTS_MAX * sizeof(DirectionalLight) +
+                 DIRLIGHTS_MAX * sizeof(DirLight) +
                      POINTLIGHTS_MAX * sizeof(PointLight) +
                      SPOTLIGHTS_MAX * sizeof(SpotLight),
                  NULL, GL_DYNAMIC_DRAW);
@@ -83,14 +83,13 @@ LightScene *lightSceneCreate(DirectionalLight *directionalLights,
 }
 void lightScenePreRender(LightScene *lightScene) {
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0,
-                    DIRLIGHTS_MAX * sizeof(DirectionalLight),
-                    lightScene->DirectionalLights);
-    glBufferSubData(GL_UNIFORM_BUFFER, DIRLIGHTS_MAX * sizeof(DirectionalLight),
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, DIRLIGHTS_MAX * sizeof(DirLight),
+                    lightScene->DirLights);
+    glBufferSubData(GL_UNIFORM_BUFFER, DIRLIGHTS_MAX * sizeof(DirLight),
                     POINTLIGHTS_MAX * sizeof(PointLight),
                     lightScene->PointLights);
     glBufferSubData(GL_UNIFORM_BUFFER,
-                    DIRLIGHTS_MAX * sizeof(DirectionalLight) +
+                    DIRLIGHTS_MAX * sizeof(DirLight) +
                         POINTLIGHTS_MAX * sizeof(PointLight),
                     SPOTLIGHTS_MAX * sizeof(SpotLight), lightScene->SpotLights);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
