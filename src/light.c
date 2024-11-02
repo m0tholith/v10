@@ -19,44 +19,40 @@ DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
         .Diffuse = (vec4s){{diffuse.x, diffuse.y, diffuse.z, 0}},
         .Specular = (vec4s){{specular.x, specular.y, specular.z, 0}},
         .Direction = direction,
+        ._enabled = true,
     };
     return directionalLight;
 }
-void directionalLightFree(DirectionalLight *directionalLight) {
-    free(directionalLight);
-}
 
-PointLight pointLightCreate(vec3s position, vec3s ambient, vec3s diffuse,
-                            vec3s specular, float intensity, float distance,
-                            float decay) {
+PointLight pointLightCreate(vec3s position, vec3s diffuse, vec3s specular,
+                            float intensity, float distance, float decay) {
     PointLight pointLight = (PointLight){
         .Position = position,
         .Intensity = intensity,
-        .Ambient = ambient,
-        .Distance = distance,
         .Diffuse = diffuse,
         .Decay = decay,
         .Specular = specular,
+        .Distance = distance,
+        ._enabled = true,
     };
     return pointLight;
 }
-void pointLightFree(PointLight *pointLight) { free(pointLight); }
 
-SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s ambient,
-                          vec3s diffuse, vec3s specular, float intensity,
-                          float distance, float decay, float innerCutoffDeg,
+SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s diffuse,
+                          vec3s specular, float intensity, float distance,
+                          float decay, float innerCutoffDeg,
                           float outerCutoffDeg) {
     SpotLight spotLight = (SpotLight){
         .Position = position,
         .Intensity = intensity,
-        .Ambient = ambient,
-        .Distance = distance,
         .Diffuse = diffuse,
         .Decay = decay,
         .Specular = specular,
         .InnerCutoff = cosf(glm_rad(innerCutoffDeg)),
         .Direction = direction,
         .OuterCutoff = cosf(glm_rad(outerCutoffDeg)),
+        .Distance = distance,
+        ._enabled = true,
     };
     return spotLight;
 }

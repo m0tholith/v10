@@ -11,7 +11,7 @@ typedef struct {
     vec4s Specular;
 
     vec3s Direction;
-    float __padding; // to complete a 16 byte block in uniform buffer
+    int _enabled;
 } DirectionalLight;
 DirectionalLight directionalLightCreate(vec3s direction, vec3s ambient,
                                         vec3s diffuse, vec3s specular);
@@ -20,25 +20,20 @@ typedef struct {
     vec3s Position;
     float Intensity;
 
-    vec3s Ambient;
-    float Distance;
-
     vec3s Diffuse;
     float Decay;
 
     vec3s Specular;
-    float __padding; // to complete a 16 byte block in uniform buffer
+    float Distance;
+
+    int _enabled;
 } PointLight;
-PointLight pointLightCreate(vec3s position, vec3s ambient, vec3s diffuse,
-                            vec3s specular, float intensity, float distance,
-                            float decay);
+PointLight pointLightCreate(vec3s position, vec3s diffuse, vec3s specular,
+                            float intensity, float distance, float decay);
 
 typedef struct {
     vec3s Position;
     float Intensity;
-
-    vec3s Ambient;
-    float Distance;
 
     vec3s Diffuse;
     float Decay;
@@ -48,10 +43,13 @@ typedef struct {
 
     vec3s Direction;
     float OuterCutoff;
+
+    float Distance;
+    int _enabled;
 } SpotLight;
-SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s ambient,
-                          vec3s diffuse, vec3s specular, float intensity,
-                          float distance, float decay, float innerCutoffDeg,
+SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s diffuse,
+                          vec3s specular, float intensity, float distance,
+                          float decay, float innerCutoffDeg,
                           float outerCutoffDeg);
 void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
                         float outerCutoffDeg);
