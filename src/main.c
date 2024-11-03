@@ -80,7 +80,8 @@ int main(void) {
 
     Shader *lightShader =
         shaderCreate("light_source.vert", "light_source.frag");
-    Model *pointLightModel = modelLoad("light.glb", 0);
+    Model *pointLightModel =
+        modelLoad("light.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
     pointLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
@@ -89,7 +90,8 @@ int main(void) {
         glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
     SCENE_OBJECT_COUNT++;
 
-    Model *dirLightModel = modelLoad("arrow.glb", 0);
+    Model *dirLightModel =
+        modelLoad("arrow.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
     dirLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
@@ -101,7 +103,8 @@ int main(void) {
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
     SCENE_OBJECT_COUNT++;
 
-    Model *spotLightModel = modelLoad("flashlight.glb", 0);
+    Model *spotLightModel =
+        modelLoad("flashlight.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
     spotLightModel->Materials[0] =
         materialCreate(lightShader, 1,
                        materialPropertyCreate("diffuse", MATTYPE_VEC3,
@@ -160,8 +163,8 @@ int main(void) {
     sceneObjects[2] = sceneObjectCreate(spotLightModel, NULL);
     sceneObjects[3] = sceneObjectCreate(homeModel, NULL);
     sceneObjects[4] = sceneObjectCreate(skinningModel, armature);
-    for (int i = 5; i < SCENE_OBJECT_COUNT; i++) {
-        sceneObjects[i] = sceneObjectCreate(texturedBoxes[i - 5], NULL);
+    for (int i = 0; i < TexturedBoxCount; i++) {
+        sceneObjects[i + 5] = sceneObjectCreate(texturedBoxes[i], NULL);
     }
 
     glEnable(GL_CULL_FACE);
@@ -253,27 +256,36 @@ int main(void) {
         windowDraw(window);
     }
 
-    for (int i = 0; i < skinningModel->MaterialCount; i++) {
-        Material *material = skinningModel->Materials[i];
-        for (int j = 0; j < material->PropertyCount; j++) {
-            MaterialProperty *property = material->Properties[j];
-            if (strncmp(property->Name, "_material.", 9) == 0) {
-                materialPropertyDelete(property);
+    for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {
+        for (int i = 0; i < sceneObjects[objIdx]->Model->MaterialCount; i++) {
+            Material *material = sceneObjects[objIdx]->Model->Materials[i];
+            for (int j = 0; j < material->PropertyCount; j++) {
+                MaterialProperty *property = material->Properties[j];
+                if (strncmp(property->Name, "_material.", 9) == 0) {
+                    materialPropertyDelete(property);
+                }
             }
         }
-        materialFree(material);
     }
-    materialFree(homeModel->Materials[0]);
+    for (int i = 0; i < skinningModel->MaterialCount; i++)
+        materialFree(skinningModel->Materials[i]);
+    for (int i = 0; i < homeModel->MaterialCount; i++)
+        materialFree(homeModel->Materials[i]);
+
     materialPropertyFree(pointLightModel->Materials[0]->Properties[0]);
     materialFree(pointLightModel->Materials[0]);
     materialPropertyFree(dirLightModel->Materials[0]->Properties[0]);
     materialFree(dirLightModel->Materials[0]);
+    materialPropertyFree(spotLightModel->Materials[0]->Properties[0]);
+    materialFree(spotLightModel->Materials[0]);
     modelFree(skinningModel);
+    modelFree(spotLightModel);
     modelFree(pointLightModel);
     modelFree(dirLightModel);
     modelFree(homeModel);
     for (int i = 0; i < TexturedBoxCount; i++) {
-        materialFree(texturedBoxes[i]->Materials[0]);
+        for (int j = 0; i < texturedBoxes[i]->MaterialCount; i++)
+            materialFree(texturedBoxes[i]->Materials[j]);
         modelFree(texturedBoxes[i]);
     }
     free(texturedBoxes);
@@ -284,6 +296,7 @@ int main(void) {
     }
     free(sceneObjects);
 
+    free(spotLights);
     free(pointLights);
     free(dirLights);
     lightSceneFree(lightScene);
