@@ -11,6 +11,8 @@ SceneObject *sceneObjectCreate(Model *model, Armature *armature) {
 }
 void sceneObjectRender(SceneObject *sceneObject,
                        enum SceneObjectRenderOptions options) {
+    if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS)
+        modelPreRender(sceneObject->Model);
     if (options & SCENEOBJ_RENDER_DEPTH)
         meshOverrideShaders(sceneObject->Model->DepthShader);
     if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS &&
