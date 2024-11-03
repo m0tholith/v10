@@ -23,7 +23,7 @@
 #include <string.h>
 
 #define MOVE_SPEED 10.0f
-#define EVENT_COUNT 2
+#define EVENT_COUNT 3
 
 GLFWwindow *window;
 
@@ -176,6 +176,7 @@ int main(void) {
 
     InputEvent *movementEvent = inputGetEvent("movement");
     InputEvent *exitEvent = inputGetEvent("exit");
+    InputEvent *sprintEvent = inputGetEvent("sprint");
     while (!glfwWindowShouldClose(window)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
@@ -205,6 +206,8 @@ int main(void) {
             glm_clamp(movementEvent->State & (1 << 4), -1, 1) -
                 glm_clamp(movementEvent->State & (1 << 5), -1, 1),
         }};
+        if (sprintEvent->State > 0)
+            movementInput = glms_vec3_scale(movementInput, 2);
         positionDelta = (vec3s){{movementInput.x, 0, -movementInput.z}};
         positionDelta = glms_quat_rotatev(camera->Quaternion, positionDelta);
         positionDelta =
@@ -350,6 +353,16 @@ InputEvent *getInputEventArray() {
     events[1].Keys = malloc(1 * sizeof(struct InputKey));
     events[1].Keys[0] = (struct InputKey){
         .Value = GLFW_KEY_ESCAPE,
+    };
+
+    events[2] = (InputEvent){
+        .Name = "sprint",
+        .Type = INPUTEVENT_BUTTON,
+        .KeyCount = 1,
+    };
+    events[2].Keys = malloc(1 * sizeof(struct InputKey));
+    events[2].Keys[0] = (struct InputKey){
+        .Value = GLFW_KEY_LEFT_SHIFT,
     };
 
     return events;

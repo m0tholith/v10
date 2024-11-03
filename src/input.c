@@ -82,7 +82,12 @@ void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
         InputEvent *event = &_events[i];
         for (int keyIdx = 0; keyIdx < event->KeyCount; keyIdx++) {
             struct InputKey *eventKey = &event->Keys[keyIdx];
-            if (key == eventKey->Value && mods == eventKey->Modifiers) {
+            bool check;
+            if (eventKey->Modifiers == 0)
+                check = key == eventKey->Value;
+            else
+                check = key == eventKey->Value && mods == eventKey->Modifiers;
+            if (check) {
                 eventKey->Action = action;
                 break;
             }
