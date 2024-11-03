@@ -3,6 +3,8 @@
 #include "cglm/struct/affine-mat.h"
 #include "cglm/struct/cam.h"
 #include "glad/glad.h"
+#include "render_texture.h"
+#include "window.h"
 #include <GL/gl.h>
 #include <cglm/util.h>
 #include <math.h>
@@ -62,6 +64,8 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
     spotLight->OuterCutoff = cosf(glm_rad(outerCutoffDeg));
 }
 
+#define DIRLIGHT_SHADOWMAP_SIZE 4096
+
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights) {
     LightScene *lightScene = malloc(sizeof(LightScene));
@@ -79,7 +83,39 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
     glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightScene->UBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    lightScene->DirLightShadowMaps =
+        malloc(DIRLIGHTS_MAX * sizeof(RenderTexture));
+    for (int i = 0; i < DIRLIGHTS_MAX; i++) {
+        lightScene->DirLightShadowMaps[i] = renderTextureCreate(
+            DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE, RENDERTEX_DEPTH);
+    }
+
     return lightScene;
+}
+void sendLightMatrix(mat4s *matrix, Model *model) {
+    glUseProgram(model->DepthShader->ID);
+    glUniformMatrix4fv(glGetUniformLocation(model->DepthShader->ID,
+                                            "_lightSpaceProjectionFromWorld"),
+                       1, GL_FALSE, (void *)matrix);
+}
+void lightSceneRenderShadowMaps(LightScene *lightScene,
+                                SceneObject **sceneObjects,
+                                int sceneObjectCount) {
+    glCullFace(GL_FRONT);
+
+    for (int dirLightIdx = 0; dirLightIdx < DIRLIGHTS_MAX; dirLightIdx++) {
+        renderTextureBind(lightScene->DirLightShadowMaps[dirLightIdx]);
+        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
+            sendLightMatrix(
+                &lightScene->DirLights[dirLightIdx].ProjectionFromWorld,
+                sceneObjects[objIdx]->Model);
+            sceneObjectRender(sceneObjects[objIdx], true);
+        }
+    }
+
+    glCullFace(GL_BACK);
+    renderTextureResetBind();
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void lightScenePreRender(LightScene *lightScene) {
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);
@@ -96,5 +132,9 @@ void lightScenePreRender(LightScene *lightScene) {
 }
 void lightSceneFree(LightScene *lightScene) {
     glDeleteBuffers(1, &lightScene->UBO);
+    for (int i = 0; i < DIRLIGHTS_MAX; i++) {
+        renderTextureFree(lightScene->DirLightShadowMaps[i]);
+    }
+    free(lightScene->DirLightShadowMaps);
     free(lightScene);
 }

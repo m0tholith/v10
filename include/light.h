@@ -1,6 +1,8 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include "render_texture.h"
+#include "scene_object.h"
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
@@ -63,9 +65,14 @@ typedef struct {
     SpotLight *SpotLights;
 
     uint32_t UBO;
+
+    RenderTexture **DirLightShadowMaps;
 } LightScene;
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights);
+void lightSceneRenderShadowMaps(LightScene *lightScene,
+                                SceneObject **sceneObjects,
+                                int sceneObjectCount);
 void lightScenePreRender(LightScene *lightScene);
 void lightSceneFree(LightScene *lightScene);
 

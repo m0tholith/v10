@@ -164,15 +164,6 @@ int main(void) {
         sceneObjects[i] = sceneObjectCreate(texturedBoxes[i - 5], NULL);
     }
 
-    //
-    int maxTextureSize;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    maxTextureSize /= 4;
-    const int SHADOW_WIDTH = maxTextureSize, SHADOW_HEIGHT = maxTextureSize;
-    RenderTexture *dirLightRenderTex =
-        renderTextureCreate(SHADOW_WIDTH, SHADOW_HEIGHT, RENDERTEX_DEPTH);
-    //
-
     glEnable(GL_CULL_FACE);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
@@ -242,37 +233,17 @@ int main(void) {
 
         lastTime = currentTime;
 
-        lightScenePreRender(lightScene);
-        cameraPreRender(camera);
-
-        //
-        renderTextureBind(dirLightRenderTex);
-        glCullFace(GL_FRONT);
-
-        ///
-#define sendLightMatrix(__model)                                               \
-    glUseProgram(__model->DepthShader->ID);                                    \
-    glUniformMatrix4fv(glGetUniformLocation(__model->DepthShader->ID,          \
-                                            "_lightSpaceProjectionFromWorld"), \
-                       1, GL_FALSE,                                            \
-                       (void *)&dirLights[0].ProjectionFromWorld);
-
-        for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
-            sendLightMatrix(sceneObjects[i]->Model);
-            sceneObjectRender(sceneObjects[i], true);
-        }
-        ///
-        glCullFace(GL_BACK);
-        renderTextureResetBind();
-        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        lightSceneRenderShadowMaps(lightScene, sceneObjects,
+                                   SCENE_OBJECT_COUNT);
         for (int i = 0; i < shaderCache->Used; i++) {
             glUseProgram(shaderCache->Array[i].value->ID);
             glActiveTexture(GL_TEXTURE10);
-            glBindTexture(GL_TEXTURE_2D, dirLightRenderTex->Texture);
+            glBindTexture(GL_TEXTURE_2D,
+                          lightScene->DirLightShadowMaps[0]->Texture);
         }
-        meshOverrideShaders(NULL);
-        //
 
+        cameraPreRender(camera);
+        lightScenePreRender(lightScene);
         modelRender(pointLightModel);
         modelRender(dirLightModel);
         modelRender(spotLightModel);
@@ -322,8 +293,6 @@ int main(void) {
 
     textureFreeCache();
     shaderCacheFree(shaderCache);
-
-    renderTextureFree(dirLightRenderTex);
 
     windowClose();
 
