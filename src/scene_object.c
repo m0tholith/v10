@@ -11,24 +11,26 @@ SceneObject *sceneObjectCreate(Model *model, Armature *armature) {
 }
 void sceneObjectRender(SceneObject *sceneObject,
                        enum SceneObjectRenderOptions options) {
-    if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS)
+    if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS) {
         modelPreRender(sceneObject->Model);
-    if (options & SCENEOBJ_RENDER_DEPTH)
-        meshOverrideShaders(sceneObject->Model->DepthShader);
-    if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS &&
-        sceneObject->Armature != NULL) {
-        armatureApplyTransformations(sceneObject->Armature);
-        if (options & SCENEOBJ_RENDER_DEPTH) {
-            glUseProgram(sceneObject->Model->DepthShader->ID);
-            glUniformMatrix4fv(
-                glGetUniformLocation(sceneObject->Model->DepthShader->ID,
-                                     "_boneTransformations"),
-                MAX_BONES, GL_FALSE,
-                (void *)&sceneObject->Armature->BoneTransformations);
+        if (sceneObject->Armature != NULL) {
+            armatureApplyTransformations(sceneObject->Armature);
+            if (options & SCENEOBJ_RENDER_DEPTH) {
+                glUseProgram(sceneObject->Model->DepthShader->ID);
+                glUniformMatrix4fv(
+                    glGetUniformLocation(sceneObject->Model->DepthShader->ID,
+                                         "_boneTransformations"),
+                    MAX_BONES, GL_FALSE,
+                    (void *)&sceneObject->Armature->BoneTransformations);
+            }
         }
     }
-    modelRender(sceneObject->Model);
-    if (options & SCENEOBJ_RENDER_DEPTH)
+
+    if (options & SCENEOBJ_RENDER_DEPTH) {
+        meshOverrideShaders(sceneObject->Model->DepthShader);
+        modelRender(sceneObject->Model);
         meshOverrideShaders(NULL);
+    } else
+        modelRender(sceneObject->Model);
 }
 void sceneObjectFree(SceneObject *sceneObject) { free(sceneObject); }
