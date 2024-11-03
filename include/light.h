@@ -8,12 +8,15 @@
 
 typedef struct {
     mat4s ProjectionFromWorld;
-    vec4s Ambient;
-    vec4s Diffuse;
-    vec4s Specular;
+    vec3s Ambient;
+    float _padding1;
+    vec3s Diffuse;
+    float _padding2;
+    vec3s Specular;
+    float _padding3;
 
     vec3s Direction;
-    int _enabled;
+    float _enabled;
 } DirLight; // short for directional light
 DirLight dirLightCreate(vec3s direction, vec3s ambient, vec3s diffuse,
                         vec3s specular);
@@ -28,7 +31,8 @@ typedef struct {
     vec3s Specular;
     float Distance;
 
-    int _enabled;
+    float _enabled;
+    vec3s _padding; // to complete 16 byte offset
 } PointLight;
 PointLight pointLightCreate(vec3s position, vec3s diffuse, vec3s specular,
                             float intensity, float distance, float decay);
@@ -47,7 +51,8 @@ typedef struct {
     float OuterCutoff;
 
     float Distance;
-    int _enabled;
+    float _enabled;
+    vec2s _padding; // to complete 16 byte offset
 } SpotLight;
 SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s diffuse,
                           vec3s specular, float intensity, float distance,
