@@ -263,7 +263,7 @@ int main(void) {
         }
         ///
         glCullFace(GL_BACK);
-        renderTextureUnbind(dirLightRenderTex);
+        renderTextureResetBind();
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
         for (int i = 0; i < shaderCache->Used; i++) {
             glUseProgram(shaderCache->Array[i].value->ID);

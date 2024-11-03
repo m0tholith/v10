@@ -16,7 +16,7 @@ typedef struct {
 } RenderTexture;
 RenderTexture *renderTextureCreate(int x, int y, enum RenderTextureType type);
 void renderTextureBind(RenderTexture *renderTexture);
-void renderTextureUnbind(RenderTexture *renderTexture);
+void renderTextureResetBind();
 void renderTextureFree(RenderTexture *renderTexture);
 
 #endif // !RENDER_TEXTURE_H

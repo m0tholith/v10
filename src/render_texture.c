@@ -52,7 +52,7 @@ void renderTextureBind(RenderTexture *renderTexture) {
     glBindFramebuffer(GL_FRAMEBUFFER, renderTexture->FBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-void renderTextureUnbind(RenderTexture *renderTexture) {
+void renderTextureResetBind() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void renderTextureFree(RenderTexture *renderTexture) {
