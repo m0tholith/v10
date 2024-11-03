@@ -244,13 +244,10 @@ int main(void) {
 
         cameraPreRender(camera);
         lightScenePreRender(lightScene);
-        modelRender(pointLightModel);
-        modelRender(dirLightModel);
-        modelRender(spotLightModel);
-        modelRender(skinningModel);
-        modelRender(homeModel);
-        for (int i = 0; i < TexturedBoxCount; i++) {
-            modelRender(texturedBoxes[i]);
+
+        for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
+            sceneObjectRender(sceneObjects[i],
+                              SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
 
         windowDraw(window);
