@@ -11,6 +11,7 @@
 #include "material.h"
 #include "model.h"
 #include "render_texture.h"
+#include "scene_object.h"
 #include "shader.h"
 #include "texture.h"
 
@@ -75,6 +76,8 @@ int main(void) {
     LightScene *lightScene =
         lightSceneCreate(dirLights, pointLights, spotLights);
 
+    int SCENE_OBJECT_COUNT = 0;
+
     Shader *lightShader =
         shaderCreate("light_source.vert", "light_source.frag");
     Model *pointLightModel = modelLoad("light.glb", 0);
@@ -84,6 +87,7 @@ int main(void) {
                                               (void *)&pointLights[0].Diffuse));
     pointLightModel->WorldFromModel =
         glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
+    SCENE_OBJECT_COUNT++;
 
     Model *dirLightModel = modelLoad("arrow.glb", 0);
     dirLightModel->Materials[0] =
@@ -95,6 +99,7 @@ int main(void) {
     vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
     dirLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
+    SCENE_OBJECT_COUNT++;
 
     Model *spotLightModel = modelLoad("flashlight.glb", 0);
     spotLightModel->Materials[0] =
@@ -106,6 +111,7 @@ int main(void) {
     spotLightModel->WorldFromModel =
         glms_rotate(glms_translate(GLMS_MAT4_IDENTITY, spotLights[0].Position),
                     angle, axis);
+    SCENE_OBJECT_COUNT++;
 
     Shader *homeShader =
         shaderCreate("light_affected.vert", "light_affected.frag");
@@ -113,6 +119,7 @@ int main(void) {
     for (int i = 0; i < homeModel->MaterialCount; i++) {
         homeModel->Materials[i]->Shader = homeShader;
     }
+    SCENE_OBJECT_COUNT++;
 
     Shader *skinningShader =
         shaderCreate("skinning.vert", "light_affected.frag");
@@ -128,6 +135,7 @@ int main(void) {
                    (vec3s){{1.5f, 1.5f, 1.5f}}),
         (vec3s){{-3.0f, 0.0f, -1.4f}});
     Armature *armature = armatureCreate(skinningModel);
+    SCENE_OBJECT_COUNT++;
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
@@ -142,6 +150,18 @@ int main(void) {
             glms_rotate_y(GLMS_MAT4_IDENTITY, glm_rad(23)),
             (vec3s){{-1.7f + (float)i / ((TexturedBoxCount - 1) * 2), -4.0f + i,
                      -4.4f}});
+        SCENE_OBJECT_COUNT++;
+    }
+
+    SceneObject **sceneObjects =
+        malloc(SCENE_OBJECT_COUNT * sizeof(SceneObject *));
+    sceneObjects[0] = sceneObjectCreate(pointLightModel, NULL);
+    sceneObjects[1] = sceneObjectCreate(dirLightModel, NULL);
+    sceneObjects[2] = sceneObjectCreate(spotLightModel, NULL);
+    sceneObjects[3] = sceneObjectCreate(homeModel, NULL);
+    sceneObjects[4] = sceneObjectCreate(skinningModel, armature);
+    for (int i = 5; i < SCENE_OBJECT_COUNT; i++) {
+        sceneObjects[i] = sceneObjectCreate(texturedBoxes[i - 5], NULL);
     }
 
     //
@@ -237,36 +257,9 @@ int main(void) {
                        1, GL_FALSE,                                            \
                        (void *)&dirLights[0].ProjectionFromWorld);
 
-        meshOverrideShaders(pointLightModel->DepthShader);
-        sendLightMatrix(pointLightModel);
-        modelRender(pointLightModel);
-
-        meshOverrideShaders(dirLightModel->DepthShader);
-        sendLightMatrix(dirLightModel);
-        modelRender(dirLightModel);
-
-        meshOverrideShaders(spotLightModel->DepthShader);
-        sendLightMatrix(spotLightModel);
-        modelRender(spotLightModel);
-
-        meshOverrideShaders(skinningModel->DepthShader);
-        sendLightMatrix(skinningModel);
-        armatureApplyTransformations(armature);
-        glUseProgram(skinningModel->DepthShader->ID);
-        glUniformMatrix4fv(glGetUniformLocation(skinningModel->DepthShader->ID,
-                                                "_boneTransformations"),
-                           MAX_BONES, GL_FALSE,
-                           (void *)&armature->BoneTransformations);
-        modelRender(skinningModel);
-
-        meshOverrideShaders(homeModel->DepthShader);
-        sendLightMatrix(homeModel);
-        modelRender(homeModel);
-
-        for (int i = 0; i < TexturedBoxCount; i++) {
-            meshOverrideShaders(texturedBoxes[i]->DepthShader);
-            sendLightMatrix(texturedBoxes[i]);
-            modelRender(texturedBoxes[i]);
+        for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
+            sendLightMatrix(sceneObjects[i]->Model);
+            sceneObjectRender(sceneObjects[i], true);
         }
         ///
         glCullFace(GL_BACK);
@@ -317,6 +310,11 @@ int main(void) {
     }
     free(texturedBoxes);
     armatureFree(armature);
+
+    for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
+        sceneObjectFree(sceneObjects[i]);
+    }
+    free(sceneObjects);
 
     free(pointLights);
     free(dirLights);
