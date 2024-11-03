@@ -109,7 +109,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
             sendLightMatrix(
                 &lightScene->DirLights[dirLightIdx].ProjectionFromWorld,
                 sceneObjects[objIdx]->Model);
-            sceneObjectRender(sceneObjects[objIdx], true);
+            sceneObjectRender(sceneObjects[objIdx], SCENEOBJ_RENDER_DEPTH);
         }
     }
 

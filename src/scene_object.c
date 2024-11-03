@@ -9,12 +9,14 @@ SceneObject *sceneObjectCreate(Model *model, Armature *armature) {
     sceneObject->Armature = armature;
     return sceneObject;
 }
-void sceneObjectRender(SceneObject *sceneObject, bool renderDepth) {
-    if (renderDepth)
+void sceneObjectRender(SceneObject *sceneObject,
+                       enum SceneObjectRenderOptions options) {
+    if (options & SCENEOBJ_RENDER_DEPTH)
         meshOverrideShaders(sceneObject->Model->DepthShader);
-    if (sceneObject->Armature != NULL) {
+    if (options & ~SCENEOBJ_RENDER_NOAPPLYTRANSFORMS &&
+        sceneObject->Armature != NULL) {
         armatureApplyTransformations(sceneObject->Armature);
-        if (renderDepth) {
+        if (options & SCENEOBJ_RENDER_DEPTH) {
             glUseProgram(sceneObject->Model->DepthShader->ID);
             glUniformMatrix4fv(
                 glGetUniformLocation(sceneObject->Model->DepthShader->ID,
@@ -24,7 +26,7 @@ void sceneObjectRender(SceneObject *sceneObject, bool renderDepth) {
         }
     }
     modelRender(sceneObject->Model);
-    if (renderDepth)
+    if (options & SCENEOBJ_RENDER_DEPTH)
         meshOverrideShaders(NULL);
 }
 void sceneObjectFree(SceneObject *sceneObject) { free(sceneObject); }
