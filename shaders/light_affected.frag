@@ -162,6 +162,7 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular) {
         lightSpecular * spec * _material.specular * _material.specular_strength;
     return specular;
 }
+const int pcfSize = 1;
 float shadow(vec4 lightSpacePos, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
@@ -170,7 +171,6 @@ float shadow(vec4 lightSpacePos, float bias) {
     float shadow = 0;
     if (projectionCoords.z < 1.0) {
         vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-        int pcfSize = 2;
         for (int x = -pcfSize; x <= pcfSize; x++) {
             for (int y = -pcfSize; y <= pcfSize; y++) {
                 float pcfDepth = texture(shadowMap, projectionCoords.xy +
