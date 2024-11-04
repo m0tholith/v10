@@ -12,6 +12,9 @@ typedef struct {
     char *VertPath;
     uint32_t VertID;
 
+    char *GeomPath;
+    uint32_t GeomID;
+
     char *FragPath;
     uint32_t FragID;
 
@@ -30,6 +33,7 @@ typedef struct {
 ShaderCache *shaderCacheCreate();
 void shaderSetCache(ShaderCache *cache);
 Shader *shaderCreate(const char *vertexShaderPath,
+                     const char *geometryShaderPath,
                      const char *fragmentShaderPath);
 void shaderFree(Shader *shader);
 void shaderCacheFree(ShaderCache *cache);

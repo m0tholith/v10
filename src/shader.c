@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,13 +27,18 @@ ShaderCache *shaderCacheCreate() {
 }
 void shaderSetCache(ShaderCache *cache) { _shaderCache = cache; }
 Shader *shaderCreate(const char *_vertexShaderPath,
+                     const char *_geometryShaderPath,
                      const char *_fragmentShaderPath) {
+    bool useGeomShader = strlen(_geometryShaderPath) != 0;
+
     char *hashSource = "";
     uint64_t hashSourceHash = 0;
     if (_shaderCache != NULL) {
         hashSource =
-            malloc(strlen(_vertexShaderPath) + strlen(_fragmentShaderPath) + 1);
+            malloc(strlen(_vertexShaderPath) + strlen(_geometryShaderPath) +
+                   strlen(_fragmentShaderPath) + 1);
         strcpy(hashSource, _vertexShaderPath);
+        strcat(hashSource, _geometryShaderPath);
         strcat(hashSource, _fragmentShaderPath);
         hashSourceHash = shaderPathHash(hashSource);
         int shaderCacheIndex = shaderCacheSearch(_shaderCache, hashSourceHash);
@@ -46,6 +52,14 @@ Shader *shaderCreate(const char *_vertexShaderPath,
         malloc(strlen(_vertexShaderPath) + sizeof(SHADERS_PATH));
     strcpy(vertexShaderPath, SHADERS_PATH);
     strcat(vertexShaderPath, _vertexShaderPath);
+    char *geometryShaderPath;
+    if (useGeomShader) {
+        geometryShaderPath =
+            malloc(strlen(_geometryShaderPath) + sizeof(SHADERS_PATH));
+        strcpy(geometryShaderPath, SHADERS_PATH);
+        strcat(geometryShaderPath, _geometryShaderPath);
+    } else
+        geometryShaderPath = "";
     char *fragmentShaderPath =
         malloc(strlen(_fragmentShaderPath) + sizeof(SHADERS_PATH));
     strcpy(fragmentShaderPath, SHADERS_PATH);
@@ -66,6 +80,23 @@ Shader *shaderCreate(const char *_vertexShaderPath,
         exit(EXIT_FAILURE);
     }
 
+    char *geometryShaderContents = malloc(sizeof(char));
+    uint32_t geometryShader = 0;
+    if (useGeomShader) {
+        free(geometryShaderContents);
+        char *geometryShaderContents = readShaderFile(geometryShaderPath);
+        const char *geometryShaderSource = geometryShaderContents;
+        geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometryShader, 1, &geometryShaderSource, NULL);
+        glCompileShader(geometryShader);
+        glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(geometryShader, sizeof(infoLog), NULL, infoLog);
+            fprintf(stderr, "geometry shader could not compile: %s", infoLog);
+            exit(EXIT_FAILURE);
+        }
+    }
+
     char *fragmentShaderContents = readShaderFile(fragmentShaderPath);
     const char *fragmentShaderSource = fragmentShaderContents;
     uint32_t fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -80,6 +111,8 @@ Shader *shaderCreate(const char *_vertexShaderPath,
 
     uint32_t shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
+    if (useGeomShader)
+        glAttachShader(shaderProgram, geometryShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
     int shaderSuccess;
@@ -92,8 +125,11 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     glUseProgram(shaderProgram);
 
     free(vertexShaderContents);
+    free(geometryShaderContents);
     free(fragmentShaderContents);
     free(vertexShaderPath);
+    if (useGeomShader)
+        free(geometryShaderPath);
     free(fragmentShaderPath);
 
     Shader *shader = malloc(sizeof(Shader));
@@ -103,6 +139,15 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     shader->VertPath = malloc(strlen(_vertexShaderPath) + 1);
     strcpy(shader->VertPath, _vertexShaderPath);
     shader->VertID = vertexShader;
+
+    if (useGeomShader) {
+        shader->GeomPath = malloc(strlen(_geometryShaderPath) + 1);
+        strcpy(shader->GeomPath, _geometryShaderPath);
+        shader->GeomID = geometryShader;
+    } else {
+        shader->GeomPath = "";
+        shader->GeomID = 0;
+    }
 
     shader->FragPath = malloc(strlen(_fragmentShaderPath) + 1);
     strcpy(shader->FragPath, _fragmentShaderPath);
@@ -117,11 +162,17 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     return shader;
 }
 void shaderFree(Shader *shader) {
+    bool useGeomShader = shader->GeomID != 0;
+
     glDeleteProgram(shader->ID);
     glDeleteShader(shader->VertID);
+    if (useGeomShader)
+        glDeleteShader(shader->GeomID);
     glDeleteShader(shader->FragID);
-    free(shader->FragPath);
     free(shader->VertPath);
+    if (useGeomShader)
+        free(shader->GeomPath);
+    free(shader->FragPath);
     free(shader);
 }
 

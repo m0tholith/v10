@@ -79,7 +79,7 @@ int main(void) {
     int SCENE_OBJECT_COUNT = 0;
 
     Shader *lightShader =
-        shaderCreate("light_source.vert", "light_source.frag");
+        shaderCreate("light_source.vert", "", "light_source.frag");
     Model *pointLightModel =
         modelLoad("light.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
     pointLightModel->Materials[0] =
@@ -117,7 +117,7 @@ int main(void) {
     SCENE_OBJECT_COUNT++;
 
     Shader *homeShader =
-        shaderCreate("light_affected.vert", "light_affected.frag");
+        shaderCreate("light_affected.vert", "", "light_affected.frag");
     Model *homeModel = modelLoad("home.glb", 0);
     for (int i = 0; i < homeModel->MaterialCount; i++) {
         homeModel->Materials[i]->Shader = homeShader;
@@ -125,10 +125,10 @@ int main(void) {
     SCENE_OBJECT_COUNT++;
 
     Shader *skinningShader =
-        shaderCreate("skinning.vert", "light_affected.frag");
+        shaderCreate("skinning.vert", "", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
     skinningModel->DepthShader =
-        shaderCreate("depth_skinning.vert", "depth.frag");
+        shaderCreate("depth_skinning.vert", "", "depth.frag");
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
     }
@@ -143,7 +143,7 @@ int main(void) {
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
     Shader *texturedShader =
-        shaderCreate("light_affected.vert", "light_affected.frag");
+        shaderCreate("light_affected.vert", "", "light_affected.frag");
     for (int i = 0; i < TexturedBoxCount; i++) {
         texturedBoxes[i] = modelLoad("BoxTextured.glb", 0);
         for (int j = 0; j < texturedBoxes[i]->MaterialCount; j++) {
