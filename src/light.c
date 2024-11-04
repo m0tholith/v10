@@ -102,6 +102,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
                                 SceneObject **sceneObjects,
                                 int sceneObjectCount) {
     glCullFace(GL_FRONT);
+    glViewport(0, 0, DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE);
 
     for (int dirLightIdx = 0; dirLightIdx < DIRLIGHTS_MAX; dirLightIdx++) {
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
