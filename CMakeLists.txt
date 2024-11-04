@@ -16,7 +16,7 @@ set(SRC_FILES
     src/node.c
     src/scene_object.c
     src/animation.c
-    src/render_texture.c
+    src/framebuffer.c
     src/shader.c
     src/light.c
     src/material.c

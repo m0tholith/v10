@@ -10,7 +10,7 @@
 #include "light.h"
 #include "material.h"
 #include "model.h"
-#include "render_texture.h"
+#include "framebuffer.h"
 #include "scene_object.h"
 #include "shader.h"
 #include "texture.h"

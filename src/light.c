@@ -3,7 +3,7 @@
 #include "cglm/struct/affine-mat.h"
 #include "cglm/struct/cam.h"
 #include "glad/glad.h"
-#include "render_texture.h"
+#include "framebuffer.h"
 #include "window.h"
 #include <GL/gl.h>
 #include <cglm/util.h>
@@ -84,10 +84,10 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     lightScene->DirLightShadowMaps =
-        malloc(DIRLIGHTS_MAX * sizeof(RenderTexture));
+        malloc(DIRLIGHTS_MAX * sizeof(Framebuffer));
     for (int i = 0; i < DIRLIGHTS_MAX; i++) {
-        lightScene->DirLightShadowMaps[i] = renderTextureCreate(
-            DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE, RENDERTEX_DEPTH);
+        lightScene->DirLightShadowMaps[i] = framebufferCreate(
+            DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE, FRAMEBUF_DEPTH);
     }
 
     return lightScene;
@@ -104,7 +104,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
     glCullFace(GL_FRONT);
 
     for (int dirLightIdx = 0; dirLightIdx < DIRLIGHTS_MAX; dirLightIdx++) {
-        renderTextureBind(lightScene->DirLightShadowMaps[dirLightIdx]);
+        framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             sendLightMatrix(
                 &lightScene->DirLights[dirLightIdx].ProjectionFromWorld,
@@ -114,7 +114,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
     }
 
     glCullFace(GL_BACK);
-    renderTextureResetBind();
+    framebufferResetBind();
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void lightScenePreRender(LightScene *lightScene) {
@@ -133,7 +133,7 @@ void lightScenePreRender(LightScene *lightScene) {
 void lightSceneFree(LightScene *lightScene) {
     glDeleteBuffers(1, &lightScene->UBO);
     for (int i = 0; i < DIRLIGHTS_MAX; i++) {
-        renderTextureFree(lightScene->DirLightShadowMaps[i]);
+        framebufferFree(lightScene->DirLightShadowMaps[i]);
     }
     free(lightScene->DirLightShadowMaps);
     free(lightScene);
