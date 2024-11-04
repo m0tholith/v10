@@ -56,7 +56,7 @@ int main(void) {
     memset(dirLights, 0, DIRLIGHTS_MAX * sizeof(DirLight));
     dirLights[0] = dirLightCreate(
         glms_vec3_normalize(glms_vec3_negate((vec3s){{-3, -4, 7}})),
-        (vec3s){{0.0f, 0.0f, 0.0f}}, (vec3s){{0.694f, 0.688f, 0.578f}},
+        (vec3s){{0.2f, 0.2f, 0.2f}}, (vec3s){{0.694f, 0.688f, 0.578f}},
         (vec3s){{0.7f, 0.7f, 0.7f}});
 
     PointLight *pointLights = malloc(POINTLIGHTS_MAX * sizeof(PointLight));
