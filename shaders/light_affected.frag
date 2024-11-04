@@ -57,14 +57,15 @@ layout(binding = 10) uniform sampler2D shadowMap;
 
 vec3 _diffuse;
 
+vec3 calc_dir_light(DirLight light);
+vec3 calc_point_light(PointLight light);
+vec3 calc_spot_light(SpotLight light);
+
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity,
                   float lightDecay);
 vec3 diffuse(vec3 lightDir, vec3 lightDiffuse);
 vec3 specular(vec3 lightDir, vec3 lightSpecular);
 float shadow(vec4 lightSpacePos, float bias);
-vec3 calc_spot_light(SpotLight light);
-vec3 calc_point_light(PointLight light);
-vec3 calc_dir_light(DirLight light);
 
 void main() {
     _diffuse = vec3(texture(_material.diffuse_tex, fs_in.TexCoord));
@@ -87,6 +88,57 @@ void main() {
     FragColor = vec4(totalColor, 1.0);
 }
 
+vec3 calc_dir_light(DirLight light) {
+    vec4 lightSpacePos = light.projectionFromWorld * vec4(fs_in.Pos, 1.0);
+
+    vec3 ambient = light.ambient.xyz * _material.ambient;
+    vec3 diffuse = diffuse(light.directionAndEnabled.xyz, light.diffuse.xyz);
+    vec3 specular = specular(light.directionAndEnabled.xyz, light.specular.xyz);
+
+    vec3 resultColor = diffuse + specular;
+
+    return ambient + resultColor * shadow(lightSpacePos, 0);
+}
+vec3 calc_point_light(PointLight light) {
+    vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);
+    vec3 diffuse = diffuse(lightDir, light.diffuseAndDecay.xyz);
+    vec3 specular = specular(lightDir, light.specularAndDistance.xyz);
+
+    vec3 resultColor = diffuse + specular;
+
+    return resultColor * attenuation(light.positionAndIntensity.xyz,
+                                     light.specularAndDistance.w,
+                                     light.positionAndIntensity.w,
+                                     light.diffuseAndDecay.w);
+}
+#define SPOTLIGHT_EASE(x) (x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2)
+vec3 calc_spot_light(SpotLight light) {
+    vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);
+
+    float angle = dot(lightDir, light.directionAndOuterCutoff.xyz);
+    if (angle < light.directionAndOuterCutoff.w)
+        return vec3(0);
+
+    vec3 diffuse = diffuse(lightDir, light.diffuseAndDecay.xyz);
+    vec3 specular = specular(lightDir, light.specularAndInnerCutoff.xyz);
+
+    vec3 resultColor = diffuse + specular;
+
+    float t;
+    if (light.specularAndInnerCutoff.w == light.directionAndOuterCutoff.w ||
+        angle > light.specularAndInnerCutoff.w)
+        t = 1;
+    else
+        t = (angle - light.directionAndOuterCutoff.w) /
+            (light.specularAndInnerCutoff.w - light.directionAndOuterCutoff.w);
+    t = SPOTLIGHT_EASE(t);
+
+    return resultColor *
+           attenuation(light.positionAndIntensity.xyz,
+                       light.distanceAndEnabled.x, light.positionAndIntensity.w,
+                       light.diffuseAndDecay.w) *
+           t;
+}
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity,
                   float lightDecay) {
     float distanceRatioSqr =
@@ -110,7 +162,6 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular) {
         lightSpecular * spec * _material.specular * _material.specular_strength;
     return specular;
 }
-#define ease(x) (x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2)
 float shadow(vec4 lightSpacePos, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
@@ -132,54 +183,4 @@ float shadow(vec4 lightSpacePos, float bias) {
             shadow /= pow(pcfSize * 3, 2);
     }
     return 1 - shadow;
-}
-vec3 calc_spot_light(SpotLight light) {
-    vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);
-
-    float angle = dot(lightDir, light.directionAndOuterCutoff.xyz);
-    if (angle < light.directionAndOuterCutoff.w)
-        return vec3(0);
-
-    vec3 diffuse = diffuse(lightDir, light.diffuseAndDecay.xyz);
-    vec3 specular = specular(lightDir, light.specularAndInnerCutoff.xyz);
-
-    vec3 resultColor = diffuse + specular;
-
-    float t;
-    if (light.specularAndInnerCutoff.w == light.directionAndOuterCutoff.w ||
-        angle > light.specularAndInnerCutoff.w)
-        t = 1;
-    else
-        t = (angle - light.directionAndOuterCutoff.w) /
-            (light.specularAndInnerCutoff.w - light.directionAndOuterCutoff.w);
-    t = ease(t);
-
-    return resultColor *
-           attenuation(light.positionAndIntensity.xyz,
-                       light.distanceAndEnabled.x, light.positionAndIntensity.w,
-                       light.diffuseAndDecay.w) *
-           t;
-}
-vec3 calc_point_light(PointLight light) {
-    vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);
-    vec3 diffuse = diffuse(lightDir, light.diffuseAndDecay.xyz);
-    vec3 specular = specular(lightDir, light.specularAndDistance.xyz);
-
-    vec3 resultColor = diffuse + specular;
-
-    return resultColor * attenuation(light.positionAndIntensity.xyz,
-                                     light.specularAndDistance.w,
-                                     light.positionAndIntensity.w,
-                                     light.diffuseAndDecay.w);
-}
-vec3 calc_dir_light(DirLight light) {
-    vec4 lightSpacePos = light.projectionFromWorld * vec4(fs_in.Pos, 1.0);
-
-    vec3 ambient = light.ambient.xyz * _material.ambient;
-    vec3 diffuse = diffuse(light.directionAndEnabled.xyz, light.diffuse.xyz);
-    vec3 specular = specular(light.directionAndEnabled.xyz, light.specular.xyz);
-
-    vec3 resultColor = diffuse + specular;
-
-    return ambient + resultColor * shadow(lightSpacePos, 0);
 }
