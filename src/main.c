@@ -6,11 +6,11 @@
 #include "animation.h"
 #include "armature.h"
 #include "camera.h"
+#include "framebuffer.h"
 #include "input.h"
 #include "light.h"
 #include "material.h"
 #include "model.h"
-#include "framebuffer.h"
 #include "scene_object.h"
 #include "shader.h"
 #include "texture.h"
@@ -245,7 +245,7 @@ int main(void) {
             glUseProgram(shaderCache->Array[i].value->ID);
             glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D,
-                          lightScene->DirLightShadowMaps[0]->Texture);
+                          lightScene->DirLightShadowMaps[0]->Target);
         }
 
         cameraPreRender(camera);
