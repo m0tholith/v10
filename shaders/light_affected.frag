@@ -117,13 +117,23 @@ float shadow(vec4 lightSpacePos, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
 
-    float closestDepth = texture(shadowMap, projectionCoords.xy).r;
     float currentDepth = projectionCoords.z;
-    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
-    if (projectionCoords.z > 1.0)
-        shadow = 0.0;
-
-    return shadow;
+    float shadow = 0;
+    if (projectionCoords.z < 1.0) {
+        vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+        int pcfSize = 2;
+        for (int x = -pcfSize; x <= pcfSize; x++) {
+            for (int y = -pcfSize; y <= pcfSize; y++) {
+                float pcfDepth = texture(shadowMap, projectionCoords.xy +
+                                                        vec2(x, y) * texelSize)
+                                     .r;
+                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+            }
+        }
+        if (pcfSize > 0)
+            shadow /= pow(pcfSize * 3, 2);
+    }
+    return 1 - shadow;
 }
 vec3 calc_spot_light(SpotLight light) {
     vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);

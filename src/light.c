@@ -64,7 +64,7 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
     spotLight->OuterCutoff = cosf(glm_rad(outerCutoffDeg));
 }
 
-#define DIRLIGHT_SHADOWMAP_SIZE 4096
+#define DIRLIGHT_SHADOWMAP_SIZE 2048
 
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights) {
