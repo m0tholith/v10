@@ -110,9 +110,7 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular) {
         lightSpecular * spec * _material.specular * _material.specular_strength;
     return specular;
 }
-float ease(float x) {
-    return x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2;
-}
+#define ease(x) (x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2)
 float shadow(vec4 lightSpacePos, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
