@@ -17,9 +17,9 @@ DirLight dirLightCreate(vec3s direction, vec3s ambient, vec3s diffuse,
         .ProjectionFromWorld = glms_mul(
             glms_ortho(-10, 10, -10, 10, -10, 10),
             glms_lookat(direction, GLMS_VEC3_ZERO, (vec3s){{0, 1, 0}})),
-        .Ambient = (vec3s){{ambient.x, ambient.y, ambient.z}},
-        .Diffuse = (vec3s){{diffuse.x, diffuse.y, diffuse.z}},
-        .Specular = (vec3s){{specular.x, specular.y, specular.z}},
+        .Ambient = ambient,
+        .Diffuse = diffuse,
+        .Specular = specular,
         .Direction = direction,
         ._enabled = true,
     };
