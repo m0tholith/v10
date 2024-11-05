@@ -16,6 +16,7 @@ Framebuffer *framebufferCreate(int x, int y, enum FramebufferOpts options) {
     Framebuffer *framebuffer = malloc(sizeof(Framebuffer));
     framebuffer->x = x;
     framebuffer->y = y;
+    framebuffer->Options = options;
 
     glGenFramebuffers(1, &framebuffer->FBO);
     glGenTextures(1, &framebuffer->Target);

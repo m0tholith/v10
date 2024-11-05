@@ -16,6 +16,7 @@ typedef struct {
     uint32_t Target;
     int x;
     int y;
+    enum FramebufferOpts Options;
 } Framebuffer;
 Framebuffer *framebufferCreate(int x, int y, enum FramebufferOpts options);
 void framebufferBind(Framebuffer *framebuffer);
