@@ -8,10 +8,13 @@
 
 typedef struct {
     mat4s ProjectionFromWorld;
+
     vec3s Ambient;
     float _padding1;
+
     vec3s Diffuse;
     float _padding2;
+
     vec3s Specular;
     float _padding3;
 
@@ -72,6 +75,7 @@ typedef struct {
     uint32_t UBO;
 
     Framebuffer **DirLightShadowMaps;
+    Framebuffer **PointLightShadowMaps;
 } LightScene;
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights);

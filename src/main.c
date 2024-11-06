@@ -127,8 +127,11 @@ int main(void) {
     Shader *skinningShader =
         shaderCreate("skinning.vert", "", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
-    skinningModel->DepthShader =
-        shaderCreate("depth_skinning.vert", "", "depth.frag");
+    skinningModel->DirLightDepthShader =
+        shaderCreate("depth_skinning_dirlight.vert", "", "depth_dirlight.frag");
+    skinningModel->PointLightDepthShader =
+        shaderCreate("depth_skinning_pointlight.vert", "depth_pointlight.geom",
+                     "depth_pointlight.frag");
     for (int i = 0; i < skinningModel->MaterialCount; i++) {
         skinningModel->Materials[i]->Shader = skinningShader;
     }
@@ -246,6 +249,9 @@ int main(void) {
             glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D,
                           lightScene->DirLightShadowMaps[0]->Target);
+            glActiveTexture(GL_TEXTURE9);
+            glBindTexture(GL_TEXTURE_CUBE_MAP,
+                          lightScene->PointLightShadowMaps[0]->Target);
         }
 
         cameraPreRender(camera);

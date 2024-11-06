@@ -2,8 +2,8 @@
 
 #include "cglm/struct/affine-mat.h"
 #include "cglm/struct/cam.h"
-#include "glad/glad.h"
 #include "framebuffer.h"
+#include "glad/glad.h"
 #include "window.h"
 #include <GL/gl.h>
 #include <cglm/util.h>
@@ -65,6 +65,7 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
 }
 
 #define DIRLIGHT_SHADOWMAP_SIZE 1024
+#define POINTLIGHT_SHADOWMAP_SIZE (DIRLIGHT_SHADOWMAP_SIZE)
 
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights) {
@@ -86,31 +87,106 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
     lightScene->DirLightShadowMaps =
         malloc(DIRLIGHTS_MAX * sizeof(Framebuffer));
     for (int i = 0; i < DIRLIGHTS_MAX; i++) {
-        lightScene->DirLightShadowMaps[i] = framebufferCreate(
-            DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE, FRAMEBUF_DEPTH);
+        if (!dirLights[i]._enabled)
+            break;
+        lightScene->DirLightShadowMaps[i] =
+            framebufferCreate(DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE,
+                              FRAMEBUF_TEX2D | FRAMEBUF_DEPTH);
+    }
+    lightScene->PointLightShadowMaps =
+        malloc(POINTLIGHTS_MAX * sizeof(Framebuffer));
+    for (int i = 0; i < POINTLIGHTS_MAX; i++) {
+        if (!pointLights[i]._enabled)
+            break;
+        lightScene->PointLightShadowMaps[i] = framebufferCreate(
+            POINTLIGHT_SHADOWMAP_SIZE, POINTLIGHT_SHADOWMAP_SIZE,
+            FRAMEBUF_CUBEMAP | FRAMEBUF_DEPTH);
     }
 
     return lightScene;
 }
-void sendLightMatrix(mat4s *matrix, Model *model) {
-    glUseProgram(model->DepthShader->ID);
-    glUniformMatrix4fv(glGetUniformLocation(model->DepthShader->ID,
-                                            "_lightSpaceProjectionFromWorld"),
-                       1, GL_FALSE, (void *)matrix);
-}
+
 void lightSceneRenderShadowMaps(LightScene *lightScene,
                                 SceneObject **sceneObjects,
                                 int sceneObjectCount) {
     glCullFace(GL_FRONT);
-    glViewport(0, 0, DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE);
 
+#define sendMatrices(__name, __matrices, __count, __shader)                    \
+    glUseProgram(__shader->ID);                                                \
+    glUniformMatrix4fv(glGetUniformLocation(__shader->ID, __name), __count,    \
+                       GL_FALSE, (void *)__matrices);
+
+    glViewport(0, 0, DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE);
     for (int dirLightIdx = 0; dirLightIdx < DIRLIGHTS_MAX; dirLightIdx++) {
+        DirLight *dirLight = &lightScene->DirLights[dirLightIdx];
+        if (!dirLight->_enabled)
+            continue;
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
-            sendLightMatrix(
-                &lightScene->DirLights[dirLightIdx].ProjectionFromWorld,
-                sceneObjects[objIdx]->Model);
-            sceneObjectRender(sceneObjects[objIdx], SCENEOBJ_RENDER_DEPTH);
+            glUseProgram(sceneObjects[objIdx]->Model->DirLightDepthShader->ID);
+            sendMatrices(
+                "_lightSpaceProjectionFromWorld",
+                lightScene->DirLights[dirLightIdx].ProjectionFromWorld.raw[0],
+                1, sceneObjects[objIdx]->Model->DirLightDepthShader);
+            sceneObjectRender(sceneObjects[objIdx],
+                              SCENEOBJ_RENDER_DEPTH_DIRLIGHT);
+        }
+    }
+
+    glViewport(0, 0, POINTLIGHT_SHADOWMAP_SIZE, POINTLIGHT_SHADOWMAP_SIZE);
+    for (int pointLightIdx = 0; pointLightIdx < POINTLIGHTS_MAX;
+         pointLightIdx++) {
+        PointLight *pointLight = &lightScene->PointLights[pointLightIdx];
+        if (!pointLight->_enabled)
+            continue;
+        mat4s projectionFromWorld =
+            glms_perspective(glm_rad(90), 1, 0.1f, pointLight->Distance);
+        mat4s projectionFromWorldMatrices[6] = {
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{+1.0, 0.0, 0.0}}),
+                                 (vec3s){{0.0, -1.0, 0.0}})),
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{-1.0, 0.0, 0.0}}),
+                                 (vec3s){{0.0, -1.0, 0.0}})),
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{0.0, +1.0, 0.0}}),
+                                 (vec3s){{0.0, 0.0, +1.0}})),
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{0.0, -1.0, 0.0}}),
+                                 (vec3s){{0.0, 0.0, -1.0}})),
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{0.0, 0.0, +1.0}}),
+                                 (vec3s){{0.0, -1.0, 0.0}})),
+            glms_mul(projectionFromWorld,
+                     glms_lookat(pointLight->Position,
+                                 glms_vec3_add(pointLight->Position,
+                                               (vec3s){{0.0, 0.0, -1.0}}),
+                                 (vec3s){{0.0, -1.0, 0.0}})),
+        };
+
+        framebufferBind(lightScene->PointLightShadowMaps[pointLightIdx]);
+        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
+            SceneObject *obj = sceneObjects[objIdx];
+            Shader *shader = obj->Model->PointLightDepthShader;
+            glUseProgram(shader->ID);
+            sendMatrices("_lightMatrices", projectionFromWorldMatrices, 6,
+                         shader);
+            glUniform3fv(glGetUniformLocation(shader->ID, "_lightPos"), 1,
+                         (void *)&pointLight->Position);
+            glUniform1f(glGetUniformLocation(shader->ID, "_farPlane"),
+                        pointLight->Distance);
+            sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_POINTLIGHT |
+                                       SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
     }
 
@@ -134,8 +210,16 @@ void lightScenePreRender(LightScene *lightScene) {
 void lightSceneFree(LightScene *lightScene) {
     glDeleteBuffers(1, &lightScene->UBO);
     for (int i = 0; i < DIRLIGHTS_MAX; i++) {
+        if (!lightScene->DirLights[i]._enabled)
+            continue;
         framebufferFree(lightScene->DirLightShadowMaps[i]);
     }
+    for (int i = 0; i < POINTLIGHTS_MAX; i++) {
+        if (!lightScene->PointLights[i]._enabled)
+            continue;
+        framebufferFree(lightScene->PointLightShadowMaps[i]);
+    }
     free(lightScene->DirLightShadowMaps);
+    free(lightScene->PointLightShadowMaps);
     free(lightScene);
 }
