@@ -168,7 +168,8 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular) {
     return specular;
 }
 
-const int dirPcfSize = 1;
+#define DISTRIB(__t, __max) (-pow(__max, -2) * abs(__t) + pow(__max, -1))
+const int dirPcfSize = 3;
 float dirlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
@@ -182,10 +183,10 @@ float dirlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias) {
                 float pcfDepth = texture(shadowMap, projectionCoords.xy +
                                                         vec2(x, y) * texelSize)
                                      .r;
-                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+                if (currentDepth - bias > pcfDepth)
+                    shadow += DISTRIB(x, dirPcfSize) * DISTRIB(y, dirPcfSize);
             }
         }
-        shadow /= pow(2 * dirPcfSize + 1, 2);
     } else {
         float closestDepth = texture(dirLightShadowMap, projectionCoords.xy).r;
         shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
