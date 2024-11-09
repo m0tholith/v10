@@ -65,7 +65,7 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
 }
 
 #define DIRLIGHT_SHADOWMAP_SIZE 1024
-#define POINTLIGHT_SHADOWMAP_SIZE (DIRLIGHT_SHADOWMAP_SIZE)
+#define POINTLIGHT_SHADOWMAP_SIZE 256
 
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights) {
