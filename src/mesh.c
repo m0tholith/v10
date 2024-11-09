@@ -71,9 +71,8 @@ void meshSendData(struct Mesh *mesh) {
 void meshOverrideShaders(Shader *shader) { shaderOverride = shader; }
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shaderID) {
     if (shaderOverride != NULL)
-        glUseProgram(shaderOverride->ID);
-    else
-        glUseProgram(shaderID);
+        shaderID = shaderOverride->ID;
+    glUseProgram(shaderID);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderID, "_worldFromModel"), 1,
                        GL_FALSE, worldFromModel.raw[0]);
