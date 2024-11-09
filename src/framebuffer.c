@@ -34,8 +34,6 @@ Framebuffer *framebufferCreate(int x, int y, enum FramebufferOpts options) {
         break;
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     return framebuffer;
 }
 void framebufferBind(Framebuffer *framebuffer) {
@@ -82,6 +80,8 @@ void createTex2D(Framebuffer *framebuffer, int x, int y,
                                GL_TEXTURE_2D, framebuffer->Target, 0);
         break;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void createCubemap(Framebuffer *framebuffer, int x, int y,
                    enum FramebufferOpts format) {
@@ -120,4 +120,6 @@ void createCubemap(Framebuffer *framebuffer, int x, int y,
                              framebuffer->Target, 0);
         break;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
