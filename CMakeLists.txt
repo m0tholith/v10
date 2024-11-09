@@ -4,25 +4,26 @@ set(BUILD_DEBUG ON)
 set(ENABLE_ERRORCHECKING ON)
 
 set(SRC_FILES
-    src/main.c
     src/glad.c
-    src/error.c
     src/rendering.c
     src/window.c
     src/input.c
     src/mesh.c
-    src/model.c
-    src/armature.c
-    src/node.c
-    src/scene_object.c
-    src/animation.c
-    src/framebuffer.c
     src/shader.c
-    src/light.c
-    src/material.c
-    src/texture.c
     src/stb_image.c
-    src/camera.c)
+    src/texture.c
+    src/model.c
+    src/animation.c
+    src/node.c
+    src/camera.c
+    src/material.c
+    src/main.c
+    src/armature.c
+    src/scene_object.c
+    src/framebuffer.c
+    src/light.c
+    src/error.c
+)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(BUILD_DEBUG)
