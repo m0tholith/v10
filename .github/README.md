@@ -37,13 +37,14 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [X] spot light
     - [X] dedicated lighting system
     - [ ] shadows
-        - [ ] directional light shadows `<------ WE ARE HERE`
-        - [ ] point light shadows
-        - [ ] spot light shadows
+        - [X] directional light shadows
+        - [X] point light shadows
+        - [ ] spot light shadows `<------ WE ARE HERE`
 - [X] skinning
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
     - [X] texture importing
+- [ ] skybox
 - [ ] post processing
     - [ ] multi-aliasing
     - [ ] bloom
