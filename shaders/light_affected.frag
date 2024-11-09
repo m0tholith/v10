@@ -168,25 +168,58 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular) {
     return specular;
 }
 
-const int pcfSize = 1;
+const int dirPcfSize = 1;
 float dirlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias) {
     vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
     projectionCoords = projectionCoords * 0.5 + vec3(0.5);
     float currentDepth = projectionCoords.z;
 
-    float closestDepth = texture(dirLightShadowMap, projectionCoords.xy).r;
-
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = 0;
+    if (dirPcfSize > 0) {
+        vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+        for (int x = -dirPcfSize; x <= dirPcfSize; ++x) {
+            for (int y = -dirPcfSize; y <= dirPcfSize; ++y) {
+                float pcfDepth = texture(shadowMap, projectionCoords.xy +
+                                                        vec2(x, y) * texelSize)
+                                     .r;
+                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+            }
+        }
+        shadow /= pow(2 * dirPcfSize + 1, 2);
+    } else {
+        float closestDepth = texture(dirLightShadowMap, projectionCoords.xy).r;
+        shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    }
 
     return 1 - shadow;
 }
+const int pointPcfSize = 4;
 float pointlight_shadow(PointLight light, samplerCube cubemap, float bias) {
     vec3 fragToLight = fs_in.Pos - light.positionAndIntensity.xyz;
-    float closestDepth = texture(cubemap, fragToLight).r;
 
     float currentDepth = length(fragToLight) / light.specularAndDistance.w;
 
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    float shadow = 0;
+    if (pointPcfSize > 0) {
+        float offset = 0.1;
+        for (float x = -offset; x < offset;
+             x += offset / (pointPcfSize * 0.5)) {
+            for (float y = -offset; y < offset;
+                 y += offset / (pointPcfSize * 0.5)) {
+                for (float z = -offset; z < offset;
+                     z += offset / (pointPcfSize * 0.5)) {
+                    float closestDepth =
+                        texture(cubemap, fragToLight + vec3(x, y, z)).r;
+                    if (currentDepth - bias > closestDepth)
+                        shadow += 1.0;
+                }
+            }
+        }
+        shadow /= pow(pointPcfSize, 3);
+    } else {
+        float closestDepth = texture(cubemap, fragToLight).r;
+        shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    }
 
     return 1 - shadow;
 }
