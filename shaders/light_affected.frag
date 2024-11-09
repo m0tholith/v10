@@ -197,7 +197,7 @@ const int pointPcfSize = 4;
 float pointlight_shadow(PointLight light, samplerCube cubemap, float bias) {
     vec3 fragToLight = fs_in.Pos - light.positionAndIntensity.xyz;
 
-    float currentDepth = length(fragToLight) / light.specularAndDistance.w;
+    float currentDepth = length(fragToLight);
 
     float shadow = 0;
     if (pointPcfSize > 0) {
@@ -209,7 +209,8 @@ float pointlight_shadow(PointLight light, samplerCube cubemap, float bias) {
                 for (float z = -offset; z < offset;
                      z += offset / (pointPcfSize * 0.5)) {
                     float closestDepth =
-                        texture(cubemap, fragToLight + vec3(x, y, z)).r;
+                        texture(cubemap, fragToLight + vec3(x, y, z)).r *
+                        light.specularAndDistance.w;
                     if (currentDepth - bias > closestDepth)
                         shadow += 1.0;
                 }
