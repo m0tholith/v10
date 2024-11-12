@@ -127,9 +127,9 @@ int main(void) {
     Shader *skinningShader =
         shaderCreate("skinning.vert", "", "light_affected.frag");
     Model *skinningModel = modelLoad("BrainStem.glb", 0);
-    skinningModel->DirLightDepthShader =
+    skinningModel->TexDepthShader =
         shaderCreate("depth_skinning_dirlight.vert", "", "depth_dirlight.frag");
-    skinningModel->PointLightDepthShader =
+    skinningModel->CubemapDepthShader =
         shaderCreate("depth_skinning_pointlight.vert", "depth_pointlight.geom",
                      "depth_pointlight.frag");
     for (int i = 0; i < skinningModel->MaterialCount; i++) {

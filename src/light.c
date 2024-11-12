@@ -123,13 +123,13 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
             continue;
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
-            glUseProgram(sceneObjects[objIdx]->Model->DirLightDepthShader->ID);
+            glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
             sendMatrices(
                 "_lightSpaceProjectionFromWorld",
                 lightScene->DirLights[dirLightIdx].ProjectionFromWorld.raw[0],
-                1, sceneObjects[objIdx]->Model->DirLightDepthShader);
+                1, sceneObjects[objIdx]->Model->TexDepthShader);
             sceneObjectRender(sceneObjects[objIdx],
-                              SCENEOBJ_RENDER_DEPTH_DIRLIGHT);
+                              SCENEOBJ_RENDER_DEPTH_TEX);
         }
     }
 
@@ -177,7 +177,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         framebufferBind(lightScene->PointLightShadowMaps[pointLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             SceneObject *obj = sceneObjects[objIdx];
-            Shader *shader = obj->Model->PointLightDepthShader;
+            Shader *shader = obj->Model->CubemapDepthShader;
             glUseProgram(shader->ID);
             sendMatrices("_lightMatrices", projectionFromWorldMatrices, 6,
                          shader);
@@ -185,7 +185,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
                          (void *)&pointLight->Position);
             glUniform1f(glGetUniformLocation(shader->ID, "_farPlane"),
                         pointLight->Distance);
-            sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_POINTLIGHT |
+            sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_CUBEMAP |
                                        SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
     }

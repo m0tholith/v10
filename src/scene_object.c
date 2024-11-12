@@ -12,10 +12,10 @@ SceneObject *sceneObjectCreate(Model *model, Armature *armature) {
 
 #define ISDEPTH(__opt)                                                         \
     (__opt &                                                                   \
-     (SCENEOBJ_RENDER_DEPTH_DIRLIGHT | SCENEOBJ_RENDER_DEPTH_POINTLIGHT))
+     (SCENEOBJ_RENDER_DEPTH_TEX | SCENEOBJ_RENDER_DEPTH_CUBEMAP))
 #define DEPTHSHADER(__model, __opt)                                            \
-    (__opt & SCENEOBJ_RENDER_DEPTH_DIRLIGHT ? __model->DirLightDepthShader     \
-                                            : __model->PointLightDepthShader)
+    (__opt & SCENEOBJ_RENDER_DEPTH_TEX ? __model->TexDepthShader          \
+                                            : __model->CubemapDepthShader)
 
 void sceneObjectRender(SceneObject *sceneObject,
                        enum SceneObjectRenderOptions options) {

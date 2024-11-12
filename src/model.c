@@ -211,9 +211,9 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                             model->NodeEntries[0].Node);
     }
 
-    model->DirLightDepthShader =
+    model->TexDepthShader =
         shaderCreate("depth_dirlight.vert", "", "depth_dirlight.frag");
-    model->PointLightDepthShader =
+    model->CubemapDepthShader =
         shaderCreate("depth_pointlight.vert", "depth_pointlight.geom",
                      "depth_pointlight.frag");
 

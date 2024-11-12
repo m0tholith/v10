@@ -36,8 +36,8 @@ typedef struct {
     int AnimationCount;
     Animation **Animations;
 
-    Shader *DirLightDepthShader;
-    Shader *PointLightDepthShader;
+    Shader *TexDepthShader;
+    Shader *CubemapDepthShader;
 
     void (*OnDelete)(void *model);
 } Model;
