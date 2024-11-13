@@ -1,6 +1,6 @@
 # v10
 
-https://github.com/user-attachments/assets/b5e7abf0-5e9b-47e2-a90e-0e9e199b3b05
+https://github.com/user-attachments/assets/32c6f81a-cf73-45a3-ac15-49bd188f7093
 
 an opengl game engine/framework
 ## cloning and building
@@ -36,15 +36,15 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
     - [X] directional light
     - [X] spot light
     - [X] dedicated lighting system
-    - [ ] shadows
+    - [X] shadows
         - [X] directional light shadows
         - [X] point light shadows
-        - [ ] spot light shadows `<------ WE ARE HERE`
+        - [X] spot light shadows
 - [X] skinning
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
     - [X] texture importing
-- [ ] skybox
+- [ ] skybox `<------ WE ARE HERE`
 - [ ] post processing
     - [ ] multi-aliasing
     - [ ] bloom
