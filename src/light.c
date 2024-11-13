@@ -45,6 +45,11 @@ SpotLight spotLightCreate(vec3s position, vec3s direction, vec3s diffuse,
                           float decay, float innerCutoffDeg,
                           float outerCutoffDeg) {
     SpotLight spotLight = (SpotLight){
+        .ProjectionFromWorld = glms_mul(
+            glms_perspective(2 * glm_rad(outerCutoffDeg), 1, 0.1f, distance),
+            glms_lookat(position,
+                        glms_vec3_add(position, glms_vec3_negate(direction)),
+                        (vec3s){{0, 1, 0}})),
         .Position = position,
         .Intensity = intensity,
         .Diffuse = diffuse,
@@ -66,6 +71,7 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
 
 #define DIRLIGHT_SHADOWMAP_SIZE 1024
 #define POINTLIGHT_SHADOWMAP_SIZE 256
+#define SPOTLIGHT_SHADOWMAP_SIZE 256
 
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights) {
@@ -102,6 +108,15 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
             POINTLIGHT_SHADOWMAP_SIZE, POINTLIGHT_SHADOWMAP_SIZE,
             FRAMEBUF_CUBEMAP | FRAMEBUF_DEPTH);
     }
+    lightScene->SpotLightShadowMaps =
+        malloc(SPOTLIGHTS_MAX * sizeof(Framebuffer));
+    for (int i = 0; i < SPOTLIGHTS_MAX; i++) {
+        if (!spotLights[i]._enabled)
+            break;
+        lightScene->SpotLightShadowMaps[i] = framebufferCreate(
+            SPOTLIGHT_SHADOWMAP_SIZE, SPOTLIGHT_SHADOWMAP_SIZE,
+            FRAMEBUF_TEX2D | FRAMEBUF_DEPTH);
+    }
 
     return lightScene;
 }
@@ -128,8 +143,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
                 "_lightSpaceProjectionFromWorld",
                 lightScene->DirLights[dirLightIdx].ProjectionFromWorld.raw[0],
                 1, sceneObjects[objIdx]->Model->TexDepthShader);
-            sceneObjectRender(sceneObjects[objIdx],
-                              SCENEOBJ_RENDER_DEPTH_TEX);
+            sceneObjectRender(sceneObjects[objIdx], SCENEOBJ_RENDER_DEPTH_TEX);
         }
     }
 
@@ -187,6 +201,24 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
                         pointLight->Distance);
             sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_CUBEMAP |
                                        SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
+        }
+    }
+
+    glViewport(0, 0, SPOTLIGHT_SHADOWMAP_SIZE, SPOTLIGHT_SHADOWMAP_SIZE);
+    for (int spotLightIdx = 0; spotLightIdx < SPOTLIGHTS_MAX; spotLightIdx++) {
+        SpotLight *spotLight = &lightScene->SpotLights[spotLightIdx];
+        if (!spotLight->_enabled)
+            continue;
+        framebufferBind(lightScene->SpotLightShadowMaps[spotLightIdx]);
+        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
+            glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
+            sendMatrices(
+                "_lightSpaceProjectionFromWorld",
+                lightScene->SpotLights[spotLightIdx].ProjectionFromWorld.raw[0],
+                1, sceneObjects[objIdx]->Model->TexDepthShader);
+            sceneObjectRender(sceneObjects[objIdx],
+                              SCENEOBJ_RENDER_DEPTH_TEX |
+                                  SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
     }
 

@@ -41,6 +41,8 @@ PointLight pointLightCreate(vec3s position, vec3s diffuse, vec3s specular,
                             float intensity, float distance, float decay);
 
 typedef struct {
+    mat4s ProjectionFromWorld;
+
     vec3s Position;
     float Intensity;
 
@@ -76,6 +78,7 @@ typedef struct {
 
     Framebuffer **DirLightShadowMaps;
     Framebuffer **PointLightShadowMaps;
+    Framebuffer **SpotLightShadowMaps;
 } LightScene;
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights);

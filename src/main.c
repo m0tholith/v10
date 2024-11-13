@@ -252,6 +252,9 @@ int main(void) {
             glActiveTexture(GL_TEXTURE9);
             glBindTexture(GL_TEXTURE_CUBE_MAP,
                           lightScene->PointLightShadowMaps[0]->Target);
+            glActiveTexture(GL_TEXTURE8);
+            glBindTexture(GL_TEXTURE_2D,
+                          lightScene->SpotLightShadowMaps[0]->Target);
         }
 
         cameraPreRender(camera);

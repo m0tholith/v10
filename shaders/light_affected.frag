@@ -38,6 +38,7 @@ struct PointLight {
     vec4 enabled;              // x: enabled
 };
 struct SpotLight {
+    mat4 projectionFromWorld;
     vec4 positionAndIntensity;    // xyz: position, w: intensity
     vec4 diffuseAndDecay;         // xyz: diffuse, w: decay
     vec4 specularAndInnerCutoff;  // xyz: specular, w: inner cutoff
@@ -55,6 +56,7 @@ layout(std140, binding = 1) uniform Lights {
 
 layout(binding = 10) uniform sampler2D dirLightShadowMap;
 layout(binding = 9) uniform samplerCube pointLightShadowMap;
+layout(binding = 8) uniform sampler2D spotLightShadowMap;
 
 vec3 _diffuse;
 
@@ -69,6 +71,7 @@ vec3 specular(vec3 lightDir, vec3 lightSpecular);
 
 float dirlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias);
 float pointlight_shadow(PointLight light, samplerCube cubemap, float bias);
+float spotlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias);
 
 void main() {
     _diffuse = vec3(texture(_material.diffuse_tex, fs_in.TexCoord));
@@ -118,6 +121,7 @@ vec3 calc_point_light(PointLight light) {
 }
 #define SPOTLIGHT_EASE(x) (x < 0.5 ? 4 * x * x * x : 1 - pow(-2 * x + 2, 3) / 2)
 vec3 calc_spot_light(SpotLight light) {
+    vec4 lightSpacePos = light.projectionFromWorld * vec4(fs_in.Pos, 1.0);
     vec3 lightDir = normalize(light.positionAndIntensity.xyz - fs_in.Pos);
 
     float angle = dot(lightDir, light.directionAndOuterCutoff.xyz);
@@ -142,7 +146,7 @@ vec3 calc_spot_light(SpotLight light) {
            attenuation(light.positionAndIntensity.xyz,
                        light.distanceAndEnabled.x, light.positionAndIntensity.w,
                        light.diffuseAndDecay.w) *
-           t;
+           t * spotlight_shadow(lightSpacePos, spotLightShadowMap, 0.0);
 }
 float attenuation(vec3 lightPos, float lightDistance, float lightIntensity,
                   float lightDecay) {
@@ -220,6 +224,31 @@ float pointlight_shadow(PointLight light, samplerCube cubemap, float bias) {
         shadow /= pow(pointPcfSize, 3);
     } else {
         float closestDepth = texture(cubemap, fragToLight).r;
+        shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    }
+
+    return 1 - shadow;
+}
+const int spotPcfSize = 3;
+float spotlight_shadow(vec4 lightSpacePos, sampler2D shadowMap, float bias) {
+    vec3 projectionCoords = lightSpacePos.xyz / lightSpacePos.w;
+    projectionCoords = projectionCoords * 0.5 + vec3(0.5);
+    float currentDepth = projectionCoords.z;
+
+    float shadow = 0;
+    if (spotPcfSize > 0) {
+        vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+        for (int x = -spotPcfSize; x <= spotPcfSize; ++x) {
+            for (int y = -spotPcfSize; y <= spotPcfSize; ++y) {
+                float pcfDepth = texture(shadowMap, projectionCoords.xy +
+                                                        vec2(x, y) * texelSize)
+                                     .r;
+                if (currentDepth - bias > pcfDepth)
+                    shadow += DISTRIB(x, spotPcfSize) * DISTRIB(y, spotPcfSize);
+            }
+        }
+    } else {
+        float closestDepth = texture(spotLightShadowMap, projectionCoords.xy).r;
         shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
     }
 
