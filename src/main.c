@@ -6,6 +6,7 @@
 #include "animation.h"
 #include "armature.h"
 #include "camera.h"
+#include "cubemap.h"
 #include "framebuffer.h"
 #include "input.h"
 #include "light.h"
@@ -172,6 +173,8 @@ int main(void) {
 
     glEnable(GL_CULL_FACE);
 
+    Cubemap *cubemap = cubemapCreate("textures/sky_cubemap", "png");
+
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
     vec3s movementInput = GLMS_VEC3_ZERO;
@@ -267,6 +270,8 @@ int main(void) {
 
         windowDraw(window);
     }
+
+    cubemapFree(cubemap);
 
     for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {
         for (int i = 0; i < sceneObjects[objIdx]->Model->MaterialCount; i++) {

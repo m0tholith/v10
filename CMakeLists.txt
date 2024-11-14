@@ -12,6 +12,7 @@ set(SRC_FILES
     src/shader.c
     src/stb_image.c
     src/texture.c
+    src/cubemap.c
     src/model.c
     src/animation.c
     src/node.c
