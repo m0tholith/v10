@@ -18,12 +18,14 @@
       pkgs-24-05 = nixos-24-05.legacyPackages.${system};
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
+      devShells.${system}.default = (pkgs.mkShell.override { stdenv = pkgs.clangStdenv; }) {
         packages = with pkgs; [
           cmake
           glfw
           cglm
           assimp
+          clang-tools
+          clang
 
           # debugging
           valgrind
