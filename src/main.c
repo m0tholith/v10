@@ -175,7 +175,8 @@ int main(void) {
     glEnable(GL_CULL_FACE);
 
     Cubemap *cubemap = cubemapCreate("textures/sky_cubemap", "png");
-    Skybox *skybox = skyboxCreate(cubemap);
+    skyboxInit();
+    skyboxSet(cubemap, NULL);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
@@ -270,13 +271,13 @@ int main(void) {
                               SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
 
-        skyboxRender(skybox);
+        skyboxRender();
 
         windowDraw(window);
     }
 
     cubemapFree(cubemap);
-    skyboxFree(skybox);
+    skyboxDestroy();
 
     for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {
         for (int i = 0; i < sceneObjects[objIdx]->Model->MaterialCount; i++) {

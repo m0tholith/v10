@@ -4,14 +4,14 @@
 #include "cubemap.h"
 #include "shader.h"
 
-typedef struct {
-    Cubemap *Cubemap;
-    Shader *Shader;
-    uint32_t VAO;
-    uint32_t VBO;
-} Skybox;
-Skybox *skyboxCreate(Cubemap *cubemap);
-void skyboxRender(Skybox *skybox);
-void skyboxFree(Skybox *skybox);
+/// Sets up skybox state (VAO, VBO)
+void skyboxInit();
+/// Sets skybox cubemap and shader.
+/// @param cubemap Setting this to NULL will only set the shader.
+/// @param shader Shader pointer. Leave as NULL for default.
+void skyboxSet(Cubemap *cubemap, Shader *shader);
+/// Call this after all other entities have been rendered.
+void skyboxRender();
+void skyboxDestroy();
 
 #endif // !SKYBOX_H
