@@ -44,7 +44,8 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
 - [X] material importing
     - [X] color importing (diffuse, ambient, etc.)
     - [X] texture importing
-- [ ] skybox `<------ WE ARE HERE`
+- [X] skybox
+- [ ] serialization
 - [ ] post processing
     - [ ] multi-aliasing
     - [ ] bloom
@@ -52,3 +53,6 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
 - [ ] physics engine
 - [ ] sound engine
 - [ ] particle system
+- [ ] visual effects system
+
+`⸮⸮ WHAT DO I WORK ON NOW ??`
