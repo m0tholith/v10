@@ -13,6 +13,7 @@ set(SRC_FILES
     src/stb_image.c
     src/texture.c
     src/cubemap.c
+    src/skybox.c
     src/model.c
     src/animation.c
     src/node.c

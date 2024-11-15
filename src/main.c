@@ -14,6 +14,7 @@
 #include "model.h"
 #include "scene_object.h"
 #include "shader.h"
+#include "skybox.h"
 #include "texture.h"
 
 #include <cglm/struct/affine-pre.h>
@@ -174,6 +175,7 @@ int main(void) {
     glEnable(GL_CULL_FACE);
 
     Cubemap *cubemap = cubemapCreate("textures/sky_cubemap", "png");
+    Skybox *skybox = skyboxCreate(cubemap);
 
     float lastTime = 0, currentTime = 0, deltaTime = 0;
     vec3s eulerAngles = GLMS_VEC3_ZERO;
@@ -268,10 +270,13 @@ int main(void) {
                               SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
         }
 
+        skyboxRender(skybox);
+
         windowDraw(window);
     }
 
     cubemapFree(cubemap);
+    skyboxFree(skybox);
 
     for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {
         for (int i = 0; i < sceneObjects[objIdx]->Model->MaterialCount; i++) {
