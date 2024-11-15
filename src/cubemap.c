@@ -51,6 +51,8 @@ Cubemap *cubemapCreate(char *folderPath, char *extension) {
             stbi_image_free(data);
         }
     }
+    free(filePath);
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -59,4 +61,7 @@ Cubemap *cubemapCreate(char *folderPath, char *extension) {
 
     return cubemap;
 };
-void cubemapFree(Cubemap *cubemap) { glDeleteTextures(1, &cubemap->ID); }
+void cubemapFree(Cubemap *cubemap) {
+    glDeleteTextures(1, &cubemap->ID);
+    free(cubemap);
+}
