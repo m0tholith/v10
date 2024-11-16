@@ -47,7 +47,7 @@ int main(void) {
     errorInit();
 #endif
 
-    ShaderCache *shaderCache = shaderCacheCreate();
+    ShaderCache shaderCache = shaderCacheCreate();
     shaderSetCache(shaderCache);
 
     Camera *camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
@@ -250,8 +250,8 @@ int main(void) {
 
         lightSceneRenderShadowMaps(lightScene, sceneObjects,
                                    SCENE_OBJECT_COUNT);
-        for (int i = 0; i < shaderCache->Used; i++) {
-            glUseProgram(shaderCache->Array[i].value->ID);
+        for (int i = 0; i < shaderCache->size; i++) {
+            glUseProgram(shaderCacheIndex(shaderCache, i)->ID);
             glActiveTexture(GL_TEXTURE10);
             glBindTexture(GL_TEXTURE_2D,
                           lightScene->DirLightShadowMaps[0]->Target);

@@ -10,22 +10,20 @@
 char *readShaderFile(const char *fileName);
 uint64_t shaderPathHash(char *str);
 
-void shaderCacheFitSize(ShaderCache *cache);
-void shaderCacheAppend(ShaderCache *cache, uint32_t key, Shader *value);
-void shaderCacheRemove(ShaderCache *cache, int index);
-int shaderCacheSearch(ShaderCache *cache, uint32_t key);
+void shaderCacheAppend(ShaderCache cache, uint32_t key, Shader *value);
+int shaderCacheSearch(ShaderCache cache, uint32_t key);
 
-ShaderCache *_shaderCache;
+ShaderCache _shaderCache;
 
-ShaderCache *shaderCacheCreate() {
-    ShaderCache *cache = malloc(sizeof(ShaderCache));
-    cache->Array = NULL;
-    cache->Used = 0;
-    cache->Size = 4;
-    shaderCacheFitSize(cache);
+ShaderCache shaderCacheCreate() {
+    ShaderCache cache;
+    LIST_INIT(cache, 4);
     return cache;
 }
-void shaderSetCache(ShaderCache *cache) { _shaderCache = cache; }
+Shader *shaderCacheIndex(ShaderCache cache, int idx) {
+    return LIST_IDX(cache, idx).value;
+}
+void shaderSetCache(ShaderCache cache) { _shaderCache = cache; }
 Shader *shaderCreate(const char *_vertexShaderPath,
                      const char *_geometryShaderPath,
                      const char *_fragmentShaderPath) {
@@ -44,7 +42,7 @@ Shader *shaderCreate(const char *_vertexShaderPath,
         int shaderCacheIndex = shaderCacheSearch(_shaderCache, hashSourceHash);
         if (shaderCacheIndex != -1) {
             free(hashSource);
-            return _shaderCache->Array[shaderCacheIndex].value;
+            return LIST_IDX(_shaderCache, shaderCacheIndex).value;
         }
     }
 
@@ -176,45 +174,17 @@ void shaderFree(Shader *shader) {
     free(shader);
 }
 
-void shaderCacheFitSize(ShaderCache *cache) {
-    struct shaderCacheEntry *temp =
-        realloc(cache->Array, cache->Size * sizeof(struct shaderCacheEntry));
-    if (temp != NULL)
-        cache->Array = temp;
-    else {
-        fprintf(stderr, "could not resize shader cache\n");
-        exit(EXIT_FAILURE);
-    }
+void shaderCacheAppend(ShaderCache cache, uint32_t key, Shader *value) {
+    LIST_APPEND(cache, ((struct shaderCacheEntry){key, value}));
 }
-void shaderCacheAppend(ShaderCache *cache, uint32_t key, Shader *value) {
-    if (cache->Used >= cache->Size) {
-        cache->Size *= 2;
-        shaderCacheFitSize(cache);
-    }
-    cache->Array[cache->Used++] =
-        (struct shaderCacheEntry){.key = key & 0xFFFFFFFF, .value = value};
-}
-void shaderCacheRemove(ShaderCache *cache, int index) {
-    shaderFree(cache->Array[index].value);
-    for (int i = index + 1; i < cache->Used; i++) {
-        cache[i - 1] = cache[i];
-    }
-    cache->Used--;
-}
-int shaderCacheSearch(ShaderCache *cache, uint32_t key) {
-    for (int i = 0; i < cache->Used; i++) {
-        if (key == cache->Array[i].key)
+int shaderCacheSearch(ShaderCache cache, uint32_t key) {
+    for (int i = 0; i < cache->size; i++) {
+        if (key == LIST_IDX(cache, i).key)
             return i;
     }
     return -1;
 }
-void shaderCacheFree(ShaderCache *cache) {
-    while (cache->Used > 0) {
-        shaderCacheRemove(cache, cache->Used - 1);
-    }
-    free(cache->Array);
-    free(cache);
-}
+void shaderCacheFree(ShaderCache cache) { LIST_FREE(cache); }
 
 char *readShaderFile(const char *fileName) {
     FILE *file = fopen(fileName, "rb");

@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "lib/list.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -24,18 +25,16 @@ struct shaderCacheEntry {
     uint32_t key;
     Shader *value;
 };
-typedef struct {
-    size_t Used;
-    size_t Size;
-    struct shaderCacheEntry *Array;
-} ShaderCache;
+typedef LIST(struct shaderCacheEntry) ShaderCache;
 
-ShaderCache *shaderCacheCreate();
-void shaderSetCache(ShaderCache *cache);
+ShaderCache shaderCacheCreate();
+Shader *shaderCacheIndex(ShaderCache cache, int idx);
+
+void shaderSetCache(ShaderCache cache);
 Shader *shaderCreate(const char *vertexShaderPath,
                      const char *geometryShaderPath,
                      const char *fragmentShaderPath);
 void shaderFree(Shader *shader);
-void shaderCacheFree(ShaderCache *cache);
+void shaderCacheFree(ShaderCache cache);
 
 #endif // !SHADER_H
