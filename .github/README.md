@@ -27,32 +27,42 @@ nix develop
 ```
 if you use `nix-direnv` then you can call `direnv allow` to automatically enter a devshell when entering the project directory
 ## goals
-- [X] model loading
-- [X] shader cache
-- [X] texture cache
-- [X] input system
-- [X] lighting
-    - [X] point light
-    - [X] directional light
-    - [X] spot light
-    - [X] dedicated lighting system
-    - [X] shadows
-        - [X] directional light shadows
-        - [X] point light shadows
-        - [X] spot light shadows
-- [X] skinning
-- [X] material importing
-    - [X] color importing (diffuse, ambient, etc.)
-    - [X] texture importing
-- [X] skybox
+- [ ] 3D renderer
+    - [X] model loading
+    - [X] shader cache
+    - [X] texture cache
+    - [X] input system
+    - [X] lighting
+        - [X] point light
+        - [X] directional light
+        - [X] spot light
+        - [X] dedicated lighting system
+        - [X] shadows
+            - [X] directional light shadows
+            - [X] point light shadows
+            - [X] spot light shadows
+    - [X] skinning
+    - [X] material importing
+        - [X] color importing (diffuse, ambient, etc.)
+        - [X] texture importing
+    - [X] skybox
+    - [ ] refactoring `<------ WE ARE HERE`
+        - [ ] optimizations
+            - [X] camera UBO
+            - [ ] light scene UBO
+            - [ ] shaders
+                - [X] shader cache
+                - [ ] uniform cache
+            - [X] texture cache
+            - [ ] cubemap cache
+        - [ ] documentation
+    - [ ] post processing
+        - [ ] multi-aliasing
+        - [ ] bloom
+        - [ ] post processing pipeline
+    - [ ] convert to vulkan
 - [ ] serialization
-- [ ] post processing
-    - [ ] multi-aliasing
-    - [ ] bloom
-    - [ ] post processing pipeline
 - [ ] physics engine
 - [ ] sound engine
 - [ ] particle system
 - [ ] visual effects system
-
-`⸮⸮ WHAT DO I WORK ON NOW ??`
