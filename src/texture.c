@@ -1,6 +1,7 @@
 #include "texture.h"
 
 #include "glad/glad.h"
+#include "lib/list.h"
 #include "stb/stb_image.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
@@ -14,19 +15,14 @@ struct textureCacheEntry {
     uint32_t key;
     Texture *value;
 };
-struct textureCache {
-    size_t used;
-    size_t size;
-    struct textureCacheEntry *array;
-};
-struct textureCache *textureCacheCreate();
-void textureCacheAppend(struct textureCache *cache, uint32_t key,
-                        Texture *value);
-void textureCacheRemove(struct textureCache *cache, int index);
-int textureCacheSearch(struct textureCache *cache, uint32_t key);
-void textureCacheFree(struct textureCache *cache);
+typedef LIST(struct textureCacheEntry) textureCache;
 
-struct textureCache *_textureCache;
+textureCache textureCacheCreate();
+void textureCacheAppend(textureCache cache, uint32_t key, Texture *value);
+int textureCacheSearch(textureCache cache, uint32_t key);
+void textureCacheFree(textureCache cache);
+
+textureCache _textureCache;
 
 Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
                        bool optional) {
@@ -43,7 +39,7 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     if (textureCacheIndex != -1) {
         free(textureFile);
         free(hashSource);
-        return _textureCache->array[textureCacheIndex].value;
+        return LIST_IDX(_textureCache, textureCacheIndex).value;
     }
 
     uint32_t textureId;
@@ -88,58 +84,37 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     return texture;
 }
 void textureFree(Texture *texture) {
+    for (int i = 0; i < _textureCache->size; i++) {
+        if (texture == LIST_IDX(_textureCache, i).value) {
+            LIST_POP(_textureCache, i);
+        }
+    }
     glDeleteTextures(1, &texture->id);
     free(texture);
 }
 void textureFreeCache() { textureCacheFree(_textureCache); }
 
-void textureCacheFitSize(struct textureCache *cache) {
-    struct textureCacheEntry *temp =
-        realloc(cache->array, cache->size * sizeof(struct textureCacheEntry));
-    if (temp != NULL)
-        cache->array = temp;
-    else {
-        fprintf(stderr, "could not resize texture cache\n");
-        exit(EXIT_FAILURE);
-    }
-}
-struct textureCache *textureCacheCreate() {
-    struct textureCache *cache = malloc(sizeof(struct textureCache));
-    cache->array = NULL;
-    cache->used = 0;
-    cache->size = 4;
-    textureCacheFitSize(cache);
+textureCache textureCacheCreate() {
+    textureCache cache;
+    LIST_INIT(cache, 4);
     return cache;
 }
-void textureCacheAppend(struct textureCache *cache, uint32_t key,
-                        Texture *value) {
-    if (cache->used > cache->size) {
-        cache->size *= 2;
-        textureCacheFitSize(cache);
-    }
-    cache->array[cache->used++] =
-        (struct textureCacheEntry){.key = key & 0xFFFFFFFF, .value = value};
+void textureCacheAppend(textureCache cache, uint32_t key, Texture *value) {
+    LIST_APPEND(cache, ((struct textureCacheEntry){.key = key & 0xFFFFFFFF,
+                                                   .value = value}));
 }
-void textureCacheRemove(struct textureCache *cache, int index) {
-    textureFree(cache->array[index].value);
-    for (int i = index + 1; i < cache->used; i++) {
-        cache[i - 1] = cache[i];
-    }
-    cache->size--;
-}
-int textureCacheSearch(struct textureCache *cache, uint32_t key) {
-    for (int i = 0; i < cache->used; i++) {
-        if (key == cache->array[i].key)
+int textureCacheSearch(textureCache cache, uint32_t key) {
+    for (int i = 0; i < cache->size; i++) {
+        if (key == LIST_IDX(cache, i).key)
             return i;
     }
     return -1;
 }
-void textureCacheFree(struct textureCache *cache) {
-    for (int i = 0; i < cache->used; i++) {
-        textureFree(cache->array[i].value);
+void textureCacheFree(textureCache cache) {
+    for (int i = 0; i < cache->size; i++) {
+        textureFree(LIST_IDX(cache, i).value);
     }
-    free(cache->array);
-    free(cache);
+    LIST_FREE(cache);
 }
 
 char *readTextureFile(const char *fileName) {
