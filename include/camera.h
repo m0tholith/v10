@@ -3,9 +3,17 @@
 
 #include <cglm/struct.h>
 
+struct camera_data {
+    vec3s position;
+    versors quaternion;
+    mat4s projectionFromViewMatrix;
+    mat4s viewFromWorldMatrix;
+};
 typedef struct {
+    struct camera_data _prev;
     vec3s Position;
     versors Quaternion;
+    mat4s ProjectionFromViewMatrix;
     mat4s ViewFromWorldMatrix;
     uint32_t MatricesUBO;
 } Camera;
