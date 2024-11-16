@@ -65,13 +65,6 @@ void cameraSetQuaternion(Camera *camera, versors quaternion) {
 vec3s camPosPrev = GLMS_VEC3_ZERO;
 versors camRotPrev = GLMS_QUAT_IDENTITY;
 void cameraPreRender(Camera *camera) {
-    if (glms_vec3_eqv(camera->Position, camPosPrev) &&
-        glms_vec4_eqv(
-            (vec4s){{camera->Quaternion.x, camera->Quaternion.y,
-                     camera->Quaternion.z, camera->Quaternion.w}},
-            (vec4s){{camRotPrev.x, camRotPrev.y, camRotPrev.z, camRotPrev.w}}))
-        return;
-
     CameraPosition = camPosPrev = camera->Position;
     camRotPrev = camera->Quaternion;
 

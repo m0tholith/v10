@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
+extern int WINDOW_WIDTH;
+extern int WINDOW_HEIGHT;
 
 GLFWwindow *windowCreate();
 void windowSetSkybox(float r, float g, float b);

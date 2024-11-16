@@ -2,8 +2,16 @@
 
 #include <stdlib.h>
 
+int WINDOW_WIDTH = 800;
+int WINDOW_HEIGHT = 800;
+
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+void windowSizeCallback(GLFWwindow *window, int width, int height) {
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void glfwErrorCallback(int errorCode, const char *description) {
     printf("GLFW error code 0x%04X:\n	%s\n", errorCode, description);
@@ -21,7 +29,7 @@ GLFWwindow *windowCreate() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 #endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     GLFWwindow *window =
         glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "template", NULL, NULL);
@@ -41,6 +49,8 @@ GLFWwindow *windowCreate() {
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     glEnable(GL_DEPTH_TEST);
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetWindowSizeCallback(window, windowSizeCallback);
+    glfwFocusWindow(window);
 
     return window;
 }

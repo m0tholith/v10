@@ -248,6 +248,9 @@ int main(void) {
 
         lastTime = currentTime;
 
+#define fov(x) (1.0f / 112.0f) * (x - 800.0f) + 60.0f
+        cameraSetProjectionMatrixPersp(camera, fov(WINDOW_WIDTH), 0.1f, 100.0f);
+
         lightSceneRenderShadowMaps(lightScene, sceneObjects,
                                    SCENE_OBJECT_COUNT);
         for (int i = 0; i < shaderCache->size; i++) {
