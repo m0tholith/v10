@@ -174,7 +174,7 @@ int main(void) {
 
     glEnable(GL_CULL_FACE);
 
-    Cubemap *cubemap = cubemapCreate("textures/sky_cubemap", "png");
+    Cubemap *cubemap = cubemapCreate("textures/sky_cubemap");
     skyboxInit();
     skyboxSet(cubemap, NULL);
 

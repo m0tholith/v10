@@ -12,20 +12,20 @@
     __filepath[__ilen + 0] = '/';                                              \
     __filepath[__ilen + 1] = __idx % 2 == 0 ? 'p' : 'n';                       \
     __filepath[__ilen + 2] =                                                   \
-        (int)(__idx / 2) == 0 ? 'x' : ((int)(__idx / 2) == 1 ? 'y' : 'z');     \
-    __filepath[__ilen + 3] = '.';
+        (int)(__idx / 2) == 0 ? 'x' : ((int)(__idx / 2) == 1 ? 'y' : 'z');
 
-Cubemap *cubemapCreate(char *folderPath, char *extension) {
+Cubemap *cubemapCreate(char *folderPath) {
     Cubemap *cubemap = malloc(sizeof(Cubemap));
     cubemap->Path = folderPath;
 
     int folderPathLen = strlen(folderPath);
-    int extensionLen = strlen(extension);
 
-    char *filePath = malloc(folderPathLen + 4 + extensionLen + 1);
-    filePath[folderPathLen + 4 + extensionLen + 1] = '\0';
+    const int FilePathLen =
+        folderPathLen +
+        3; // "${folderPathLen}/nx" (what would be the result of strlen)
+    char *filePath = malloc(FilePathLen + 1);
+    filePath[FilePathLen] = '\0'; // (FilePathLen - 1) + 1
     strcpy(filePath, folderPath);
-    strcpy(filePath + folderPathLen + 4, extension);
 
     glGenTextures(1, &cubemap->ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->ID);
@@ -34,10 +34,6 @@ Cubemap *cubemapCreate(char *folderPath, char *extension) {
     bool isTransparent;
     for (int i = 0; i < 6; i++) {
         SWITCHFILE(filePath, folderPathLen, i);
-        for (int j = 0; j < folderPathLen + 4 + extensionLen; j++) {
-            printf("%c", filePath[j]);
-        }
-        printf("\n");
         unsigned char *data =
             stbi_load(filePath, &width, &height, &nrChannels, 0);
         isTransparent =
