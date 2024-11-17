@@ -174,7 +174,7 @@ int main(void) {
 
     glEnable(GL_CULL_FACE);
 
-    Cubemap *cubemap = cubemapCreate("textures/sky_cubemap");
+    Cubemap *cubemap = cubemapCreate("textures/cubemaps/sky");
     skyboxInit();
     skyboxSet(cubemap, NULL);
 
@@ -279,7 +279,7 @@ int main(void) {
         windowDraw(window);
     }
 
-    cubemapFree(cubemap);
+    cubemapFreeCache();
     skyboxDestroy();
 
     for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {

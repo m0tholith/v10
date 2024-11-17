@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *readTextureFile(const char *fileName);
 uint64_t texturePathHash(char *str);
 
 struct textureCacheEntry {
@@ -121,26 +120,6 @@ void textureCacheFree(textureCache cache) {
     LIST_FREE(cache);
 }
 
-char *readTextureFile(const char *fileName) {
-    FILE *file = fopen(fileName, "rb");
-    if (file == NULL) {
-        printf("file %s could not be read", fileName);
-        exit(EXIT_FAILURE);
-    }
-    fseek(file, 0, SEEK_END);
-    long fsize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    char *string = malloc(fsize + 1);
-    if (fread(string, fsize, 1, file) < 1) {
-        fprintf(stderr, "couldn't read file \"%s\"\n", fileName);
-        exit(1);
-    }
-    fclose(file);
-
-    string[fsize] = 0;
-    return string;
-}
 uint64_t texturePathHash(char *str) {
     uint64_t hash = 5381;
     int c;

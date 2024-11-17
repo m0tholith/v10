@@ -1,6 +1,7 @@
 #include "cubemap.h"
 
 #include "glad/glad.h"
+#include "lib/list.h"
 #include "stb/stb_image.h"
 #include <GL/gl.h>
 #include <stdbool.h>
@@ -14,18 +15,49 @@
     __filepath[__ilen + 2] =                                                   \
         (int)(__idx / 2) == 0 ? 'x' : ((int)(__idx / 2) == 1 ? 'y' : 'z');
 
-Cubemap *cubemapCreate(char *folderPath) {
-    Cubemap *cubemap = malloc(sizeof(Cubemap));
-    cubemap->Path = folderPath;
+uint64_t cubemapPathHash(char *str);
 
-    int folderPathLen = strlen(folderPath);
+struct cubemapCacheEntry {
+    uint32_t key;
+    Cubemap *value;
+};
+typedef LIST(struct cubemapCacheEntry) cubemapCache;
+
+cubemapCache cubemapCacheCreate();
+void cubemapCacheAppend(cubemapCache cache, uint32_t key, Cubemap *value);
+int cubemapCacheSearch(cubemapCache cache, uint32_t key);
+void cubemapCacheFree(cubemapCache cache);
+
+cubemapCache _cubemapCache;
+
+Cubemap *cubemapCreate(char *_cubemapPath) {
+    if (_cubemapCache == NULL)
+        _cubemapCache = cubemapCacheCreate();
+
+    char *hashSource = malloc(strlen(_cubemapPath) + 1);
+    strcpy(hashSource, _cubemapPath);
+    char *cubemapFile = malloc(strlen(_cubemapPath) + sizeof(CUBEMAPS_PATH));
+    strcpy(cubemapFile, CUBEMAPS_PATH);
+    strcat(cubemapFile, _cubemapPath);
+    uint64_t hashSourceHash = cubemapPathHash(hashSource);
+    int cubemapCacheIndex = cubemapCacheSearch(_cubemapCache, hashSourceHash);
+    if (cubemapCacheIndex != -1) {
+        free(cubemapFile);
+        free(hashSource);
+        return LIST_IDX(_cubemapCache, cubemapCacheIndex).value;
+    }
+
+    Cubemap *cubemap = malloc(sizeof(Cubemap));
+    cubemap->Path = _cubemapPath;
+
+    int folderPathLen = strlen(_cubemapPath);
 
     const int FilePathLen =
         folderPathLen +
         3; // "${folderPathLen}/nx" (what would be the result of strlen)
     char *filePath = malloc(FilePathLen + 1);
     filePath[FilePathLen] = '\0'; // (FilePathLen - 1) + 1
-    strcpy(filePath, folderPath);
+    strcpy(filePath, _cubemapPath);
 
     glGenTextures(1, &cubemap->ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->ID);
@@ -49,7 +81,7 @@ Cubemap *cubemapCreate(char *folderPath) {
             stbi_image_free(data);
         } else {
             fprintf(stderr, "Could not load cubemap \"%s\" (file \"%s\")\n",
-                    folderPath, filePath);
+                    _cubemapPath, filePath);
             stbi_image_free(data);
         }
     }
@@ -61,9 +93,46 @@ Cubemap *cubemapCreate(char *folderPath) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    cubemapCacheAppend(_cubemapCache, hashSourceHash, cubemap);
+    free(hashSource);
+
     return cubemap;
 };
 void cubemapFree(Cubemap *cubemap) {
     glDeleteTextures(1, &cubemap->ID);
     free(cubemap);
+}
+void cubemapFreeCache() { cubemapCacheFree(_cubemapCache); }
+
+cubemapCache cubemapCacheCreate() {
+    cubemapCache cache;
+    LIST_INIT(cache, 4);
+    return cache;
+}
+void cubemapCacheAppend(cubemapCache cache, uint32_t key, Cubemap *value) {
+    LIST_APPEND(cache, ((struct cubemapCacheEntry){.key = key & 0xFFFFFFFF,
+                                                   .value = value}));
+}
+int cubemapCacheSearch(cubemapCache cache, uint32_t key) {
+    for (int i = 0; i < cache->size; i++) {
+        if (key == LIST_IDX(cache, i).key)
+            return i;
+    }
+    return -1;
+}
+void cubemapCacheFree(cubemapCache cache) {
+    for (int i = 0; i < cache->size; i++) {
+        cubemapFree(LIST_IDX(cache, i).value);
+    }
+    LIST_FREE(cache);
+}
+
+uint64_t cubemapPathHash(char *str) {
+    uint64_t hash = 5381;
+    int c;
+
+    while ((c = (uint8_t)*str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
 }

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define CUBEMAPS_PATH "textures/cubemaps/"
+
 typedef struct {
     uint32_t ID;
     char *Path;
@@ -20,5 +22,6 @@ typedef struct {
  */
 Cubemap *cubemapCreate(char *cubemapPath);
 void cubemapFree(Cubemap *cubemap);
+void cubemapFreeCache();
 
 #endif // !CUBEMAP_H
