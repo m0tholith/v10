@@ -13,7 +13,7 @@
     __filepath[__ilen + 2] =                                                   \
         (int)(__idx / 2) == 0 ? 'x' : ((int)(__idx / 2) == 1 ? 'y' : 'z');     \
     __filepath[__ilen + 3] = '.';
-#define ISTRANSPARENT(__ext) strncmp(__ext, "png", 3) == 0 ? 1 : 0
+#define ISTRANSPARENT(__ext) (strncmp(__ext, "png", 3) == 0 ? 1 : 0)
 
 Cubemap *cubemapCreate(char *folderPath, char *extension) {
     Cubemap *cubemap = malloc(sizeof(Cubemap));
