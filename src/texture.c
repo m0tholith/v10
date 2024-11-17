@@ -8,8 +8,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ISTRANSPARENT(__ext) (strncmp(__ext, "png", 3) == 0 ? 1 : 0)
+
 char *readTextureFile(const char *fileName);
 uint64_t texturePathHash(char *str);
+const char *getFileExtension(const char *filename) {
+    char *dot = strrchr(filename, '.');
+    if (!dot || dot == filename)
+        return "";
+    return dot + 1;
+}
 
 struct textureCacheEntry {
     uint32_t key;
@@ -24,8 +32,7 @@ void textureCacheFree(textureCache cache);
 
 textureCache _textureCache;
 
-Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
-                       bool optional) {
+Texture *textureCreate(const char *_texturePath, bool optional) {
     if (_textureCache == NULL)
         _textureCache = textureCacheCreate();
 
@@ -43,6 +50,7 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
     }
 
     uint32_t textureId;
+    const char *extension = getFileExtension(_texturePath);
 
     int width, height, numColorChannels;
     unsigned char *data;
@@ -68,7 +76,7 @@ Texture *textureCreate(const char *_texturePath, enum TEXTURETYPE type,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                 GL_RGB + (type & 1), GL_UNSIGNED_BYTE,
+                 GL_RGB + ISTRANSPARENT(extension), GL_UNSIGNED_BYTE,
                  data); // HINT: type is either 0 or 1; GL_RGBA is 1+GL_RGB
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);

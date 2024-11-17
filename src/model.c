@@ -58,8 +58,8 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
     model->TextureCount = scene->mNumTextures;
     model->Textures = malloc(model->TextureCount * sizeof(Texture *));
     for (int i = 0; i < model->TextureCount; i++) {
-        model->Textures[i] = textureCreate(scene->mTextures[i]->mFilename.data,
-                                           TEXTURETYPE_RGB, true);
+        model->Textures[i] =
+            textureCreate(scene->mTextures[i]->mFilename.data, true);
     }
 
     if (!(options & MODELOPTS_DONT_IMPORT_MATERIALS)) {
@@ -142,14 +142,14 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
                     printf("using texture %d\n", idx);
                     texture = model->Textures[idx];
                 } else
-                    texture = textureCreate(texPathStr, TEXTURETYPE_RGB, 0);
+                    texture = textureCreate(texPathStr, 0);
                 materialAddProperty(
                     material,
                     materialPropertyCreate(
                         "_material.diffuse_tex", MATTYPE_TEXTURE2D,
                         (void *)materialTextureDataCreate(texture, 0)));
             } else {
-                texture = textureCreate(TEXTURE_DEFAULT, TEXTURETYPE_RGB, 0);
+                texture = textureCreate(TEXTURE_DEFAULT, 0);
                 materialAddProperty(
                     material,
                     materialPropertyCreate(
