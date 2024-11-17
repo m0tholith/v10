@@ -3,6 +3,7 @@
 #include "glad/glad.h"
 #include "stb/stb_image.h"
 #include <GL/gl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +14,6 @@
     __filepath[__ilen + 2] =                                                   \
         (int)(__idx / 2) == 0 ? 'x' : ((int)(__idx / 2) == 1 ? 'y' : 'z');     \
     __filepath[__ilen + 3] = '.';
-#define ISTRANSPARENT(__ext) (strncmp(__ext, "png", 3) == 0 ? 1 : 0)
 
 Cubemap *cubemapCreate(char *folderPath, char *extension) {
     Cubemap *cubemap = malloc(sizeof(Cubemap));
@@ -31,7 +31,7 @@ Cubemap *cubemapCreate(char *folderPath, char *extension) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->ID);
 
     int width, height, nrChannels;
-    int isTransparent = ISTRANSPARENT(extension);
+    bool isTransparent;
     for (int i = 0; i < 6; i++) {
         SWITCHFILE(filePath, folderPathLen, i);
         for (int j = 0; j < folderPathLen + 4 + extensionLen; j++) {
@@ -40,6 +40,12 @@ Cubemap *cubemapCreate(char *folderPath, char *extension) {
         printf("\n");
         unsigned char *data =
             stbi_load(filePath, &width, &height, &nrChannels, 0);
+        isTransparent =
+            nrChannels == 2 ||
+            nrChannels == 4; // stb sets these values if an image has either:
+                             // grey + alpha channel (hence 2)
+                             // red + green + blue + alpha channel (hence 4)
+
         if (data) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                          GL_RGB + isTransparent, width, height, 0,

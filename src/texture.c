@@ -8,16 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ISTRANSPARENT(__ext) (strncmp(__ext, "png", 3) == 0 ? 1 : 0)
-
 char *readTextureFile(const char *fileName);
 uint64_t texturePathHash(char *str);
-const char *getFileExtension(const char *filename) {
-    char *dot = strrchr(filename, '.');
-    if (!dot || dot == filename)
-        return "";
-    return dot + 1;
-}
 
 struct textureCacheEntry {
     uint32_t key;
@@ -50,7 +42,6 @@ Texture *textureCreate(const char *_texturePath, bool optional) {
     }
 
     uint32_t textureId;
-    const char *extension = getFileExtension(_texturePath);
 
     int width, height, numColorChannels;
     unsigned char *data;
@@ -60,6 +51,11 @@ Texture *textureCreate(const char *_texturePath, bool optional) {
                          &numColorChannels, 0);
     else
         data = stbi_load(textureFile, &width, &height, &numColorChannels, 0);
+    bool isTransparent =
+        numColorChannels == 2 ||
+        numColorChannels == 4; // stb sets these values if an image has either:
+                               // grey + alpha channel (hence 2)
+                               // red + green + blue + alpha channel (hence 4)
     if (!data) {
         printf("failed to load texture \"%s\"\n", textureFile);
         stbi_image_free(data);
@@ -75,8 +71,8 @@ Texture *textureCreate(const char *_texturePath, bool optional) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                 GL_RGB + ISTRANSPARENT(extension), GL_UNSIGNED_BYTE,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB + isTransparent, width, height, 0,
+                 GL_RGB + isTransparent, GL_UNSIGNED_BYTE,
                  data); // HINT: type is either 0 or 1; GL_RGBA is 1+GL_RGB
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
