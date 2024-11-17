@@ -54,7 +54,7 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
                 - [X] shader cache
                 - [ ] uniform cache
             - [X] texture cache
-            - [ ] cubemap cache
+            - [X] cubemap cache
         - [ ] documentation
     - [ ] post processing
         - [ ] multi-aliasing
