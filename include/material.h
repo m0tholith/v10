@@ -31,9 +31,15 @@ typedef struct {
     char Index;
 } MaterialTextureData;
 
-/// returns material property to be used in `materialCreate`. free with
-/// `materialPropertyFree`
-/// @param void *`data`: pointer to data
+/**
+ * Creates a material property.
+ *
+ * This is typically used in materialCreate().
+ *
+ * @param: void *data Pointer to data to be supplied into shader. MUST be a
+ *  pointer, no matter what type of property you want to send.
+ * @return: MaterialProperty * New material property.
+ */
 MaterialProperty *materialPropertyCreate(const char *name,
                                          enum MaterialPropertyType type,
                                          void *data);
@@ -43,7 +49,7 @@ void materialPropertyFree(MaterialProperty *property);
 ///
 /// use this e.x. for freeing properties imported by model (_diffuse, etc.)
 void materialPropertyDelete(MaterialProperty *property);
-/// returns material texture property data. free with `materialTextureDataFree`
+/// @note: Free with `materialTextureDataFree`.
 MaterialTextureData *materialTextureDataCreate(Texture *texture, int index);
 void materialTextureDataFree(MaterialTextureData *data);
 
@@ -54,9 +60,9 @@ typedef struct {
     MaterialProperty **Properties;
 } Material;
 
-/// returns material for use with models
-/// @param int `propertyCount`: the number of properties to allocate for
-/// @param MaterialProperty *...: x number of properties to set
+/// @return: material for use with models
+/// @param: int `propertyCount` The number of properties to allocate for
+/// @param: MaterialProperty *... X number of properties to set
 Material *materialCreate(Shader *shader, int propertyCount, ...);
 void materialApplyProperties(Material *material);
 Material *materialCopy(Material *source);
