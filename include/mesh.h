@@ -26,14 +26,27 @@ struct Mesh {
     int MaterialIndex;
 };
 
-/// creates OpenGL buffers with supplied vertices and indices. free with
-/// `meshFree`
+/**
+ * Creates mesh struct to hold vertex data.
+ */
 struct Mesh *meshLoad(struct Vertex *vertices, uint32_t *indices,
                       int vertexCount, int indexCount);
+/**
+ * Creates the GPU buffers containing vertex data.
+ */
 void meshSendData(struct Mesh *mesh);
-/// overrides all meshes' draw calls to use specific shader
-///
-/// set to -1 to remove override
+/**
+ * Sets the shader which will override any shaders supplied in meshRender().
+ *
+ * Set to NULL to remove this override.
+ *
+ * @example:
+ *  shaderOverride(NULL);
+ *  meshRender(myMesh, coolTransform1, redShader); // renders red
+ *  shaderOverride(blueShader);
+ *  meshRender(myMesh, coolTransform2, redShader); // renders blue
+ *  shaderOverride(NULL); // back to normal
+ */
 void meshOverrideShaders(Shader *shader);
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, Shader *shader);
 void meshFree(struct Mesh *mesh);
