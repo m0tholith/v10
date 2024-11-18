@@ -46,11 +46,11 @@ enum ModelLoadOptions {
     MODELOPTS_DONT_IMPORT_MATERIALS = 1,
 };
 
-/// manages rendering a 3d file. free with `modelFree`
-/// @param enum ModelLoadOptions `options`: use MODELOPTS_* options here
+/// Manages rendering a 3D file. Free with `modelFree`
+/// @param enum ModelLoadOptions `options` Use MODELOPTS_* options here
 Model *modelLoad(const char *modelFilename, unsigned int options);
-/// @param Material *...: materials to set, needs to be `model->MaterialCount`
-/// number of them
+/// @param Material *... Materials to set, needs to be `model->MaterialCount`
+///  number of them
 void modelSetMaterials(Model *model, int materialCount, ...);
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelPreRender(void *_model);
