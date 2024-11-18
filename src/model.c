@@ -212,10 +212,9 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
     }
 
     model->TexDepthShader =
-        shaderCreate("depth_dirlight.vert", "", "depth_dirlight.frag");
-    model->CubemapDepthShader =
-        shaderCreate("depth_pointlight.vert", "depth_pointlight.geom",
-                     "depth_pointlight.frag");
+        shaderCreate("depth_tex2d.vert", "", "depth_tex2d.frag");
+    model->CubemapDepthShader = shaderCreate(
+        "depth_cubemap.vert", "depth_cubemap.geom", "depth_cubemap.frag");
 
     model->OnDelete = &_modelDelete;
 
