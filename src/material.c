@@ -59,9 +59,8 @@ Material *materialCreate(Shader *shader, int propertyCount, ...) {
     return material;
 }
 
-// @todo: Replace glGetUniformLocation with shaderGetUniformLocation
-void applyProperty(MaterialProperty *property, uint32_t shaderID) {
-    glUseProgram(shaderID);
+void applyProperty(MaterialProperty *property, Shader *shader) {
+    glUseProgram(shader->ID);
     int intValue;
     float floatValue;
     vec2s vec2;
@@ -74,46 +73,47 @@ void applyProperty(MaterialProperty *property, uint32_t shaderID) {
     switch (property->Type) {
     case MATTYPE_INT:
         intValue = *(int *)property->Data;
-        glUniform1i(glGetUniformLocation(shaderID, property->Name), intValue);
+        glUniform1i(shaderGetUniformLocation(shader, property->Name), intValue);
         break;
     case MATTYPE_FLOAT:
         floatValue = *(float *)property->Data;
-        glUniform1f(glGetUniformLocation(shaderID, property->Name), floatValue);
+        glUniform1f(shaderGetUniformLocation(shader, property->Name),
+                    floatValue);
         break;
     case MATTYPE_VEC2:
         vec2 = *(vec2s *)property->Data;
-        glUniform2fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniform2fv(shaderGetUniformLocation(shader, property->Name), 1,
                      vec2.raw);
         break;
     case MATTYPE_VEC3:
         vec3 = *(vec3s *)property->Data;
-        glUniform3fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniform3fv(shaderGetUniformLocation(shader, property->Name), 1,
                      vec3.raw);
         break;
     case MATTYPE_VEC4:
         vec4 = *(vec4s *)property->Data;
-        glUniform4fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniform4fv(shaderGetUniformLocation(shader, property->Name), 1,
                      vec4.raw);
         break;
     case MATTYPE_MAT2:
         mat2 = *(mat2s *)property->Data;
-        glUniformMatrix2fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniformMatrix2fv(shaderGetUniformLocation(shader, property->Name), 1,
                            GL_FALSE, mat2.raw[0]);
     case MATTYPE_MAT3:
         mat3 = *(mat3s *)property->Data;
-        glUniformMatrix3fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniformMatrix3fv(shaderGetUniformLocation(shader, property->Name), 1,
                            GL_FALSE, mat3.raw[0]);
         break;
     case MATTYPE_MAT4:
         mat4 = *(mat4s *)property->Data;
-        glUniformMatrix4fv(glGetUniformLocation(shaderID, property->Name), 1,
+        glUniformMatrix4fv(shaderGetUniformLocation(shader, property->Name), 1,
                            GL_FALSE, mat4.raw[0]);
         break;
     case MATTYPE_TEXTURE2D:
         textureData = *(MaterialTextureData *)(property->Data);
         glActiveTexture(GL_TEXTURE0 + textureData.Index);
         glBindTexture(GL_TEXTURE_2D, textureData.Texture->id);
-        glUniform1i(glGetUniformLocation(shaderID, property->Name),
+        glUniform1i(shaderGetUniformLocation(shader, property->Name),
                     textureData.Index);
         break;
     default:
@@ -126,7 +126,7 @@ void applyProperty(MaterialProperty *property, uint32_t shaderID) {
 }
 void materialApplyProperties(Material *material) {
     for (int i = 0; i < material->PropertyCount; i++) {
-        applyProperty(material->Properties[i], material->Shader->ID);
+        applyProperty(material->Properties[i], material->Shader);
     }
 }
 Material *materialCopy(Material *source) {
