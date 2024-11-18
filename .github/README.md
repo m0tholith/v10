@@ -50,9 +50,9 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
         - [ ] optimizations
             - [X] camera UBO
             - [ ] light scene UBO
-            - [ ] shaders
+            - [X] shaders
                 - [X] shader cache
-                - [ ] uniform cache
+                - [X] uniform cache
             - [X] texture cache
             - [X] cubemap cache
         - [ ] documentation
