@@ -24,6 +24,7 @@ Shader *shaderCacheIndex(ShaderCache cache, int idx) {
     return LIST_IDX(cache, idx).value;
 }
 void shaderSetCache(ShaderCache cache) { _shaderCache = cache; }
+
 Shader *shaderCreate(const char *_vertexShaderPath,
                      const char *_geometryShaderPath,
                      const char *_fragmentShaderPath) {
@@ -151,6 +152,8 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     strcpy(shader->FragPath, _fragmentShaderPath);
     shader->FragID = fragmentShader;
 
+    LIST_INIT(shader->Uniforms, 4);
+
     if (_shaderCache != NULL) {
         shader->_hash = hashSourceHash;
         shaderCacheAppend(_shaderCache, hashSourceHash, shader);
@@ -158,6 +161,23 @@ Shader *shaderCreate(const char *_vertexShaderPath,
     }
 
     return shader;
+}
+int shaderGetUniformLocation(Shader *shader, char *uniformName) {
+    int nameLen = strlen(uniformName);
+    struct shader_uniform uniform;
+    for (int i = 0; i < shader->Uniforms->size; i++) {
+        uniform = LIST_IDX(shader->Uniforms, i);
+        if (strncmp(uniformName, uniform.name, nameLen) == 0)
+            return uniform.location;
+    }
+    printf("Couldn't find uniform \"%s\" in shader %0X, creating new entry\n",
+           uniformName, shader->_hash & 0xFFFFFFFF);
+
+    uniform.name = uniformName;
+    uniform.location = glGetUniformLocation(shader->ID, uniformName);
+    LIST_APPEND(shader->Uniforms, uniform);
+
+    return uniform.location;
 }
 void shaderFree(Shader *shader) {
     bool useGeomShader = shader->GeomID != 0;

@@ -7,6 +7,10 @@
 
 #define SHADERS_PATH "shaders/"
 
+struct shader_uniform {
+    char *name;
+    int location;
+};
 typedef struct {
     uint32_t ID;
 
@@ -18,6 +22,8 @@ typedef struct {
 
     char *FragPath;
     uint32_t FragID;
+
+    LIST(struct shader_uniform) Uniforms;
 
     uint32_t _hash;
 } Shader;
@@ -34,7 +40,7 @@ void shaderSetCache(ShaderCache cache);
 Shader *shaderCreate(const char *vertexShaderPath,
                      const char *geometryShaderPath,
                      const char *fragmentShaderPath);
+int shaderGetUniformLocation(Shader *shader, char *uniformName);
 void shaderFree(Shader *shader);
-void shaderCacheFree(ShaderCache cache);
 
 #endif // !SHADER_H
