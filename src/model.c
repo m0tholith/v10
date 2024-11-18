@@ -22,6 +22,7 @@ struct Mesh *processMesh(struct aiMesh *mesh);
 struct Node *processNode(struct aiNode *node, struct Node *parentNode);
 void processNodeArray(struct NodeEntry *nodeArray, struct Node *rootNode,
                       int *index, int parentIndex);
+void importAssimpMaterials(Model *model, const struct aiScene *scene);
 
 Model *modelLoad(const char *_modelPath, unsigned int options) {
     char *modelFile = malloc(strlen(_modelPath) + sizeof(MODELS_PATH));
@@ -63,102 +64,7 @@ Model *modelLoad(const char *_modelPath, unsigned int options) {
     }
 
     if (!(options & MODELOPTS_DONT_IMPORT_MATERIALS)) {
-        for (int i = 0; i < model->MaterialCount; i++) {
-            struct aiMaterial *aiMat = scene->mMaterials[i];
-            Material *material = materialCreate(0, 0);
-
-            struct aiColor4D color;
-            float num;
-            struct aiString texPath;
-            enum aiTextureMapping texMapping;
-            unsigned int texUvIndex;
-            ai_real texBlend;
-            enum aiTextureOp texOp;
-            enum aiTextureMapMode texMapMode;
-            unsigned int texFlags;
-            char *texPathStr;
-            Texture *texture;
-
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, &color) ==
-                AI_SUCCESS) {
-                vec3s *ambient = malloc(sizeof(vec3s));
-                ambient->r = color.r;
-                ambient->g = color.g;
-                ambient->b = color.b;
-                materialAddProperty(material,
-                                    materialPropertyCreate("_material.ambient",
-                                                           MATTYPE_VEC3,
-                                                           (void *)ambient));
-            }
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &color) ==
-                AI_SUCCESS) {
-                vec3s *diffuse = malloc(sizeof(vec3s));
-                diffuse->r = color.r;
-                diffuse->g = color.g;
-                diffuse->b = color.b;
-                materialAddProperty(material,
-                                    materialPropertyCreate("_material.diffuse",
-                                                           MATTYPE_VEC3,
-                                                           (void *)diffuse));
-            }
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, &color) ==
-                AI_SUCCESS) {
-                vec3s *specular = malloc(sizeof(vec3s));
-                specular->r = color.r;
-                specular->g = color.g;
-                specular->b = color.b;
-                materialAddProperty(material,
-                                    materialPropertyCreate("_material.specular",
-                                                           MATTYPE_VEC3,
-                                                           (void *)specular));
-            }
-            if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS, &num) ==
-                AI_SUCCESS) {
-                float *shininess = malloc(sizeof(float));
-                *shininess = num;
-                materialAddProperty(
-                    material,
-                    materialPropertyCreate("_material.shininess", MATTYPE_FLOAT,
-                                           (void *)shininess));
-            }
-            if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS_STRENGTH, &num) ==
-                AI_SUCCESS) {
-                float *specular_strength = malloc(sizeof(float));
-                *specular_strength = num;
-                materialAddProperty(material, materialPropertyCreate(
-                                                  "_material.specular_strength",
-                                                  MATTYPE_FLOAT,
-                                                  (void *)specular_strength));
-            }
-
-            if (aiGetMaterialTexture(aiMat, aiTextureType_DIFFUSE, 0, &texPath,
-                                     &texMapping, &texUvIndex, &texBlend,
-                                     &texOp, &texMapMode,
-                                     &texFlags) == AI_SUCCESS &&
-                strlen(texPathStr) > 0) {
-                texPathStr = texPath.data;
-                if (texPathStr[0] == '*') {
-                    int idx = atoi(&texPathStr[1]);
-                    printf("using texture %d\n", idx);
-                    texture = model->Textures[idx];
-                } else
-                    texture = textureCreate(texPathStr, 0);
-                materialAddProperty(
-                    material,
-                    materialPropertyCreate(
-                        "_material.diffuse_tex", MATTYPE_TEXTURE2D,
-                        (void *)materialTextureDataCreate(texture, 0)));
-            } else {
-                texture = textureCreate(TEXTURE_DEFAULT, 0);
-                materialAddProperty(
-                    material,
-                    materialPropertyCreate(
-                        "_material.diffuse_tex", MATTYPE_TEXTURE2D,
-                        (void *)materialTextureDataCreate(texture, 0)));
-            }
-
-            model->Materials[i] = material;
-        }
+        importAssimpMaterials(model, scene);
     }
 
     struct Node *rootNode = processNode(scene->mRootNode, NULL);
@@ -395,4 +301,96 @@ struct Node *searchForNode(char *name, struct Node *rootNode) {
             return result;
     }
     return NULL;
+}
+void importAssimpMaterials(Model *model, const struct aiScene *scene) {
+    for (int i = 0; i < model->MaterialCount; i++) {
+        struct aiMaterial *aiMat = scene->mMaterials[i];
+        Material *material = materialCreate(0, 0);
+
+        struct aiColor4D color;
+        float num;
+        struct aiString texPath;
+        enum aiTextureMapping texMapping;
+        unsigned int texUvIndex;
+        ai_real texBlend;
+        enum aiTextureOp texOp;
+        enum aiTextureMapMode texMapMode;
+        unsigned int texFlags;
+        char *texPathStr;
+        Texture *texture;
+
+        if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, &color) ==
+            AI_SUCCESS) {
+            vec3s *ambient = malloc(sizeof(vec3s));
+            ambient->r = color.r;
+            ambient->g = color.g;
+            ambient->b = color.b;
+            materialAddProperty(material, materialPropertyCreate(
+                                              "_material.ambient", MATTYPE_VEC3,
+                                              (void *)ambient));
+        }
+        if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &color) ==
+            AI_SUCCESS) {
+            vec3s *diffuse = malloc(sizeof(vec3s));
+            diffuse->r = color.r;
+            diffuse->g = color.g;
+            diffuse->b = color.b;
+            materialAddProperty(material, materialPropertyCreate(
+                                              "_material.diffuse", MATTYPE_VEC3,
+                                              (void *)diffuse));
+        }
+        if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, &color) ==
+            AI_SUCCESS) {
+            vec3s *specular = malloc(sizeof(vec3s));
+            specular->r = color.r;
+            specular->g = color.g;
+            specular->b = color.b;
+            materialAddProperty(material, materialPropertyCreate(
+                                              "_material.specular",
+                                              MATTYPE_VEC3, (void *)specular));
+        }
+        if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS, &num) ==
+            AI_SUCCESS) {
+            float *shininess = malloc(sizeof(float));
+            *shininess = num;
+            materialAddProperty(material,
+                                materialPropertyCreate("_material.shininess",
+                                                       MATTYPE_FLOAT,
+                                                       (void *)shininess));
+        }
+        if (aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS_STRENGTH, &num) ==
+            AI_SUCCESS) {
+            float *specular_strength = malloc(sizeof(float));
+            *specular_strength = num;
+            materialAddProperty(
+                material, materialPropertyCreate("_material.specular_strength",
+                                                 MATTYPE_FLOAT,
+                                                 (void *)specular_strength));
+        }
+
+        if (aiGetMaterialTexture(aiMat, aiTextureType_DIFFUSE, 0, &texPath,
+                                 &texMapping, &texUvIndex, &texBlend, &texOp,
+                                 &texMapMode, &texFlags) == AI_SUCCESS &&
+            strlen(texPathStr) > 0) {
+            texPathStr = texPath.data;
+            if (texPathStr[0] == '*') {
+                int idx = atoi(&texPathStr[1]);
+                printf("using texture %d\n", idx);
+                texture = model->Textures[idx];
+            } else
+                texture = textureCreate(texPathStr, 0);
+            materialAddProperty(
+                material, materialPropertyCreate(
+                              "_material.diffuse_tex", MATTYPE_TEXTURE2D,
+                              (void *)materialTextureDataCreate(texture, 0)));
+        } else {
+            texture = textureCreate(TEXTURE_DEFAULT, 0);
+            materialAddProperty(
+                material, materialPropertyCreate(
+                              "_material.diffuse_tex", MATTYPE_TEXTURE2D,
+                              (void *)materialTextureDataCreate(texture, 0)));
+        }
+
+        model->Materials[i] = material;
+    }
 }
