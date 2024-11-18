@@ -48,7 +48,7 @@ int main(void) {
 #endif
 
     ShaderCache shaderCache = shaderCacheCreate();
-    shaderSetCache(shaderCache);
+    shaderUseCache(shaderCache);
 
     Camera *camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
     cameraSetProjectionMatrixPersp(camera, 60, 0.1f, 100.0f);

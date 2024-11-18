@@ -23,7 +23,7 @@ ShaderCache shaderCacheCreate() {
 Shader *shaderCacheIndex(ShaderCache cache, int idx) {
     return LIST_IDX(cache, idx).value;
 }
-void shaderSetCache(ShaderCache cache) { _shaderCache = cache; }
+void shaderUseCache(ShaderCache cache) { _shaderCache = cache; }
 
 Shader *shaderCreate(const char *_vertexShaderPath,
                      const char *_geometryShaderPath,

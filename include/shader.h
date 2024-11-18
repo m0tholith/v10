@@ -35,8 +35,23 @@ typedef LIST(struct shaderCacheEntry) ShaderCache;
 
 ShaderCache shaderCacheCreate();
 Shader *shaderCacheIndex(ShaderCache cache, int idx);
+/**
+ * Set shader cache.
+ *
+ * `shader.c` uses a shader cache to save already-compiled shaders. This
+ * function allows setting the cache to be used by the function
+ * `shaderCreate()`.
+ *
+ * @param: ShaderCache *cache Cache to use.
+ * @return: void
+ *
+ * @example:
+ *  ShaderCache *cache = shaderCacheCreate();
+ *  shaderUseCache(cache);
+ */
+void shaderUseCache(ShaderCache cache);
+void shaderCacheFree(ShaderCache cache);
 
-void shaderSetCache(ShaderCache cache);
 Shader *shaderCreate(const char *vertexShaderPath,
                      const char *geometryShaderPath,
                      const char *fragmentShaderPath);
