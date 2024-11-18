@@ -128,7 +128,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
 
 #define sendMatrices(__name, __matrices, __count, __shader)                    \
     glUseProgram(__shader->ID);                                                \
-    glUniformMatrix4fv(glGetUniformLocation(__shader->ID, __name), __count,    \
+    glUniformMatrix4fv(shaderGetUniformLocation(__shader, __name), __count,    \
                        GL_FALSE, (void *)__matrices);
 
     glViewport(0, 0, DIRLIGHT_SHADOWMAP_SIZE, DIRLIGHT_SHADOWMAP_SIZE);
@@ -195,9 +195,9 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
             glUseProgram(shader->ID);
             sendMatrices("_lightMatrices", projectionFromWorldMatrices, 6,
                          shader);
-            glUniform3fv(glGetUniformLocation(shader->ID, "_lightPos"), 1,
+            glUniform3fv(shaderGetUniformLocation(shader, "_lightPos"), 1,
                          (void *)&pointLight->Position);
-            glUniform1f(glGetUniformLocation(shader->ID, "_farPlane"),
+            glUniform1f(shaderGetUniformLocation(shader, "_farPlane"),
                         pointLight->Distance);
             sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_CUBEMAP |
                                        SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);

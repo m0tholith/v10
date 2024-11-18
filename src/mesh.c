@@ -69,6 +69,7 @@ void meshSendData(struct Mesh *mesh) {
                  mesh->Indices, GL_STATIC_DRAW);
 }
 void meshOverrideShaders(Shader *shader) { shaderOverride = shader; }
+// @todo: Replace glGetUniformLocation with shaderGetUniformLocation
 void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shaderID) {
     if (shaderOverride != NULL)
         shaderID = shaderOverride->ID;

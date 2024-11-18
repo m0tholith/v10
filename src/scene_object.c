@@ -28,7 +28,7 @@ void sceneObjectRender(SceneObject *sceneObject,
         if (sceneObject->Armature != NULL) {
             glUseProgram(shader->ID);
             glUniformMatrix4fv(
-                glGetUniformLocation(shader->ID, "_boneTransformations"),
+                shaderGetUniformLocation(shader, "_boneTransformations"),
                 MAX_BONES, GL_FALSE,
                 (void *)&sceneObject->Armature->BoneTransformations);
         }

@@ -36,8 +36,8 @@ void armatureApplyTransformations(Armature *armature) {
         glUseProgram(armature->Model->Materials[i]->Shader->ID);
 
         glUniformMatrix4fv(
-            glGetUniformLocation(armature->Model->Materials[i]->Shader->ID,
-                                 "_boneTransformations"),
+            shaderGetUniformLocation(armature->Model->Materials[i]->Shader,
+                                     "_boneTransformations"),
             MAX_BONES, GL_FALSE, (void *)&armature->BoneTransformations);
     }
 }

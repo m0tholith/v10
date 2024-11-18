@@ -51,7 +51,7 @@ Material *materialCreate(Shader *shader, int propertyCount, ...) {
             MaterialTextureData *data =
                 (MaterialTextureData *)material->Properties[i]->Data;
             glUniform1i(
-                glGetUniformLocation(shader->ID, material->Properties[i]->Name),
+                shaderGetUniformLocation(shader, material->Properties[i]->Name),
                 data->Index);
         }
     }
@@ -59,6 +59,7 @@ Material *materialCreate(Shader *shader, int propertyCount, ...) {
     return material;
 }
 
+// @todo: Replace glGetUniformLocation with shaderGetUniformLocation
 void applyProperty(MaterialProperty *property, uint32_t shaderID) {
     glUseProgram(shaderID);
     int intValue;
