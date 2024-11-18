@@ -35,7 +35,7 @@ void meshSendData(struct Mesh *mesh);
 ///
 /// set to -1 to remove override
 void meshOverrideShaders(Shader *shader);
-void meshRender(struct Mesh *mesh, mat4s worldFromModel, uint32_t shader);
+void meshRender(struct Mesh *mesh, mat4s worldFromModel, Shader *shader);
 void meshFree(struct Mesh *mesh);
 
 #endif // !MESH_H

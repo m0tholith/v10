@@ -26,7 +26,7 @@ void nodeRender(mat4s worldFromParent, struct Node *node,
         int index = mesh->MaterialIndex;
         Material *material = materialArray[index];
         materialApplyProperties(material);
-        meshRender(mesh, worldFromLocal, material->Shader->ID);
+        meshRender(mesh, worldFromLocal, material->Shader);
     }
 }
 mat4s nodeGetWorldFromLocal(struct Node *node) {
