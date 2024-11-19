@@ -139,10 +139,9 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
-            sendMatrices(
-                "_lightSpaceProjectionFromWorld",
-                lightScene->DirLights[dirLightIdx].ProjectionFromWorld.raw[0],
-                1, sceneObjects[objIdx]->Model->TexDepthShader);
+            sendMatrices("_lightSpaceProjectionFromWorld",
+                         dirLight->ProjectionFromWorld.raw[0], 1,
+                         sceneObjects[objIdx]->Model->TexDepthShader);
             sceneObjectRender(sceneObjects[objIdx], SCENEOBJ_RENDER_DEPTH_TEX);
         }
     }
@@ -192,7 +191,6 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             SceneObject *obj = sceneObjects[objIdx];
             Shader *shader = obj->Model->CubemapDepthShader;
-            glUseProgram(shader->ID);
             sendMatrices("_lightMatrices", projectionFromWorldMatrices, 6,
                          shader);
             glUniform3fv(shaderGetUniformLocation(shader, "_lightPos"), 1,
@@ -211,11 +209,9 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
             continue;
         framebufferBind(lightScene->SpotLightShadowMaps[spotLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
-            glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
-            sendMatrices(
-                "_lightSpaceProjectionFromWorld",
-                lightScene->SpotLights[spotLightIdx].ProjectionFromWorld.raw[0],
-                1, sceneObjects[objIdx]->Model->TexDepthShader);
+            sendMatrices("_lightSpaceProjectionFromWorld",
+                         spotLight->ProjectionFromWorld.raw[0], 1,
+                         sceneObjects[objIdx]->Model->TexDepthShader);
             sceneObjectRender(sceneObjects[objIdx],
                               SCENEOBJ_RENDER_DEPTH_TEX |
                                   SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
