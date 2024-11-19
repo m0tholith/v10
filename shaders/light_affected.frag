@@ -46,8 +46,8 @@ struct SpotLight {
     vec4 distanceAndEnabled;      // x: distance, y: enabled
 };
 const int DirLightsMax = 1;
-const int PointLightsMax = 8;
-const int SpotLightsMax = 8;
+const int PointLightsMax = 1;
+const int SpotLightsMax = 1;
 layout(std140, binding = 1) uniform Lights {
     DirLight[DirLightsMax] dirLights;
     PointLight[PointLightsMax] pointLights;

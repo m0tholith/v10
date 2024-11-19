@@ -67,8 +67,8 @@ void spotLightSetCutoff(SpotLight *spotLight, float innerCutoffDeg,
                         float outerCutoffDeg);
 
 #define DIRLIGHTS_MAX 1
-#define POINTLIGHTS_MAX 8
-#define SPOTLIGHTS_MAX 8
+#define POINTLIGHTS_MAX 1
+#define SPOTLIGHTS_MAX 1
 typedef struct {
     DirLight *DirLights;
     PointLight *PointLights;
