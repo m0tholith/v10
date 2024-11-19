@@ -11,6 +11,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+void setPointLightMatrices(PointLight *pointLight,
+                           mat4s *projectionFromWorldMatrices);
+
 DirLight dirLightCreate(vec3s direction, vec3s ambient, vec3s diffuse,
                         vec3s specular) {
     DirLight dirLight = (DirLight){
@@ -80,6 +83,27 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
     lightScene->PointLights = pointLights;
     lightScene->SpotLights = spotLights;
 
+    lightScene->_prev_data.dirlight_directions =
+        malloc(DIRLIGHTS_MAX * sizeof(vec3s));
+    memset(lightScene->_prev_data.dirlight_directions, 0,
+           DIRLIGHTS_MAX * sizeof(vec3s));
+    lightScene->_prev_data.pointlight_positions =
+        malloc(POINTLIGHTS_MAX * sizeof(vec3s));
+    memset(lightScene->_prev_data.pointlight_positions, 0,
+           POINTLIGHTS_MAX * sizeof(vec3s));
+    lightScene->_prev_data.pointlight_matrices =
+        malloc(6 * POINTLIGHTS_MAX * sizeof(mat4s));
+    memset(lightScene->_prev_data.pointlight_matrices, 0,
+           6 * POINTLIGHTS_MAX * sizeof(mat4s));
+    lightScene->_prev_data.spotlight_directions =
+        malloc(SPOTLIGHTS_MAX * sizeof(vec3s));
+    memset(lightScene->_prev_data.spotlight_directions, 0,
+           SPOTLIGHTS_MAX * sizeof(vec3s));
+    lightScene->_prev_data.spotlight_positions =
+        malloc(SPOTLIGHTS_MAX * sizeof(vec3s));
+    memset(lightScene->_prev_data.spotlight_positions, 0,
+           SPOTLIGHTS_MAX * sizeof(vec3s));
+
     glGenBuffers(1, &lightScene->UBO);
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);
     glBufferData(GL_UNIFORM_BUFFER,
@@ -136,6 +160,19 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         DirLight *dirLight = &lightScene->DirLights[dirLightIdx];
         if (!dirLight->_enabled)
             continue;
+
+        // check if dirlight matrix needs to be regenerated (if direction has
+        // been changed)
+        if (!glms_vec3_eqv(
+                dirLight->Direction,
+                lightScene->_prev_data.dirlight_directions[dirLightIdx])) {
+            dirLight->ProjectionFromWorld = glms_mul(
+                glms_ortho(-10, 10, -10, 10, -10, 10),
+                glms_lookat(dirLight->Direction, GLMS_VEC3_ZERO, GLMS_YUP));
+            lightScene->_prev_data.dirlight_directions[dirLightIdx] =
+                dirLight->Direction;
+        }
+
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
@@ -152,40 +189,19 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         PointLight *pointLight = &lightScene->PointLights[pointLightIdx];
         if (!pointLight->_enabled)
             continue;
-        mat4s projectionFromWorld =
-            glms_perspective(glm_rad(90), 1, 0.1f, pointLight->Distance);
-        mat4s projectionFromWorldMatrices[6] = {
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{+1.0, 0.0, 0.0}}),
-                                 (vec3s){{0.0, -1.0, 0.0}})),
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{-1.0, 0.0, 0.0}}),
-                                 (vec3s){{0.0, -1.0, 0.0}})),
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{0.0, +1.0, 0.0}}),
-                                 (vec3s){{0.0, 0.0, +1.0}})),
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{0.0, -1.0, 0.0}}),
-                                 (vec3s){{0.0, 0.0, -1.0}})),
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{0.0, 0.0, +1.0}}),
-                                 (vec3s){{0.0, -1.0, 0.0}})),
-            glms_mul(projectionFromWorld,
-                     glms_lookat(pointLight->Position,
-                                 glms_vec3_add(pointLight->Position,
-                                               (vec3s){{0.0, 0.0, -1.0}}),
-                                 (vec3s){{0.0, -1.0, 0.0}})),
-        };
+
+        mat4s *projectionFromWorldMatrices =
+            &lightScene->_prev_data.pointlight_matrices[6 * pointLightIdx];
+
+        // check if point light matrices have to be regenerated (if position or
+        // direction have been changed)
+        if (!glms_vec3_eqv(
+                pointLight->Position,
+                lightScene->_prev_data.pointlight_positions[pointLightIdx])) {
+            setPointLightMatrices(pointLight, projectionFromWorldMatrices);
+            lightScene->_prev_data.pointlight_positions[pointLightIdx] =
+                pointLight->Position;
+        }
 
         framebufferBind(lightScene->PointLightShadowMaps[pointLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
@@ -207,6 +223,32 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         SpotLight *spotLight = &lightScene->SpotLights[spotLightIdx];
         if (!spotLight->_enabled)
             continue;
+
+        // check if spotlight matrix has to be regenerated (if position or
+        // direction have been changed)
+        if (!glms_vec3_eqv(
+                spotLight->Direction,
+                lightScene->_prev_data.spotlight_directions[spotLightIdx]) ||
+
+            !glms_vec3_eqv(
+                spotLight->Position,
+                lightScene->_prev_data.spotlight_positions[spotLightIdx])) {
+
+            spotLight->ProjectionFromWorld = glms_mul(
+                glms_perspective(2 * acosf(spotLight->OuterCutoff), 1, 0.1f,
+                                 spotLight->Distance),
+                glms_lookat(
+                    spotLight->Position,
+                    glms_vec3_add(spotLight->Position,
+                                  glms_vec3_negate(spotLight->Direction)),
+                    GLMS_YUP));
+
+            lightScene->_prev_data.spotlight_positions[spotLightIdx] =
+                spotLight->Position;
+            lightScene->_prev_data.spotlight_directions[spotLightIdx] =
+                spotLight->Direction;
+        }
+
         framebufferBind(lightScene->SpotLightShadowMaps[spotLightIdx]);
         for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
             sendMatrices("_lightSpaceProjectionFromWorld",
@@ -249,5 +291,47 @@ void lightSceneFree(LightScene *lightScene) {
     }
     free(lightScene->DirLightShadowMaps);
     free(lightScene->PointLightShadowMaps);
+
+    free(lightScene->_prev_data.dirlight_directions);
+    free(lightScene->_prev_data.pointlight_positions);
+    free(lightScene->_prev_data.pointlight_matrices);
+    free(lightScene->_prev_data.spotlight_directions);
+    free(lightScene->_prev_data.spotlight_positions);
+
     free(lightScene);
+}
+
+void setPointLightMatrices(PointLight *pointLight, mat4s *out) {
+    mat4s projectionFromWorld =
+        glms_perspective(glm_rad(90), 1, 0.1f, pointLight->Distance);
+    out[0] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{+1.0, 0.0, 0.0}}),
+                                  (vec3s){{0.0, -1.0, 0.0}}));
+    out[1] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{-1.0, 0.0, 0.0}}),
+                                  (vec3s){{0.0, -1.0, 0.0}}));
+    out[2] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{0.0, +1.0, 0.0}}),
+                                  (vec3s){{0.0, 0.0, +1.0}}));
+    out[3] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{0.0, -1.0, 0.0}}),
+                                  (vec3s){{0.0, 0.0, -1.0}}));
+    out[4] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{0.0, 0.0, +1.0}}),
+                                  (vec3s){{0.0, -1.0, 0.0}}));
+    out[5] = glms_mul(projectionFromWorld,
+                      glms_lookat(pointLight->Position,
+                                  glms_vec3_add(pointLight->Position,
+                                                (vec3s){{0.0, 0.0, -1.0}}),
+                                  (vec3s){{0.0, -1.0, 0.0}}));
 }

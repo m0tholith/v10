@@ -79,6 +79,21 @@ typedef struct {
     Framebuffer **DirLightShadowMaps;
     Framebuffer **PointLightShadowMaps;
     Framebuffer **SpotLightShadowMaps;
+
+    /**
+     * Stores some data for optimizing light passes.
+     *
+     * Not to be used by user. Only by light.c.
+     */
+    struct {
+        vec3s *dirlight_directions;
+
+        vec3s *pointlight_positions;
+        mat4s *pointlight_matrices; // six for each light
+
+        vec3s *spotlight_directions;
+        vec3s *spotlight_positions;
+    } _prev_data;
 } LightScene;
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights);
