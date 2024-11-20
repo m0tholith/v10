@@ -1,11 +1,11 @@
 #include "light.h"
 
-#include "cglm/struct/affine-mat.h"
-#include "cglm/struct/cam.h"
 #include "framebuffer.h"
 #include "glad/glad.h"
 #include "window.h"
 #include <GL/gl.h>
+#include <cglm/struct/affine-mat.h>
+#include <cglm/struct/cam.h>
 #include <cglm/util.h>
 #include <math.h>
 #include <stddef.h>
