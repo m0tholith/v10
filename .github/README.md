@@ -46,7 +46,7 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
         - [X] color importing (diffuse, ambient, etc.)
         - [X] texture importing
     - [X] skybox
-    - [ ] refactoring
+    - [X] refactoring
         - [X] optimizations
             - [X] camera UBO
             - [X] light scene UBO
@@ -55,7 +55,9 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
                 - [X] uniform cache
             - [X] texture cache
             - [X] cubemap cache
-        - [ ] documentation `<------ WE ARE HERE`
+        - [X] documentation
+    - [ ] text rendering
+    - [ ] sprites
     - [ ] post processing
         - [ ] multi-aliasing
         - [ ] bloom
