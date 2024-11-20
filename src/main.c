@@ -7,12 +7,12 @@
 #include "armature.h"
 #include "camera.h"
 #include "cubemap.h"
+#include "entity.h"
 #include "framebuffer.h"
 #include "input.h"
 #include "light.h"
 #include "material.h"
 #include "model.h"
-#include "scene_object.h"
 #include "shader.h"
 #include "skybox.h"
 #include "texture.h"
@@ -78,7 +78,7 @@ int main(void) {
     LightScene *lightScene =
         lightSceneCreate(dirLights, pointLights, spotLights);
 
-    int SCENE_OBJECT_COUNT = 0;
+    int ENTITY_COUNT = 0;
 
     Shader *lightShader =
         shaderCreate("light_source.vert", "", "light_source.frag");
@@ -90,7 +90,7 @@ int main(void) {
                                               (void *)&pointLights[0].Diffuse));
     pointLightModel->WorldFromModel =
         glms_translate(GLMS_MAT4_IDENTITY, pointLights[0].Position);
-    SCENE_OBJECT_COUNT++;
+    ENTITY_COUNT++;
 
     Model *dirLightModel =
         modelLoad("arrow.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
@@ -103,7 +103,7 @@ int main(void) {
     vec3s axis = glms_vec3_cross(startAxis, dirLights[0].Direction);
     dirLightModel->WorldFromModel =
         glms_rotate(GLMS_MAT4_IDENTITY, angle, axis);
-    SCENE_OBJECT_COUNT++;
+    ENTITY_COUNT++;
 
     Model *spotLightModel =
         modelLoad("flashlight.glb", MODELOPTS_DONT_IMPORT_MATERIALS);
@@ -116,7 +116,7 @@ int main(void) {
     spotLightModel->WorldFromModel =
         glms_rotate(glms_translate(GLMS_MAT4_IDENTITY, spotLights[0].Position),
                     angle, axis);
-    SCENE_OBJECT_COUNT++;
+    ENTITY_COUNT++;
 
     Shader *homeShader =
         shaderCreate("light_affected.vert", "", "light_affected.frag");
@@ -124,7 +124,7 @@ int main(void) {
     for (int i = 0; i < homeModel->MaterialCount; i++) {
         homeModel->Materials[i]->Shader = homeShader;
     }
-    SCENE_OBJECT_COUNT++;
+    ENTITY_COUNT++;
 
     Shader *skinningShader =
         shaderCreate("skinning.vert", "", "light_affected.frag");
@@ -143,7 +143,7 @@ int main(void) {
                    (vec3s){{1.5f, 1.5f, 1.5f}}),
         (vec3s){{-3.0f, 0.0f, -1.4f}});
     Armature *armature = armatureCreate(skinningModel);
-    SCENE_OBJECT_COUNT++;
+    ENTITY_COUNT++;
 
     const int TexturedBoxCount = 7;
     Model **texturedBoxes = malloc(TexturedBoxCount * sizeof(Model *));
@@ -158,18 +158,17 @@ int main(void) {
             glms_rotate_y(GLMS_MAT4_IDENTITY, glm_rad(23)),
             (vec3s){{-1.7f + (float)i / ((TexturedBoxCount - 1) * 2), -4.0f + i,
                      -4.4f}});
-        SCENE_OBJECT_COUNT++;
+        ENTITY_COUNT++;
     }
 
-    SceneObject **sceneObjects =
-        malloc(SCENE_OBJECT_COUNT * sizeof(SceneObject *));
-    sceneObjects[0] = sceneObjectCreate(pointLightModel, NULL);
-    sceneObjects[1] = sceneObjectCreate(dirLightModel, NULL);
-    sceneObjects[2] = sceneObjectCreate(spotLightModel, NULL);
-    sceneObjects[3] = sceneObjectCreate(homeModel, NULL);
-    sceneObjects[4] = sceneObjectCreate(skinningModel, armature);
+    Entity **entities = malloc(ENTITY_COUNT * sizeof(Entity *));
+    entities[0] = entityCreate(pointLightModel, NULL);
+    entities[1] = entityCreate(dirLightModel, NULL);
+    entities[2] = entityCreate(spotLightModel, NULL);
+    entities[3] = entityCreate(homeModel, NULL);
+    entities[4] = entityCreate(skinningModel, armature);
     for (int i = 0; i < TexturedBoxCount; i++) {
-        sceneObjects[i + 5] = sceneObjectCreate(texturedBoxes[i], NULL);
+        entities[i + 5] = entityCreate(texturedBoxes[i], NULL);
     }
 
     glEnable(GL_CULL_FACE);
@@ -251,8 +250,7 @@ int main(void) {
 #define fov(x) (1.0f / 112.0f) * (x - 800.0f) + 60.0f
         cameraSetProjectionMatrixPersp(camera, fov(WINDOW_WIDTH), 0.1f, 100.0f);
 
-        lightSceneRenderShadowMaps(lightScene, sceneObjects,
-                                   SCENE_OBJECT_COUNT);
+        lightSceneRenderShadowMaps(lightScene, entities, ENTITY_COUNT);
         for (int i = 0; i < shaderCache->size; i++) {
             glUseProgram(shaderCacheIndex(shaderCache, i)->ID);
             glActiveTexture(GL_TEXTURE10);
@@ -269,9 +267,8 @@ int main(void) {
         cameraPreRender(camera);
         lightScenePreRender(lightScene);
 
-        for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
-            sceneObjectRender(sceneObjects[i],
-                              SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
+        for (int i = 0; i < ENTITY_COUNT; i++) {
+            entityRender(entities[i], ENTITY_RENDER_NOAPPLYTRANSFORMS);
         }
 
         skyboxRender();
@@ -282,9 +279,9 @@ int main(void) {
     cubemapFreeCache();
     skyboxDestroy();
 
-    for (int objIdx = 0; objIdx < SCENE_OBJECT_COUNT; objIdx++) {
-        for (int i = 0; i < sceneObjects[objIdx]->Model->MaterialCount; i++) {
-            Material *material = sceneObjects[objIdx]->Model->Materials[i];
+    for (int entityIdx = 0; entityIdx < ENTITY_COUNT; entityIdx++) {
+        for (int i = 0; i < entities[entityIdx]->Model->MaterialCount; i++) {
+            Material *material = entities[entityIdx]->Model->Materials[i];
             for (int j = 0; j < material->PropertyCount; j++) {
                 MaterialProperty *property = material->Properties[j];
                 if (strncmp(property->Name, "_material.", 9) == 0) {
@@ -317,10 +314,10 @@ int main(void) {
     free(texturedBoxes);
     armatureFree(armature);
 
-    for (int i = 0; i < SCENE_OBJECT_COUNT; i++) {
-        sceneObjectFree(sceneObjects[i]);
+    for (int i = 0; i < ENTITY_COUNT; i++) {
+        entityFree(entities[i]);
     }
-    free(sceneObjects);
+    free(entities);
 
     free(spotLights);
     free(pointLights);

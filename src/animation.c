@@ -55,8 +55,8 @@ Animation *animationCreate(const struct aiScene *scene, char *name,
     resultAnimation->Duration = animation->mDuration;
     resultAnimation->TicksPerSec = animation->mTicksPerSecond;
     resultAnimation->Time = 0;
-    printf("Found animation \"%s\":\n\tDuration: %d, ticks per sec: %d\n",
-           name, resultAnimation->Duration, resultAnimation->TicksPerSec);
+    printf("Found animation \"%s\":\n\tDuration: %d, ticks per sec: %d\n", name,
+           resultAnimation->Duration, resultAnimation->TicksPerSec);
 
     float (*interpFunction)(float);
     if (!strncmp(resultAnimation->Name, "Step", 4))

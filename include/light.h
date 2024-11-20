@@ -1,8 +1,8 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include "entity.h"
 #include "framebuffer.h"
-#include "scene_object.h"
 #include <cglm/types-struct.h>
 #include <stdint.h>
 
@@ -97,9 +97,8 @@ typedef struct {
 } LightScene;
 LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
                              SpotLight *spotLights);
-void lightSceneRenderShadowMaps(LightScene *lightScene,
-                                SceneObject **sceneObjects,
-                                int sceneObjectCount);
+void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
+                                int entityCount);
 void lightScenePreRender(LightScene *lightScene);
 void lightSceneFree(LightScene *lightScene);
 

@@ -145,9 +145,8 @@ LightScene *lightSceneCreate(DirLight *dirLights, PointLight *pointLights,
     return lightScene;
 }
 
-void lightSceneRenderShadowMaps(LightScene *lightScene,
-                                SceneObject **sceneObjects,
-                                int sceneObjectCount) {
+void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
+                                int entityCount) {
     glCullFace(GL_FRONT);
 
 #define sendMatrices(__name, __matrices, __count, __shader)                    \
@@ -174,12 +173,13 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         }
 
         framebufferBind(lightScene->DirLightShadowMaps[dirLightIdx]);
-        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
-            glUseProgram(sceneObjects[objIdx]->Model->TexDepthShader->ID);
+        for (int entityIdx = 0; entityIdx < entityCount; entityIdx++) {
+            Entity *entity = entities[entityIdx];
+            glUseProgram(entity->Model->TexDepthShader->ID);
             sendMatrices("_lightSpaceProjectionFromWorld",
                          dirLight->ProjectionFromWorld.raw[0], 1,
-                         sceneObjects[objIdx]->Model->TexDepthShader);
-            sceneObjectRender(sceneObjects[objIdx], SCENEOBJ_RENDER_DEPTH_TEX);
+                         entity->Model->TexDepthShader);
+            entityRender(entity, ENTITY_RENDER_DEPTH_TEX);
         }
     }
 
@@ -204,17 +204,17 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         }
 
         framebufferBind(lightScene->PointLightShadowMaps[pointLightIdx]);
-        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
-            SceneObject *obj = sceneObjects[objIdx];
-            Shader *shader = obj->Model->CubemapDepthShader;
+        for (int entityIdx = 0; entityIdx < entityCount; entityIdx++) {
+            Entity *entity = entities[entityIdx];
+            Shader *shader = entity->Model->CubemapDepthShader;
             sendMatrices("_lightMatrices", projectionFromWorldMatrices, 6,
                          shader);
             glUniform3fv(shaderGetUniformLocation(shader, "_lightPos"), 1,
                          (void *)&pointLight->Position);
             glUniform1f(shaderGetUniformLocation(shader, "_farPlane"),
                         pointLight->Distance);
-            sceneObjectRender(obj, SCENEOBJ_RENDER_DEPTH_CUBEMAP |
-                                       SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
+            entityRender(entity, ENTITY_RENDER_DEPTH_CUBEMAP |
+                                     ENTITY_RENDER_NOAPPLYTRANSFORMS);
         }
     }
 
@@ -250,13 +250,13 @@ void lightSceneRenderShadowMaps(LightScene *lightScene,
         }
 
         framebufferBind(lightScene->SpotLightShadowMaps[spotLightIdx]);
-        for (int objIdx = 0; objIdx < sceneObjectCount; objIdx++) {
+        for (int entityIdx = 0; entityIdx < entityCount; entityIdx++) {
+            Entity *entity = entities[entityIdx];
             sendMatrices("_lightSpaceProjectionFromWorld",
                          spotLight->ProjectionFromWorld.raw[0], 1,
-                         sceneObjects[objIdx]->Model->TexDepthShader);
-            sceneObjectRender(sceneObjects[objIdx],
-                              SCENEOBJ_RENDER_DEPTH_TEX |
-                                  SCENEOBJ_RENDER_NOAPPLYTRANSFORMS);
+                         entity->Model->TexDepthShader);
+            entityRender(entity, ENTITY_RENDER_DEPTH_TEX |
+                                     ENTITY_RENDER_NOAPPLYTRANSFORMS);
         }
     }
 

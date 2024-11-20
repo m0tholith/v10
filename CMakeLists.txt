@@ -21,7 +21,7 @@ set(SRC_FILES
     src/material.c
     src/main.c
     src/armature.c
-    src/scene_object.c
+    src/entity.c
     src/framebuffer.c
     src/light.c
     src/error.c
