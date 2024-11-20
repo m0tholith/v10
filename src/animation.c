@@ -42,7 +42,7 @@ Animation *animationCreate(const struct aiScene *scene, char *name,
             break;
     }
     if (animIndex >= scene->mNumAnimations) {
-        fprintf(stderr, "no animation found named \"%s\"\n", name);
+        fprintf(stderr, "No animation found named \"%s\"\n", name);
         exit(EXIT_FAILURE);
     }
 
@@ -55,7 +55,7 @@ Animation *animationCreate(const struct aiScene *scene, char *name,
     resultAnimation->Duration = animation->mDuration;
     resultAnimation->TicksPerSec = animation->mTicksPerSecond;
     resultAnimation->Time = 0;
-    printf("found animation \"%s\"\n    duration: %d, ticks per sec: %d\n",
+    printf("Found animation \"%s\":\n\tDuration: %d, ticks per sec: %d\n",
            name, resultAnimation->Duration, resultAnimation->TicksPerSec);
 
     float (*interpFunction)(float);

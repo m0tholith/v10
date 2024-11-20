@@ -32,8 +32,8 @@ typedef struct {
     char *Name;
 } InputEvent;
 
-void inputSetEvents(InputEvent *events, int eventCount);
 void inputInit(GLFWwindow *window);
+void inputSetEvents(InputEvent *events, int eventCount);
 void inputUpdate();
 void inputMouseUpdate();
 InputEvent *inputGetEvent(char *eventName);

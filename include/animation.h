@@ -38,11 +38,18 @@ float StepInterp(float x);
 float LinearInterp(float x);
 float SmoothStepInterp(float x);
 
-/// free with `animationFree`
+/**
+ * This function is only to be used by whatever imports models.
+ */
 Animation *animationCreate(const struct aiScene *scene, char *name,
                            struct Node *rootNode);
-/// step animation using `InterpFunction` defined by each node
+/**
+ * Call this function every frame.
+ */
 void animationStep(Animation *animation, float deltaTime);
+/**
+ * This function is only to be used by whatever imports models.
+ */
 void animationFree(Animation *animation);
 
 #endif // !ANIMATION_H

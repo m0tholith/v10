@@ -10,7 +10,7 @@ Armature *armatureCreate(Model *model) {
     armature->Model = model;
 
     if (model->NodeCount > MAX_BONES) {
-        fprintf(stderr, "couldn't create armature: model has too many nodes");
+        fprintf(stderr, "Couldn't create armature: model has too many nodes");
         exit(1);
     }
 

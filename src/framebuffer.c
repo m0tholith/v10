@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 #include <GL/gl.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 enum FramebufferOpts framebufferFormats = FRAMEBUF_DEPTH | FRAMEBUF_RGB;
@@ -33,6 +34,35 @@ Framebuffer *framebufferCreate(int x, int y, enum FramebufferOpts options) {
         createTex2D(framebuffer, x, y, format);
         break;
     }
+
+    char *formatText, *typeText;
+    {
+        switch (options & framebufferFormats) {
+        case FRAMEBUF_DEPTH:
+            formatText = "Depth";
+            break;
+        case FRAMEBUF_RGB:
+            formatText = "RGB";
+            break;
+        default:
+            formatText = "Unknown";
+            break;
+        }
+        switch (options & framebufferTypes) {
+        case FRAMEBUF_TEX2D:
+            typeText = "2D Texture";
+            break;
+        case FRAMEBUF_CUBEMAP:
+            typeText = "Cubemap";
+            break;
+        default:
+            typeText = "Unknown";
+            break;
+        }
+    }
+    printf(
+        "Created new framebuffer:\n\tSize: %dx%d\n\tFormat: %s\n\tType: %s\n",
+        x, y, formatText, typeText);
 
     return framebuffer;
 }

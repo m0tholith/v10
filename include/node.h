@@ -5,7 +5,7 @@
 #include "mesh.h"
 #include <cglm/types-struct.h>
 
-/// to be used with the model class
+/// Only to be used with the model class
 struct Node {
     mat4s ParentFromLocal;
     Material Material;

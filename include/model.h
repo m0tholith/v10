@@ -52,6 +52,7 @@ Model *modelLoad(const char *modelFilename, unsigned int options);
 /// @param Material *... Materials to set, needs to be `model->MaterialCount`
 ///  number of them
 void modelSetMaterials(Model *model, int materialCount, ...);
+/// Sets one single material to be used by all meshes.
 void modelSetDefaultMaterial(Model *model, Material *material);
 void modelPreRender(void *_model);
 void modelRender(Model *model);

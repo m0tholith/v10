@@ -9,10 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define X_AXIS ((vec3s){{1.0f, 0.0f, 0.0f}})
-#define Y_AXIS ((vec3s){{0.0f, 1.0f, 0.0f}})
-#define Z_AXIS ((vec3s){{0.0f, 0.0f, 1.0f}})
-
 #define QUAT_EQ(a, b)                                                          \
     (glms_vec4_eqv((vec4s){{a.x, a.y, a.z, a.w}},                              \
                    (vec4s){{b.x, b.y, b.z, b.w}}))
@@ -73,14 +69,14 @@ void cameraSetPosition(Camera *camera, vec3s position) {
     camera->Position = position;
 }
 void cameraLookAt(Camera *camera, vec3s target) {
-    camera->Quaternion = glms_quat_forp(camera->Position, target, Y_AXIS);
+    camera->Quaternion = glms_quat_forp(camera->Position, target, GLMS_YUP);
 }
 // creates a new quaternion by multiplying per-axis quaternions together in a
 // specific order (YXZ)
 void cameraSetEulerAngles(Camera *camera, vec3s eulerAngles) {
-    versors quatX = glms_quatv(eulerAngles.x, X_AXIS);
-    versors quatY = glms_quatv(eulerAngles.y, Y_AXIS);
-    versors quatZ = glms_quatv(eulerAngles.z, Z_AXIS);
+    versors quatX = glms_quatv(eulerAngles.x, GLMS_XUP);
+    versors quatY = glms_quatv(eulerAngles.y, GLMS_YUP);
+    versors quatZ = glms_quatv(eulerAngles.z, GLMS_ZUP);
     camera->Quaternion = glms_quat_mul(glms_quat_mul(quatY, quatX), quatZ);
 }
 void cameraSetQuaternion(Camera *camera, versors quaternion) {

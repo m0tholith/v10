@@ -14,7 +14,7 @@ void windowSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void glfwErrorCallback(int errorCode, const char *description) {
-    printf("GLFW error code 0x%04X:\n	%s\n", errorCode, description);
+    printf("GLFW error code 0x%04X:\n\t%s\n", errorCode, description);
 }
 
 GLFWwindow *windowCreate() {

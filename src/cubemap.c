@@ -68,7 +68,7 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
     bool isTransparent;
     for (int i = 0; i < 6; i++) {
         SWITCHFILE(filePath, cubemapFileLen, i);
-        printf("	Loading cubemap file '%s'\n", filePath);
+        printf("\tLoading cubemap file '%s'\n", filePath);
         unsigned char *data =
             stbi_load(filePath, &width, &height, &nrChannels, 0);
         isTransparent =

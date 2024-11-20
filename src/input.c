@@ -27,6 +27,8 @@ void inputInit(GLFWwindow *window) {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(_window, inputKeyCallback);
     mouseSensitivity = (vec2s){{0.25f, 0.25f}};
+
+    printf("Initialized input\n");
 }
 void inputUpdate() {
     for (int i = 0; i < _eventCount; i++) {
@@ -69,15 +71,13 @@ InputEvent *inputGetEvent(char *eventName) {
         if (strcmp(_events[i].Name, eventName) == 0)
             return &_events[i];
     }
-    fprintf(stderr, "ERROR: couldn't find input event '%s'\n", eventName);
+    fprintf(stderr, "Couldn't find input event '%s'\n", eventName);
     return NULL;
 }
 
 void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
                       int mods) {
-    /* printf("got callback:\n"
-           "	key %d, action %d, mods %d\n",
-           key, action, mods); */
+    printf("Got callback:\n\tkey %d, action %d, mods %d\n", key, action, mods);
     for (int i = 0; i < _eventCount; i++) {
         InputEvent *event = &_events[i];
         for (int keyIdx = 0; keyIdx < event->KeyCount; keyIdx++) {

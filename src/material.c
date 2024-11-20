@@ -117,10 +117,10 @@ void applyProperty(MaterialProperty *property, Shader *shader) {
                     textureData.Index);
         break;
     default:
-        fprintf(stderr,
-                "material property error: property \"%s\" uses type \"%d\" "
-                "which is not defined\n",
-                property->Name, property->Type);
+        fprintf(
+            stderr,
+            "Material property \"%s\" uses type \"%d\", which is not defined\n",
+            property->Name, property->Type);
         break;
     }
 }
@@ -150,7 +150,7 @@ void materialChangeProperty(Material *material, const char *propertyName,
         }
     }
     fprintf(stderr,
-            "material change property error: material doesn't have property "
+            "Couldn't change material property: material doesn't have property "
             "\"%s\"\n",
             propertyName);
 }
