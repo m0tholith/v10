@@ -46,16 +46,16 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
         - [X] color importing (diffuse, ambient, etc.)
         - [X] texture importing
     - [X] skybox
-    - [ ] refactoring `<------ WE ARE HERE`
-        - [ ] optimizations
+    - [ ] refactoring
+        - [X] optimizations
             - [X] camera UBO
-            - [ ] light scene UBO
+            - [X] light scene UBO
             - [X] shaders
                 - [X] shader cache
                 - [X] uniform cache
             - [X] texture cache
             - [X] cubemap cache
-        - [ ] documentation
+        - [ ] documentation `<------ WE ARE HERE`
     - [ ] post processing
         - [ ] multi-aliasing
         - [ ] bloom
