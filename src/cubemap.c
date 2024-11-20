@@ -34,11 +34,15 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
     if (_cubemapCache == NULL)
         _cubemapCache = cubemapCacheCreate();
 
-    char *hashSource = malloc(strlen(_cubemapPath) + 1);
+    const int cubemapPathLen = strlen(_cubemapPath);
+    const int cubemapFileLen = strlen(CUBEMAPS_PATH) + cubemapPathLen;
+
+    char *hashSource = malloc(cubemapPathLen + 1);
     strcpy(hashSource, _cubemapPath);
-    char *cubemapFile = malloc(strlen(_cubemapPath) + sizeof(CUBEMAPS_PATH));
+    char *cubemapFile = malloc(cubemapFileLen + 1);
     strcpy(cubemapFile, CUBEMAPS_PATH);
     strcat(cubemapFile, _cubemapPath);
+    printf("Loading cubemap %s (%s)\n", _cubemapPath, cubemapFile);
     uint64_t hashSourceHash = cubemapPathHash(hashSource);
     int cubemapCacheIndex = cubemapCacheSearch(_cubemapCache, hashSourceHash);
     if (cubemapCacheIndex != -1) {
@@ -50,14 +54,12 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
     Cubemap *cubemap = malloc(sizeof(Cubemap));
     cubemap->Path = _cubemapPath;
 
-    int folderPathLen = strlen(_cubemapPath);
-
     const int FilePathLen =
-        folderPathLen +
-        3; // "${folderPathLen}/nx" (what would be the result of strlen)
+        cubemapFileLen +
+        3; // "${cubemapFile}/nx" (what would be the result of strlen)
     char *filePath = malloc(FilePathLen + 1);
-    filePath[FilePathLen] = '\0'; // (FilePathLen - 1) + 1
-    strcpy(filePath, _cubemapPath);
+    memset(filePath, 0, FilePathLen + 1);
+    strcpy(filePath, cubemapFile);
 
     glGenTextures(1, &cubemap->ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->ID);
@@ -65,7 +67,8 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
     int width, height, nrChannels;
     bool isTransparent;
     for (int i = 0; i < 6; i++) {
-        SWITCHFILE(filePath, folderPathLen, i);
+        SWITCHFILE(filePath, cubemapFileLen, i);
+        printf("	Loading cubemap file '%s'\n", filePath);
         unsigned char *data =
             stbi_load(filePath, &width, &height, &nrChannels, 0);
         isTransparent =
@@ -73,7 +76,6 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
             nrChannels == 4; // stb sets these values if an image has either:
                              // grey + alpha channel (hence 2)
                              // red + green + blue + alpha channel (hence 4)
-
         if (data) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                          GL_RGB + isTransparent, width, height, 0,
@@ -83,9 +85,12 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
             fprintf(stderr, "Could not load cubemap \"%s\" (file \"%s\")\n",
                     _cubemapPath, filePath);
             stbi_image_free(data);
+            free(hashSource);
+            free(cubemapFile);
+            free(filePath);
+            return NULL;
         }
     }
-    free(filePath);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -95,6 +100,10 @@ Cubemap *cubemapCreate(char *_cubemapPath) {
 
     cubemapCacheAppend(_cubemapCache, hashSourceHash, cubemap);
     free(hashSource);
+    free(cubemapFile);
+    free(filePath);
+
+    printf("Loaded cubemap %s\n", _cubemapPath);
 
     return cubemap;
 };

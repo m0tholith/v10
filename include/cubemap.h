@@ -18,7 +18,7 @@ typedef struct {
  * @param: cubemapPath Directory to cubemap files.
  * @return: Resulting cubemap.
  *
- * @example: Cubemap *cubemap = cubemapCreate("textures/skybox_cubemap");
+ * @example: Cubemap *cubemap = cubemapCreate("sky");
  */
 Cubemap *cubemapCreate(char *cubemapPath);
 void cubemapFree(Cubemap *cubemap);
