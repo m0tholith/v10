@@ -1,21 +1,21 @@
-#include "window.h"
+#include "v10/window.h"
 
 #ifdef ENABLE_ERRORCHECKING
-#include "error.h"
+#include "v10/error.h"
 #endif
-#include "animation.h"
-#include "armature.h"
-#include "camera.h"
-#include "cubemap.h"
-#include "entity.h"
-#include "framebuffer.h"
-#include "input.h"
-#include "light.h"
-#include "material.h"
-#include "model.h"
-#include "shader.h"
-#include "skybox.h"
-#include "texture.h"
+#include "v10/animation.h"
+#include "v10/armature.h"
+#include "v10/camera.h"
+#include "v10/cubemap.h"
+#include "v10/entity.h"
+#include "v10/framebuffer.h"
+#include "v10/input.h"
+#include "v10/light.h"
+#include "v10/material.h"
+#include "v10/model.h"
+#include "v10/shader.h"
+#include "v10/skybox.h"
+#include "v10/texture.h"
 
 #include <cglm/struct/affine-pre.h>
 #include <cglm/struct/affine.h>
