@@ -1,5 +1,6 @@
 # set to anything and it'll still work
 DEBUG?=yes
+CREATE_SO?=
 
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
@@ -20,8 +21,7 @@ CFILES=src/v10/model.c \
        src/v10/entity.c \
        src/v10/framebuffer.c \
        src/v10/skybox.c \
-       src/v10/material.c \
-       src/main.c
+       src/v10/material.c
 BUILD_DIR=build
 OBJECTS=$(patsubst %.c,$(BUILD_DIR)/%.o,$(CFILES))
 DEPFILES=$(patsubst %.c,$(BUILD_DIR)/%.d,$(CFILES))
@@ -31,13 +31,20 @@ CC=clang
 INCLUDE_DIRS=include
 LIBS=gl glfw3 cglm assimp
 OPTIONS=
-CFLAGS=-Wall -Werror $(foreach DIR,$(INCLUDE_DIRS),-I$(DIR)) $(OPTIONS) \
-	   $(shell pkg-config --cflags $(LIBS)) -MMD
 ifeq ($(DEBUG), )
 else
-	CFLAGS+=-g
+	OPTIONS+=-g
 endif
+CFLAGS=-Wall -Werror $(foreach DIR,$(INCLUDE_DIRS),-I$(DIR)) $(OPTIONS) \
+	   $(shell pkg-config --cflags $(LIBS)) -MMD
 LDFLAGS=-lm $(shell pkg-config --libs $(LIBS))
+ifeq ($(CREATE_SO), )
+	CFILES+=src/main.c
+else
+	BINARY:::=lib$(BINARY).so
+	OPTIONS+=-fpic
+	LDFLAGS+=-shared
+endif
 
 # colors for printing
 COUT_NORMAL=\e[0m
@@ -57,7 +64,7 @@ $(BUILD_DIR)/%.o: %.c
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(BINARY) $(BUILD_DIR)
+	rm -rf $(BINARY) lib$(BINARY).so $(BUILD_DIR)
 
 -include $(DEPFILES)
 
