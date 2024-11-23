@@ -20,12 +20,17 @@
     {
       devShells.${system}.default = (pkgs.mkShell.override { stdenv = pkgs.clangStdenv; }) {
         packages = with pkgs; [
-          cmake
           glfw
           cglm
           assimp
+
+          # lsp
           clang-tools
           clang
+
+          # compilation
+          gnumake
+          pkg-config
 
           # debugging
           valgrind
