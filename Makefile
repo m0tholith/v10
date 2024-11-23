@@ -1,3 +1,6 @@
+# set to anything and it'll still work
+DEBUG?=yes
+
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
        src/v10/armature.c \
@@ -28,8 +31,12 @@ CC=clang
 INCLUDE_DIRS=include
 LIBS=gl glfw3 cglm assimp
 OPTIONS=
-CFLAGS=-Wall -Werror -g $(foreach DIR,$(INCLUDE_DIRS),-I$(DIR)) $(OPTIONS) \
+CFLAGS=-Wall -Werror $(foreach DIR,$(INCLUDE_DIRS),-I$(DIR)) $(OPTIONS) \
 	   $(shell pkg-config --cflags $(LIBS)) -MMD
+ifeq ($(DEBUG), )
+else
+	CFLAGS+=-g
+endif
 LDFLAGS=-lm $(shell pkg-config --libs $(LIBS))
 
 # colors for printing
