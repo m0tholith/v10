@@ -2,6 +2,7 @@
 CC=clang
 DEBUG?=yes
 CREATE_SO?=
+GENERATE_COMPILE_FLAGS_FILE=yes
 OPTIONS=
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
@@ -52,7 +53,10 @@ COUT_NORMAL=\e[0m
 COUT_GREEN=\e[32m
 COUT_YELLOW=\e[33m
 
-all: $(BINARY)
+# misc
+COMPILE_FLAGS_FILE=compile_flags.txt
+
+all: $(COMPILE_FLAGS_FILE) $(BINARY)
 
 $(BINARY): $(OBJECTS)
 	@printf "$(COUT_GREEN)Linking $@$(COUT_NORMAL)\n"
@@ -64,8 +68,15 @@ $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
+$(COMPILE_FLAGS_FILE):
+	@if [ "$(GENERATE_COMPILE_FLAGS_FILE)" != "" ]; then \
+		printf "$(COUT_GREEN)Generating $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
+		echo "$(INCLUDE_OPTS)" > $(COMPILE_FLAGS_FILE);\
+		printf "$(COUT_GREEN)Generated $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
+	fi
+
 clean:
-	rm -rf $(BINARY) lib$(BINARY).so $(BUILD_DIR)
+	rm -rf $(BINARY) lib$(BINARY).so $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
 
 -include $(DEPFILES)
 
