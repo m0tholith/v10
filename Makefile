@@ -1,7 +1,8 @@
-# set to anything and it'll still work
+# options
+CC=clang
 DEBUG?=yes
 CREATE_SO?=
-
+OPTIONS=
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
        src/v10/armature.c \
@@ -23,20 +24,20 @@ CFILES=src/v10/model.c \
        src/v10/skybox.c \
        src/v10/material.c
 BUILD_DIR=build
-OBJECTS=$(patsubst %.c,$(BUILD_DIR)/%.o,$(CFILES))
-DEPFILES=$(patsubst %.c,$(BUILD_DIR)/%.d,$(CFILES))
+INCLUDE_DIRS=include
 BINARY=v10
 
-CC=clang
-INCLUDE_DIRS=include
+# generated flags
+OBJECTS=$(patsubst %.c,$(BUILD_DIR)/%.o,$(CFILES))
+DEPFILES=$(patsubst %.c,$(BUILD_DIR)/%.d,$(CFILES))
 LIBS=gl glfw3 cglm assimp
-OPTIONS=
+INCLUDE_OPTS=$(foreach DIR,$(INCLUDE_DIRS),-I$(DIR))
 ifeq ($(DEBUG), )
 else
 	OPTIONS+=-g
 endif
-CFLAGS=-Wall -Werror $(foreach DIR,$(INCLUDE_DIRS),-I$(DIR)) $(OPTIONS) \
-	   $(shell pkg-config --cflags $(LIBS)) -MMD
+CFLAGS=-Wall -Werror -MMD $(INCLUDE_OPTS) $(OPTIONS) \
+	   $(shell pkg-config --cflags $(LIBS))
 LDFLAGS=-lm $(shell pkg-config --libs $(LIBS))
 ifeq ($(CREATE_SO), )
 	CFILES+=src/main.c
@@ -54,9 +55,9 @@ COUT_YELLOW=\e[33m
 all: $(BINARY)
 
 $(BINARY): $(OBJECTS)
-	@printf "Linking $(COUT_GREEN)$@$(COUT_NORMAL)\n"
+	@printf "$(COUT_GREEN)Linking $@$(COUT_NORMAL)\n"
 	@$(CC) -o $@ $^ $(LDFLAGS)
-	@printf "Linked $(COUT_GREEN)$@$(COUT_NORMAL)\n"
+	@printf "$(COUT_GREEN)Linked $@$(COUT_NORMAL)\n"
 
 $(BUILD_DIR)/%.o: %.c
 	@printf "$(COUT_GREEN)Compiling $<$(COUT_NORMAL) ($(COUT_YELLOW)$@$(COUT_NORMAL))\n"
