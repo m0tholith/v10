@@ -179,7 +179,7 @@ void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
             sendMatrices("_lightSpaceProjectionFromWorld",
                          dirLight->ProjectionFromWorld.raw[0], 1,
                          entity->Model->TexDepthShader);
-            entityRender(entity, ENTITY_RENDER_DEPTH_TEX);
+            entityRender(entity, ENTITYRENDER_DEPTH_TEX);
         }
     }
 
@@ -213,8 +213,8 @@ void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
                          (void *)&pointLight->Position);
             glUniform1f(shaderGetUniformLocation(shader, "_farPlane"),
                         pointLight->Distance);
-            entityRender(entity, ENTITY_RENDER_DEPTH_CUBEMAP |
-                                     ENTITY_RENDER_NOAPPLYTRANSFORMS);
+            entityRender(entity, ENTITYRENDER_DEPTH_CUBEMAP |
+                                     ENTITYRENDER_NOAPPLYTRANSFORMS);
         }
     }
 
@@ -255,8 +255,8 @@ void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
             sendMatrices("_lightSpaceProjectionFromWorld",
                          spotLight->ProjectionFromWorld.raw[0], 1,
                          entity->Model->TexDepthShader);
-            entityRender(entity, ENTITY_RENDER_DEPTH_TEX |
-                                     ENTITY_RENDER_NOAPPLYTRANSFORMS);
+            entityRender(entity, ENTITYRENDER_DEPTH_TEX |
+                                     ENTITYRENDER_NOAPPLYTRANSFORMS);
         }
     }
 

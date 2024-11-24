@@ -268,7 +268,7 @@ int main(void) {
         lightScenePreRender(lightScene);
 
         for (int i = 0; i < ENTITY_COUNT; i++) {
-            entityRender(entities[i], ENTITY_RENDER_NOAPPLYTRANSFORMS);
+            entityRender(entities[i], ENTITYRENDER_NOAPPLYTRANSFORMS);
         }
 
         skyboxRender();

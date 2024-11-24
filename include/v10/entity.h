@@ -5,10 +5,10 @@
 #include "v10/model.h"
 
 enum EntityRenderOptions {
-    ENTITY_RENDER_NONE = 0,
-    ENTITY_RENDER_NOAPPLYTRANSFORMS = (1 << 0),
-    ENTITY_RENDER_DEPTH_TEX = (1 << 1),
-    ENTITY_RENDER_DEPTH_CUBEMAP = (1 << 2),
+    ENTITYRENDER_NONE = 0,
+    ENTITYRENDER_DEPTH_TEX = (1 << 0),
+    ENTITYRENDER_DEPTH_CUBEMAP = (1 << 1),
+    ENTITYRENDER_NOAPPLYTRANSFORMS = (1 << 2),
 };
 
 typedef struct {

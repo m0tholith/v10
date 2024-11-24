@@ -11,13 +11,13 @@ Entity *entityCreate(Model *model, Armature *armature) {
 }
 
 #define ISDEPTH(__opt)                                                         \
-    (__opt & (ENTITY_RENDER_DEPTH_TEX | ENTITY_RENDER_DEPTH_CUBEMAP))
+    (__opt & (ENTITYRENDER_DEPTH_TEX | ENTITYRENDER_DEPTH_CUBEMAP))
 #define DEPTHSHADER(__model, __opt)                                            \
-    (__opt & ENTITY_RENDER_DEPTH_TEX ? __model->TexDepthShader                 \
-                                     : __model->CubemapDepthShader)
+    (__opt & ENTITYRENDER_DEPTH_TEX ? __model->TexDepthShader                  \
+                                    : __model->CubemapDepthShader)
 
 void entityRender(Entity *entity, enum EntityRenderOptions options) {
-    if (!(options & ENTITY_RENDER_NOAPPLYTRANSFORMS)) {
+    if (!(options & ENTITYRENDER_NOAPPLYTRANSFORMS)) {
         modelPreRender(entity->Model);
         if (entity->Armature != NULL)
             armatureApplyTransformations(entity->Armature);
