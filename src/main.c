@@ -267,7 +267,11 @@ int main(void) {
         cameraPreRender(camera);
         lightScenePreRender(lightScene);
 
-        for (int i = 0; i < ENTITY_COUNT; i++) {
+        for (int i = 0; i < ENTITY_COUNT && i < 3; i++) {
+            entityRender(entities[i], ENTITYRENDER_NOAPPLYTRANSFORMS |
+                                          ENTITYRENDER_WIREFRAME);
+        }
+        for (int i = 3; i < ENTITY_COUNT; i++) {
             entityRender(entities[i], ENTITYRENDER_NOAPPLYTRANSFORMS);
         }
 

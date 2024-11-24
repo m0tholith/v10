@@ -22,6 +22,8 @@ void entityRender(Entity *entity, enum EntityRenderOptions options) {
         if (entity->Armature != NULL)
             armatureApplyTransformations(entity->Armature);
     }
+    if (options & ENTITYRENDER_WIREFRAME)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (ISDEPTH(options)) {
         Shader *shader = DEPTHSHADER(entity->Model, options);
         if (entity->Armature != NULL) {
@@ -36,5 +38,7 @@ void entityRender(Entity *entity, enum EntityRenderOptions options) {
         meshOverrideShaders(NULL);
     } else
         modelRender(entity->Model);
+    if (options & ENTITYRENDER_WIREFRAME)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void entityFree(Entity *entity) { free(entity); }
