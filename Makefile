@@ -1,6 +1,7 @@
 # options
 CC=clang
 DEBUG?=yes
+ENABLE_ERRORCHECKING?=yes
 CREATE_SO?=
 GENERATE_COMPILE_FLAGS_FILE=yes
 OPTIONS=
@@ -72,6 +73,12 @@ $(COMPILE_FLAGS_FILE):
 	@if [ "$(GENERATE_COMPILE_FLAGS_FILE)" != "" ]; then \
 		printf "$(COUT_GREEN)Generating $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
 		echo "$(INCLUDE_OPTS)" > $(COMPILE_FLAGS_FILE);\
+		if [ "$(DEBUG)" != "" ]; then \
+			echo "-D DEBUG" >> $(COMPILE_FLAGS_FILE);\
+		fi;\
+		if [ "$(ENABLE_ERRORCHECKING)" != "" ]; then \
+			echo "-D ENABLE_ERRORCHECKING" >> $(COMPILE_FLAGS_FILE);\
+		fi;\
 		printf "$(COUT_GREEN)Generated $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
 	fi
 
