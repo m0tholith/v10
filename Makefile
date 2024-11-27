@@ -25,12 +25,14 @@ CFILES=src/v10/model.c \
        src/v10/framebuffer.c \
        src/v10/skybox.c \
        src/v10/material.c
+
 BUILD_DIR=build
 INCLUDE_DIRS=include
+
 BINARY_NAME=v10
 LIBRARY_NAME=libv10.so
-
 RESULT=$(BINARY_NAME)
+INSTALL_DIR=/usr/local
 
 # generated flags
 OBJECTS=$(patsubst %.c,$(BUILD_DIR)/%.o,$(CFILES))
@@ -87,6 +89,11 @@ $(COMPILE_FLAGS_FILE):
 
 clean:
 	rm -rf $(BINARY_NAME) $(LIBRARY_NAME) $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
+
+install: $(LIBRARY_NAME)
+	mkdir -p $(INSTALL_DIR)/include/v10 $(INSTALL_DIR)/lib
+	cp $(LIBRARY_NAME) $(INSTALL_DIR)/lib/
+	cp -r $(foreach DIR,$(INCLUDE_DIRS),$(INCLUDE_DIRS)/*) $(INSTALL_DIR)/include/
 
 -include $(DEPFILES)
 
