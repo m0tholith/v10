@@ -2,6 +2,7 @@
 !*v10/
 .cache
 build/
+result
 # in case sb wants to modify
 compile_flags.txt
 

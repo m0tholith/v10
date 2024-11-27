@@ -38,5 +38,6 @@
           gdb
         ];
       };
+      packages.${system}.default = pkgs.callPackage ./default.nix {};
     };
 }
