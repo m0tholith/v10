@@ -27,7 +27,10 @@ CFILES=src/v10/model.c \
        src/v10/material.c
 BUILD_DIR=build
 INCLUDE_DIRS=include
-BINARY=v10
+BINARY_NAME=v10
+LIBRARY_NAME=libv10.so
+
+RESULT=$(BINARY_NAME)
 
 # generated flags
 OBJECTS=$(patsubst %.c,$(BUILD_DIR)/%.o,$(CFILES))
@@ -44,7 +47,7 @@ LDFLAGS=-lm $(shell pkg-config --libs $(LIBS))
 ifeq ($(CREATE_SO), )
 	CFILES+=src/main.c
 else
-	BINARY:::=lib$(BINARY).so
+	RESULT=$(LIBRARY_NAME)
 	OPTIONS+=-fpic
 	LDFLAGS+=-shared
 endif
@@ -57,9 +60,9 @@ COUT_YELLOW=\e[33m
 # misc
 COMPILE_FLAGS_FILE=compile_flags.txt
 
-all: $(COMPILE_FLAGS_FILE) $(BINARY)
+all: $(COMPILE_FLAGS_FILE) $(RESULT)
 
-$(BINARY): $(OBJECTS)
+$(RESULT): $(OBJECTS)
 	@printf "$(COUT_GREEN)Linking $@$(COUT_NORMAL)\n"
 	@$(CC) -o $@ $^ $(LDFLAGS)
 	@printf "$(COUT_GREEN)Linked $@$(COUT_NORMAL)\n"
@@ -83,7 +86,7 @@ $(COMPILE_FLAGS_FILE):
 	fi
 
 clean:
-	rm -rf $(BINARY) lib$(BINARY).so $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
+	rm -rf $(BINARY_NAME) $(LIBRARY_NAME) $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
 
 -include $(DEPFILES)
 
