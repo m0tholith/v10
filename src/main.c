@@ -331,7 +331,7 @@ int main(void) {
     textureFreeCache();
     shaderCacheFree(shaderCache);
 
-    windowClose();
+    windowClose(window);
 
     cameraFree(camera);
 

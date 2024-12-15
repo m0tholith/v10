@@ -11,6 +11,6 @@ extern int WINDOW_HEIGHT;
 GLFWwindow *windowCreate();
 void windowSetSkybox(float r, float g, float b);
 void windowDraw(GLFWwindow *window);
-void windowClose();
+void windowClose(GLFWwindow *window);
 
 #endif // !WINDOW_H
