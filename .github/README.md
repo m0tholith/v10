@@ -14,12 +14,22 @@ an opengl game engine/framework
 ```bash
 git clone https://github.com/m0tholith/v10
 cd v10
-cmake CMakeLists.txt
-cmake --build .
+make
+./v10
 ```
 ### build and run (debug)
 (this is already enabled by default)
-edit `CMakeLists.txt` and enable `BUILD_DEBUG`, then compile the project again
+
+edit `Makefile` and change the value of `DEBUG` (any value means enabling, no value means disabling), then compile the project again:
+```bash
+make clean
+make
+```
+alternatively, you can momentarily change the value of the `DEBUG` variable:
+```bash
+make clean
+make DEBUG=yes
+```
 ## nix shell
 if you use nix you can use the `flake.nix` file to enter a devshell with all the required dependencies:
 ```bash
