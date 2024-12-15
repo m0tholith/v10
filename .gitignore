@@ -1,4 +1,5 @@
-*v10*
+v10
+libv10.so
 !*v10/
 .cache
 build/

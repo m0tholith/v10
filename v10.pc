@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: v10
+Description: An OpenGL game engine/framework
+Version: 0.1.0
+Cflags: -I${includedir}/v10
+Libs: -L${libdir} -lv10

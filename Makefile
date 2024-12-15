@@ -31,6 +31,7 @@ INCLUDE_DIRS=include
 
 BINARY_NAME=v10
 LIBRARY_NAME=libv10.so
+PKGCONFIG_NAME=v10.pc
 RESULT=$(BINARY_NAME)
 INSTALL_DIR=/usr/local
 
@@ -90,10 +91,12 @@ $(COMPILE_FLAGS_FILE):
 clean:
 	rm -rf $(BINARY_NAME) $(LIBRARY_NAME) $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
 
-install: $(LIBRARY_NAME)
-	mkdir -p $(INSTALL_DIR)/include/v10 $(INSTALL_DIR)/lib
+install: $(LIBRARY_NAME) $(PKGCONFIG_NAME)
+	mkdir -p $(INSTALL_DIR)/include/v10 $(INSTALL_DIR)/lib/pkgconfig
 	cp $(LIBRARY_NAME) $(INSTALL_DIR)/lib/
 	cp -r $(foreach DIR,$(INCLUDE_DIRS),$(INCLUDE_DIRS)/*) $(INSTALL_DIR)/include/
+	sed -i "1s~.*~prefix=$(INSTALL_DIR)~" $(PKGCONFIG_NAME)
+	cp $(PKGCONFIG_NAME) $(INSTALL_DIR)/lib/pkgconfig
 
 -include $(DEPFILES)
 
