@@ -18,7 +18,7 @@ struct NodeEntry {
     int ParentIndex;
     mat4s WorldFromLocal;
 };
-typedef struct {
+typedef struct Model {
     mat4s WorldFromModel;
 
     int MeshCount;
@@ -39,7 +39,7 @@ typedef struct {
     Shader *TexDepthShader;
     Shader *CubemapDepthShader;
 
-    void (*OnDelete)(void *model);
+    void (*OnDelete)(struct Model *model);
 } Model;
 
 enum ModelLoadOptions {
@@ -54,13 +54,13 @@ Model *modelLoad(const char *modelFilename, unsigned int options);
 void modelSetMaterials(Model *model, int materialCount, ...);
 /// Sets one single material to be used by all meshes.
 void modelSetDefaultMaterial(Model *model, Material *material);
-void modelPreRender(void *_model);
+void modelPreRender(Model *model);
 void modelRender(Model *model);
 /// calls `model->OnDelete`
 void modelFree(Model *model);
 
 /// not to be used directly, but by presets and such
-void _modelDelete(void *_model);
-void _modelFreeMaterials(void *_model);
+void _modelDelete(Model *model);
+void _modelFreeMaterials(Model *model);
 
 #endif // !MODEL_H

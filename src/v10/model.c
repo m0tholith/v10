@@ -144,8 +144,7 @@ void modelSetDefaultMaterial(Model *model, Material *material) {
         model->Materials[i] = material;
     }
 }
-void modelPreRender(void *_model) {
-    Model *model = (Model *)_model;
+void modelPreRender(Model *model) {
     for (int i = 0; i < model->NodeCount; i++) {
         struct NodeEntry *nodeEntry = &model->NodeEntries[i];
         mat4s worldFromParent;
@@ -175,8 +174,7 @@ void modelRender(Model *model) {
 }
 void modelFree(Model *model) { model->OnDelete(model); }
 
-void _modelDelete(void *_model) {
-    Model *model = (Model *)_model;
+void _modelDelete(Model *model) {
     nodeFree(model->NodeEntries[0].Node);
     free(model->NodeEntries);
     free(model->Materials);
@@ -191,8 +189,7 @@ void _modelDelete(void *_model) {
     free(model->Animations);
     free(model);
 }
-void _modelFreeMaterials(void *_model) {
-    Model *model = (Model *)_model;
+void _modelFreeMaterials(Model *model) {
     for (int i = 0; i < model->MaterialCount; i++) {
         materialFree(model->Materials[i]);
     }
