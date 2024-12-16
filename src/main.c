@@ -38,6 +38,7 @@ InputEvent *getInputEventArray();
 void freeInputEventArray(InputEvent *events);
 
 int main(void) {
+    windowManagerInit();
     window = windowCreate(800, 800, "v10");
     windowSetSkybox(0.117f, 0.117f, 0.18f);
     InputEvent *events = getInputEventArray();
@@ -186,7 +187,7 @@ int main(void) {
     InputEvent *movementEvent = inputGetEvent("movement");
     InputEvent *exitEvent = inputGetEvent("exit");
     InputEvent *sprintEvent = inputGetEvent("sprint");
-    while (!glfwWindowShouldClose(window->glWin)) {
+    while (!windowShouldClose(window)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
@@ -199,7 +200,7 @@ int main(void) {
 
         inputUpdate();
         if (exitEvent->State > 0)
-            glfwSetWindowShouldClose(window->glWin, 1);
+            windowSetShouldClose(window);
         inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
             eulerAngles,
@@ -335,9 +336,11 @@ int main(void) {
     textureFreeCache();
     shaderCacheFree(shaderCache);
 
+    cameraFree(camera);
+
     windowClose(window);
 
-    cameraFree(camera);
+    windowManagerDeInit();
 
     freeInputEventArray(events);
     return 0;

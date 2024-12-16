@@ -10,14 +10,16 @@ void glfwErrorCallback(int errorCode, const char *description) {
     printf("GLFW error code 0x%04X:\n\t%s\n", errorCode, description);
 }
 
+void windowManagerInit() {
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+    glfwInit();
+    glfwSetErrorCallback(glfwErrorCallback);
+}
 Window *windowCreate(int width, int height, char *title) {
     Window *window = malloc(sizeof(Window));
     window->Width = width;
     window->Height = height;
 
-    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
-    glfwInit();
-    glfwSetErrorCallback(glfwErrorCallback);
 #ifdef ENABLE_ERRORCHECKING
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -60,5 +62,6 @@ void windowDraw(Window *window) {
 }
 void windowClose(Window *window) {
     glfwDestroyWindow(window->glWin);
-    glfwTerminate();
+    free(window);
 }
+void windowManagerDeInit() { glfwTerminate(); }
