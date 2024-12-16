@@ -50,11 +50,10 @@ Camera *cameraCreate(vec3s position, versors quaternion) {
     cameraCalculateViewMatrix(camera);
     return camera;
 }
-void cameraSetProjectionMatrixPersp(Camera *camera, float fov, float nearPlane,
-                                    float farPlane) {
-    camera->ProjectionFromViewMatrix = glms_perspective(
-        glm_rad(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, nearPlane,
-        farPlane);
+void cameraSetProjectionMatrixPersp(Camera *camera, float fov, float ratio,
+                                    float nearPlane, float farPlane) {
+    camera->ProjectionFromViewMatrix =
+        glms_perspective(glm_rad(fov), ratio, nearPlane, farPlane);
 }
 void cameraSetProjectionMatrixOrtho(Camera *camera, float x, float y,
                                     float nearPlane, float farPlane) {

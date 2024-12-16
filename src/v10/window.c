@@ -1,23 +1,20 @@
 #include "v10/window.h"
 
+#include <stdio.h>
 #include <stdlib.h>
-
-int WINDOW_WIDTH = 800;
-int WINDOW_HEIGHT = 800;
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
-}
-void windowSizeCallback(GLFWwindow *window, int width, int height) {
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void glfwErrorCallback(int errorCode, const char *description) {
     printf("GLFW error code 0x%04X:\n\t%s\n", errorCode, description);
 }
 
-GLFWwindow *windowCreate() {
+Window *windowCreate(int width, int height, char *title) {
+    Window *window = malloc(sizeof(Window));
+    window->Width = width;
+    window->Height = height;
+
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
     glfwInit();
     glfwSetErrorCallback(glfwErrorCallback);
@@ -31,14 +28,13 @@ GLFWwindow *windowCreate() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-    GLFWwindow *window =
-        glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "template", NULL, NULL);
-    if (window == NULL) {
+    window->glWin = glfwCreateWindow(width, height, title, NULL, NULL);
+    if (window->glWin == NULL) {
         fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window->glWin);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         fprintf(stderr, "Failed to initialize GLAD\n");
@@ -46,21 +42,23 @@ GLFWwindow *windowCreate() {
         exit(EXIT_FAILURE);
     }
 
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, window->Width, window->Height);
     glEnable(GL_DEPTH_TEST);
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-    glfwSetWindowSizeCallback(window, windowSizeCallback);
-    glfwFocusWindow(window);
+    glfwSetFramebufferSizeCallback(window->glWin, framebufferSizeCallback);
+    glfwFocusWindow(window->glWin);
 
     return window;
 }
 void windowSetSkybox(float r, float g, float b) { glClearColor(r, g, b, 1.0f); }
-void windowDraw(GLFWwindow *window) {
-    glfwSwapBuffers(window);
+void windowPreDraw(Window *window) {
+    glViewport(0, 0, window->Width, window->Height);
+}
+void windowDraw(Window *window) {
+    glfwSwapBuffers(window->glWin);
     glfwPollEvents();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-void windowClose(GLFWwindow *window) {
-    glfwDestroyWindow(window);
+void windowClose(Window *window) {
+    glfwDestroyWindow(window->glWin);
     glfwTerminate();
 }

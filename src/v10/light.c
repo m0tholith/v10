@@ -262,7 +262,6 @@ void lightSceneRenderShadowMaps(LightScene *lightScene, Entity **entities,
 
     glCullFace(GL_BACK);
     framebufferResetBind();
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 void lightScenePreRender(LightScene *lightScene) {
     glBindBuffer(GL_UNIFORM_BUFFER, lightScene->UBO);

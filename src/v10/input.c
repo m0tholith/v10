@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-GLFWwindow *_window;
-
 InputEvent *_events;
 int _eventCount;
 
@@ -21,11 +19,9 @@ void inputSetEvents(InputEvent *events, int eventCount) {
     _events = events;
     _eventCount = eventCount;
 }
-void inputInit(GLFWwindow *window) {
-    _window = window;
-
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetKeyCallback(_window, inputKeyCallback);
+void inputInit(Window *window) {
+    glfwSetInputMode(window->glWin, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetKeyCallback(window->glWin, inputKeyCallback);
     mouseSensitivity = (vec2s){{0.25f, 0.25f}};
 
     printf("Initialized input\n");
@@ -59,9 +55,9 @@ void inputUpdate() {
         }
     }
 }
-void inputMouseUpdate() {
+void inputMouseUpdate(Window *window) {
     double xPosition, yPosition;
-    glfwGetCursorPos(_window, &xPosition, &yPosition);
+    glfwGetCursorPos(window->glWin, &xPosition, &yPosition);
     vec2s newPosition = (vec2s){{xPosition, yPosition}};
     mouseDelta = glms_vec2_sub(newPosition, mousePosition);
     mousePosition = newPosition;

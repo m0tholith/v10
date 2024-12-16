@@ -1,6 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "v10/window.h"
 #include <GLFW/glfw3.h>
 #include <stdint.h>
 
@@ -32,10 +33,10 @@ typedef struct {
     char *Name;
 } InputEvent;
 
-void inputInit(GLFWwindow *window);
+void inputInit(Window *window);
 void inputSetEvents(InputEvent *events, int eventCount);
 void inputUpdate();
-void inputMouseUpdate();
+void inputMouseUpdate(Window *window);
 InputEvent *inputGetEvent(char *eventName);
 
 #endif // !INPUT_H

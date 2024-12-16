@@ -27,7 +27,7 @@
 #define MOVE_SPEED 10.0f
 #define EVENT_COUNT 3
 
-GLFWwindow *window;
+Window *window;
 
 vec2s mousePosition;
 vec2s mouseDelta;
@@ -38,7 +38,7 @@ InputEvent *getInputEventArray();
 void freeInputEventArray(InputEvent *events);
 
 int main(void) {
-    window = windowCreate();
+    window = windowCreate(800, 800, "v10");
     windowSetSkybox(0.117f, 0.117f, 0.18f);
     InputEvent *events = getInputEventArray();
     inputSetEvents(events, EVENT_COUNT);
@@ -51,7 +51,8 @@ int main(void) {
     shaderUseCache(shaderCache);
 
     Camera *camera = cameraCreate(GLMS_VEC3_ZERO, GLMS_QUAT_IDENTITY);
-    cameraSetProjectionMatrixPersp(camera, 60, 0.1f, 100.0f);
+    cameraSetProjectionMatrixPersp(
+        camera, 60, (float)window->Width / window->Height, 0.1f, 100.0f);
     cameraLookAt(camera, GLMS_VEC3_ZERO);
 
     DirLight *dirLights = malloc(DIRLIGHTS_MAX * sizeof(DirLight));
@@ -185,7 +186,7 @@ int main(void) {
     InputEvent *movementEvent = inputGetEvent("movement");
     InputEvent *exitEvent = inputGetEvent("exit");
     InputEvent *sprintEvent = inputGetEvent("sprint");
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window->glWin)) {
         currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
 
@@ -198,8 +199,8 @@ int main(void) {
 
         inputUpdate();
         if (exitEvent->State > 0)
-            glfwSetWindowShouldClose(window, 1);
-        inputMouseUpdate();
+            glfwSetWindowShouldClose(window->glWin, 1);
+        inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
             eulerAngles,
             (vec3s){{-mouseDelta.y * mouseSensitivity.x * deltaTime,
@@ -248,7 +249,9 @@ int main(void) {
         lastTime = currentTime;
 
 #define fov(x) (1.0f / 112.0f) * (x - 800.0f) + 60.0f
-        cameraSetProjectionMatrixPersp(camera, fov(WINDOW_WIDTH), 0.1f, 100.0f);
+        cameraSetProjectionMatrixPersp(camera, fov(window->Width),
+                                       (float)window->Width / window->Height,
+                                       0.1f, 100.0f);
 
         lightSceneRenderShadowMaps(lightScene, entities, ENTITY_COUNT);
         for (int i = 0; i < shaderCache->size; i++) {
@@ -266,6 +269,7 @@ int main(void) {
 
         cameraPreRender(camera);
         lightScenePreRender(lightScene);
+        windowPreDraw(window);
 
         for (int i = 0; i < ENTITY_COUNT && i < 3; i++) {
             entityRender(entities[i], ENTITYRENDER_NOAPPLYTRANSFORMS |
