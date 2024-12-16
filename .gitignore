@@ -4,8 +4,7 @@ libv10.so
 .cache
 build/
 result
-# in case sb wants to modify
-compile_flags.txt
+compile_commands.json
 
 ### C ###
 # Prerequisites

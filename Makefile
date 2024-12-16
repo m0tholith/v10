@@ -3,7 +3,6 @@ CC=clang
 DEBUG?=yes
 ENABLE_ERRORCHECKING?=yes
 CREATE_SO?=
-GENERATE_COMPILE_FLAGS_FILE=yes
 OPTIONS=
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
@@ -60,10 +59,7 @@ COUT_NORMAL=\e[0m
 COUT_GREEN=\e[32m
 COUT_YELLOW=\e[33m
 
-# misc
-COMPILE_FLAGS_FILE=compile_flags.txt
-
-all: $(COMPILE_FLAGS_FILE) $(RESULT)
+all: $(RESULT)
 
 $(RESULT): $(OBJECTS)
 	@printf "$(COUT_GREEN)Linking $@$(COUT_NORMAL)\n"
@@ -75,21 +71,12 @@ $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-$(COMPILE_FLAGS_FILE):
-	@if [ "$(GENERATE_COMPILE_FLAGS_FILE)" != "" ]; then \
-		printf "$(COUT_GREEN)Generating $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
-		echo "$(INCLUDE_OPTS)" > $(COMPILE_FLAGS_FILE);\
-		if [ "$(DEBUG)" != "" ]; then \
-			echo "-D DEBUG" >> $(COMPILE_FLAGS_FILE);\
-		fi;\
-		if [ "$(ENABLE_ERRORCHECKING)" != "" ]; then \
-			echo "-D ENABLE_ERRORCHECKING" >> $(COMPILE_FLAGS_FILE);\
-		fi;\
-		printf "$(COUT_GREEN)Generated $(COMPILE_FLAGS_FILE)$(COUT_NORMAL)\n";\
-	fi
+compile_commands.json:
+	make clean
+	bear -- make $(RESULT)
 
 clean:
-	rm -rf $(BINARY_NAME) $(LIBRARY_NAME) $(BUILD_DIR) $(COMPILE_FLAGS_FILE)
+	rm -rf $(BINARY_NAME) $(LIBRARY_NAME) $(BUILD_DIR) compile_commands.json
 
 install: $(LIBRARY_NAME) $(PKGCONFIG_NAME)
 	mkdir -p $(INSTALL_DIR)/include/v10 $(INSTALL_DIR)/lib/pkgconfig

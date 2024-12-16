@@ -28,6 +28,7 @@
           # lsp
           clang-tools
           clang
+          bear
 
           # compilation
           gnumake
