@@ -16,6 +16,7 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       pkgs-24-05 = nixos-24-05.legacyPackages.${system};
+      v10 = pkgs.callPackage ./default.nix { };
     in
     {
       devShells.${system}.default = (pkgs.mkShell.override { stdenv = pkgs.clangStdenv; }) {
@@ -38,6 +39,6 @@
           gdb
         ];
       };
-      packages.${system}.default = pkgs.callPackage ./default.nix {};
+      packages.${system}.default = v10;
     };
 }
