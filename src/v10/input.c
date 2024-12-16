@@ -62,6 +62,8 @@ void inputMouseUpdate(Window *mainWindow) {
     glfwGetCursorPos(mainWindow->glWin, &xPosition, &yPosition);
     vec2s newPosition = (vec2s){{xPosition, yPosition}};
     _mouseData->Delta = glms_vec2_sub(newPosition, _mouseData->Position);
+    _mouseData->Delta =
+        glms_vec2_mul(_mouseData->Delta, _mouseData->Sensitivity);
     _mouseData->Position = newPosition;
 }
 MouseInput *inputGetMouseData() { return _mouseData; }

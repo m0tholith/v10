@@ -202,10 +202,8 @@ int main(void) {
             windowSetShouldClose(window);
         inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
-            eulerAngles,
-            (vec3s){{-mouseData->Delta.y * mouseData->Sensitivity.x * deltaTime,
-                     -mouseData->Delta.x * mouseData->Sensitivity.y * deltaTime,
-                     0}});
+            eulerAngles, (vec3s){{-mouseData->Delta.y * deltaTime,
+                                  -mouseData->Delta.x * deltaTime, 0}});
         cameraSetEulerAngles(camera, eulerAngles);
 
         movementInput = (vec3s){{
