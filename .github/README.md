@@ -56,8 +56,9 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
         - [X] color importing (diffuse, ambient, etc.)
         - [X] texture importing
     - [X] skybox
-    - [X] refactoring
+    - [ ] refactoring
         - [X] optimizations
+            - [ ] improved window/input systems `<------------- WE ARE HERE`
             - [X] camera UBO
             - [X] light scene UBO
             - [X] shaders
