@@ -8,9 +8,7 @@
 InputEvent *_events;
 int _eventCount;
 
-extern vec2s mousePosition;
-extern vec2s mouseDelta;
-extern vec2s mouseSensitivity;
+MouseInput *_mouseData = NULL;
 
 void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,
                       int mods);
@@ -22,8 +20,12 @@ void inputSetEvents(InputEvent *events, int eventCount) {
 void inputInit(Window *window) {
     glfwSetInputMode(window->glWin, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window->glWin, inputKeyCallback);
-    mouseSensitivity = (vec2s){{0.25f, 0.25f}};
 
+    if (_mouseData == NULL) {
+        _mouseData = malloc(sizeof(MouseInput));
+        memset(_mouseData, 0, sizeof(MouseInput));
+        _mouseData->Sensitivity = GLMS_VEC2_ONE;
+    }
     printf("Initialized input\n");
 }
 void inputUpdate() {
@@ -55,13 +57,14 @@ void inputUpdate() {
         }
     }
 }
-void inputMouseUpdate(Window *window) {
+void inputMouseUpdate(Window *mainWindow) {
     double xPosition, yPosition;
-    glfwGetCursorPos(window->glWin, &xPosition, &yPosition);
+    glfwGetCursorPos(mainWindow->glWin, &xPosition, &yPosition);
     vec2s newPosition = (vec2s){{xPosition, yPosition}};
-    mouseDelta = glms_vec2_sub(newPosition, mousePosition);
-    mousePosition = newPosition;
+    _mouseData->Delta = glms_vec2_sub(newPosition, _mouseData->Position);
+    _mouseData->Position = newPosition;
 }
+MouseInput *inputGetMouseData() { return _mouseData; }
 InputEvent *inputGetEvent(char *eventName) {
     for (int i = 0; i < _eventCount; i++) {
         if (strcmp(_events[i].Name, eventName) == 0)
@@ -69,6 +72,11 @@ InputEvent *inputGetEvent(char *eventName) {
     }
     fprintf(stderr, "Couldn't find input event '%s'\n", eventName);
     return NULL;
+}
+void inputDeInit() {
+    if (_mouseData == NULL)
+        return;
+    free(_mouseData);
 }
 
 void inputKeyCallback(GLFWwindow *window, int key, int scancode, int action,

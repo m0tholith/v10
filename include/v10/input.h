@@ -3,6 +3,7 @@
 
 #include "v10/window.h"
 #include <GLFW/glfw3.h>
+#include <cglm/types-struct.h>
 #include <stdint.h>
 
 struct InputKey {
@@ -33,10 +34,21 @@ typedef struct {
     char *Name;
 } InputEvent;
 
+typedef struct {
+    vec2s Position;
+    vec2s Delta;
+    vec2s Sensitivity;
+} MouseInput;
+
 void inputInit(Window *window);
 void inputSetEvents(InputEvent *events, int eventCount);
 void inputUpdate();
-void inputMouseUpdate(Window *window);
+void inputMouseUpdate(Window *mainWindow);
+/**
+ * @return: Pointer to mouse input struct; usable until input deinit
+ */
+MouseInput *inputGetMouseData();
 InputEvent *inputGetEvent(char *eventName);
+void inputDeInit();
 
 #endif // !INPUT_H

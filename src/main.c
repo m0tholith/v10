@@ -28,10 +28,7 @@
 #define EVENT_COUNT 3
 
 Window *window;
-
-vec2s mousePosition;
-vec2s mouseDelta;
-vec2s mouseSensitivity;
+MouseInput *mouseData = NULL;
 
 // just to make the main function more easily accessible
 InputEvent *getInputEventArray();
@@ -44,6 +41,8 @@ int main(void) {
     InputEvent *events = getInputEventArray();
     inputSetEvents(events, EVENT_COUNT);
     inputInit(window);
+    mouseData = inputGetMouseData();
+    mouseData->Sensitivity = glms_vec2_scale(GLMS_VEC2_ONE, 0.25f);
 #ifdef ENABLE_ERRORCHECKING
     errorInit();
 #endif
@@ -204,8 +203,9 @@ int main(void) {
         inputMouseUpdate(window);
         eulerAngles = glms_vec3_add(
             eulerAngles,
-            (vec3s){{-mouseDelta.y * mouseSensitivity.x * deltaTime,
-                     -mouseDelta.x * mouseSensitivity.y * deltaTime, 0}});
+            (vec3s){{-mouseData->Delta.y * mouseData->Sensitivity.x * deltaTime,
+                     -mouseData->Delta.x * mouseData->Sensitivity.y * deltaTime,
+                     0}});
         cameraSetEulerAngles(camera, eulerAngles);
 
         movementInput = (vec3s){{
@@ -340,6 +340,7 @@ int main(void) {
 
     windowClose(window);
 
+    inputDeInit();
     windowManagerDeInit();
 
     freeInputEventArray(events);
