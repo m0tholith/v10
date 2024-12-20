@@ -2,7 +2,6 @@
 
 #include "v10/framebuffer.h"
 #include "v10/lib/glad/glad.h"
-#include "v10/window.h"
 #include <GL/gl.h>
 #include <cglm/struct/affine-mat.h>
 #include <cglm/struct/cam.h>

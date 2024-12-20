@@ -3,7 +3,6 @@
 
 #include "v10/lib/list.h"
 #include <stdint.h>
-#include <string.h>
 
 #define SHADERS_PATH "shaders/"
 

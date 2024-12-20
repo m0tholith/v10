@@ -1,6 +1,8 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include <string.h>
+
 #define LIST(__type)                                                           \
     struct {                                                                   \
         size_t size, capacity;                                                 \
