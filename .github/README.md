@@ -74,6 +74,8 @@ if you use `nix-direnv` then you can call `direnv allow` to automatically enter 
         - [ ] bloom
         - [ ] post processing pipeline
     - [ ] convert to vulkan
+- [ ] @ entity component system
+- [ ] dynamic animation system
 - [ ] serialization
 - [ ] physics engine
 - [ ] sound engine
