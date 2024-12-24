@@ -1,10 +1,23 @@
 #include "v10/window.h"
 
+#include "v10/lib/list.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
-    glViewport(0, 0, width, height);
+LIST(Window *) _windows;
+
+void windowSizeCallback(GLFWwindow *window, int width, int height) {
+    if (_windows == NULL)
+        return;
+    Window *win;
+    for (int i = 0; i < _windows->size; i++) {
+        win = LIST_IDX(_windows, i);
+        if (win->glWin == window) {
+            win->Width = width;
+            win->Height = height;
+            return;
+        }
+    }
 }
 void glfwErrorCallback(int errorCode, const char *description) {
     printf("GLFW error code 0x%04X:\n\t%s\n", errorCode, description);
@@ -14,6 +27,8 @@ void windowManagerInit() {
     glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
     glfwInit();
     glfwSetErrorCallback(glfwErrorCallback);
+
+    LIST_INIT(_windows, 2);
 }
 Window *windowCreate(int width, int height, char *title) {
     Window *window = malloc(sizeof(Window));
@@ -46,8 +61,10 @@ Window *windowCreate(int width, int height, char *title) {
 
     glViewport(0, 0, window->Width, window->Height);
     glEnable(GL_DEPTH_TEST);
-    glfwSetFramebufferSizeCallback(window->glWin, framebufferSizeCallback);
+    glfwSetWindowSizeCallback(window->glWin, windowSizeCallback);
     glfwFocusWindow(window->glWin);
+
+    LIST_APPEND(_windows, window);
 
     return window;
 }
@@ -64,4 +81,7 @@ void windowClose(Window *window) {
     glfwDestroyWindow(window->glWin);
     free(window);
 }
-void windowManagerDeInit() { glfwTerminate(); }
+void windowManagerDeInit() {
+    glfwTerminate();
+    LIST_FREE(_windows);
+}
