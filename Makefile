@@ -1,9 +1,9 @@
 # options
 CC=clang
 DEBUG?=yes
-ENABLE_ERRORCHECKING?=yes
 CREATE_SO?=
-OPTIONS=
+ARGS=
+OPTIONS=ENABLE_ERRORCHECKING
 CFILES=src/v10/model.c \
        src/v10/cubemap.c \
        src/v10/armature.c \
@@ -44,17 +44,18 @@ LIBS=gl glfw3 cglm assimp
 INCLUDE_OPTS=$(foreach DIR,$(INCLUDE_DIRS),-I$(DIR))
 ifeq ($(DEBUG), )
 else
-	OPTIONS+=-g
+	ARGS+=-g
 endif
-CFLAGS=-Wall -Werror -MMD $(INCLUDE_OPTS) $(OPTIONS) \
+CFLAGS=-Wall -Werror -MMD $(INCLUDE_OPTS) $(ARGS) \
 	   $(shell pkg-config --cflags $(LIBS))
 LDFLAGS=-lm $(shell pkg-config --libs $(LIBS))
 PCHFLAGS=$(foreach PCH,$(PCHFILES),-include-pch $(PCH))
+OPTFLAGS=$(foreach OPT,$(OPTIONS),-D$(OPT))
 ifeq ($(CREATE_SO), )
 	CFILES+=src/main.c
 else
 	RESULT=$(LIBRARY_NAME)
-	OPTIONS+=-fpic
+	ARGS+=-fpic
 	LDFLAGS+=-shared
 endif
 
@@ -73,12 +74,12 @@ $(RESULT): $(OBJECTS) $(PCHFILES)
 $(BUILD_DIR)/%.o: %.c $(PCHFILES)
 	@printf "$(COUT_GREEN)Compiling $<$(COUT_NORMAL) ($(COUT_YELLOW)$@$(COUT_NORMAL))\n"
 	@mkdir -p $(@D)
-	@$(CC) $(CFLAGS) $(PCHFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(PCHFLAGS) $(OPTFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/%.pch: %.h
 	@printf "$(COUT_GREEN)Compiling $<$(COUT_NORMAL) ($(COUT_YELLOW)$@$(COUT_NORMAL))\n"
 	@mkdir -p $(@D)
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) $(OPTFLAGS) -c -o $@ $<
 
 compile_commands.json:
 	make clean
